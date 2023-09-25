@@ -1,0 +1,24 @@
+.fixed-box {
+  position: fixed;
+}
+
+.absolute-box {
+  position: absolute;
+}
+
+.relative-box {
+  position: relative;
+}
+
+.top-box {
+  top: 0;
+}
+
+.bottom-box {
+  bottom: 0;
+}
+
+.full-container {
+  width: 100%;
+  height: 100%;
+}

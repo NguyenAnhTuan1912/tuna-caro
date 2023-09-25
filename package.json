@@ -1,0 +1,18 @@
+{
+  "name": "caro-game",
+  "version": "1.0.0",
+  "description": "I build real-time caro game with React, Socket and Express.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "caro game",
+    "real-time caro game",
+    "react",
+    "socket",
+    "express"
+  ],
+  "author": "Nguyen Anh Tuan",
+  "license": "ISC"
+}

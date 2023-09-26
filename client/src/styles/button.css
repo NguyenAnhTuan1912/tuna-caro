@@ -1,0 +1,18 @@
+@import url("./variables.css");
+
+.btn {
+  padding: 12px 24px;
+  background-color: var(--clr-background);
+}
+
+.btn:hover {
+  background-color: rgba(var(--clr-rgb-onBackground), .05);
+}
+
+.btn-transparent {
+  background-color: transparent;
+}
+
+.btn-transparent:hover {
+  background-color: rgba(var(--clr-rgb-onBackground), .05);
+}

@@ -1,3 +1,5 @@
+@import url("./variables.css");
+
 .fixed-box {
   position: fixed;
 }
@@ -21,4 +23,113 @@
 .full-container {
   width: 100%;
   height: 100%;
+}
+
+.flex-box {
+  display: flex;
+}
+
+/* FLEX DIRECTION */
+.flex-rw {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+/* JUSTIFY CONTENT */
+.jc-center {
+  justify-content: center;
+}
+
+.jc-flex-start {
+  justify-content: flex-end;
+}
+
+.jc-flex-end {
+  justify-content: flex-end;
+}
+
+.jc-space-between {
+  justify-content: space-between;
+}
+
+.jc-space-around {
+  justify-content: space-around;
+}
+
+.jc-space-evenly {
+  justify-content: space-evenly;
+}
+
+/* ALIGN ITEMS */
+.ait-center {
+  align-items: center;
+}
+
+.ait-flex-start {
+  align-items: flex-start;
+}
+
+.ait-flex-end {
+  align-items: flex-end;
+}
+
+/* OUTLINE */
+.no-outline {
+  outline: none;
+  border: none;
+}
+
+.outline {
+  outline: 2px solid var(--clr-onBackground);
+  border: 2px solid var(--clr-onBackground);
+}
+
+.spe-outline {
+  border: 2px solid var(--clr-onBackground);
+  border-bottom: 5px solid var(--clr-onBackground);
+}
+
+/* SIZE */
+.w-100 {
+  width: 100%;
+}
+
+.w-75 {
+  width: 75%;
+}
+
+.w-50 {
+  width: 50%;
+}
+
+.w-25 {
+  width: 25%;
+}
+
+.w-0 {
+  width: 0;
+}
+
+/* App Header */
+.app-header {
+  position: sticky;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  top: 0;
+  background-color: var(--clr-background);
+  border-bottom: 2px solid var(--clr-onBackground);
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background-color: var(--clr-background);
+  border-top: 2px solid var(--clr-onBackground);
 }

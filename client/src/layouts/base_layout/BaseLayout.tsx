@@ -8,7 +8,9 @@ import { BaseLayoutProps } from './BaseLayout.props';
 export default function BaseLayout(props: BaseLayoutProps) {
   return (
     <>
-      <Header />
+      <Header
+        title={props.headerTitle}
+      />
       { props.children }
       <Footer />
     </>

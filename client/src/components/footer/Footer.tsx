@@ -4,6 +4,8 @@ import { FooterProps } from './Footer.props';
 
 export default function Footer(props: FooterProps) {
   return (
-    <div className="fixed-box bottom-box p-2">Footer</div>
+    <div className="app-footer p-2">
+      <span>bởi <strong>Nguyen Anh Tuan</strong></span>
+    </div>
   )
 }

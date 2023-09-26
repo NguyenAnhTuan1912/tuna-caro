@@ -2,8 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 
 // Import component
-import MyInput from 'src/components/my_input/MyInput';
 
+// Import types
 import { HomePageProps } from './HomePage.props';
 
 // Import styles

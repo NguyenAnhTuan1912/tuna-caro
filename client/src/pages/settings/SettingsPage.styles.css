@@ -1,0 +1,11 @@
+.settings {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

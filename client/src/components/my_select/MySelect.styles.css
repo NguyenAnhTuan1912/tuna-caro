@@ -1,0 +1,26 @@
+.select-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 180px;
+}
+
+.select-placeholder {
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.options-container {
+  position: absolute;
+  width: calc(100% + 4px);
+  background-color: var(--clr-background);
+  top: 100%;
+  right: -2px;
+  z-index: 10;
+}
+
+.options {
+  position: relative;
+}

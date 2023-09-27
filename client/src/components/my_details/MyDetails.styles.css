@@ -1,0 +1,9 @@
+.details {
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+}
+
+.details summary::marker {
+  font-size: 0;
+}

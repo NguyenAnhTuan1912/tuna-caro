@@ -1,4 +1,6 @@
 .btn {
+  cursor: pointer;
+  user-select: none;
   padding: 12px 24px;
   background-color: var(--clr-background);
 }
@@ -8,6 +10,8 @@
 }
 
 .btn-transparent {
+  cursor: pointer;
+  user-select: none;
   background-color: transparent;
 }
 

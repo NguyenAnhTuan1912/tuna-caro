@@ -42,7 +42,7 @@ export default function GameCreatingDialog(props: CustomizedModalItemProps) {
           <div>
             <p>Lưu ý:</p>
             <p>Mật khẩu không bắt buộc.</p>
-          </div>
+          </div> 
           <button
             type="button"
             className="btn spe-outline"

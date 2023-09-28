@@ -130,7 +130,7 @@
   top: 0;
   background-color: var(--clr-background);
   border-bottom: 2px solid var(--clr-onBackground);
-  z-index: 999;
+  z-index: 5;
 }
 
 .app-footer {

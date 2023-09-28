@@ -1,5 +1,7 @@
-import React from 'react'
+import React from 'react';
+import { openTMI } from "tunangn-react-modal";
 
+// Import types
 import { HeaderProps } from './Header.props';
 
 export default function Header(props: HeaderProps) {
@@ -19,7 +21,10 @@ export default function Header(props: HeaderProps) {
         <button className="btn-transparent no-outline rounded-8 p-1 me-1">
           <span className="material-symbols-outlined">dark_mode</span>
         </button>
-        <button className="btn-transparent no-outline rounded-8 p-1">
+        <button
+          onClick={() => { openTMI("mySideMenu") }}
+          className="btn-transparent no-outline rounded-8 p-1"
+        >
           <span className="material-symbols-outlined">menu</span>
         </button>
       </div>

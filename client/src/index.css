@@ -29,3 +29,7 @@ input[type=checkbox],
 input[type=radio] {
   cursor: pointer;
 }
+
+.tunangn-modal {
+  z-index: 999;
+}

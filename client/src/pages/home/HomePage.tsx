@@ -1,5 +1,6 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { openTMI } from 'tunangn-react-modal';
 
 // Import component
 
@@ -12,12 +13,29 @@ import "./HomePage.styles.css";
 export default function HomePage(props: HomePageProps) {
   return (
     <div className="home-page full-container p-2">
-      <h1>Hello, Welcome to Home Page!</h1>
+      <h1 className="txt-center">Trang chủ</h1>
       <div className="home-page-menu w-100 pt-4">
-      <button className="btn spe-outline w-100 mb-1">Tạo trò chơi</button>
-        <button className="btn spe-outline w-100 mb-1">Tìm người chơi</button>
-        <Link to={"/rooms"}><button className="btn spe-outline w-100 mb-1">Khám phá</button></Link>
-        <Link to={"/settings"}><button className="btn spe-outline w-100 mb-1">Cài đặt</button></Link>
+        <button
+          className="btn spe-outline w-100"
+        >Chơi hai người</button>
+
+        <hr className="my-4"></hr>
+
+        <button
+          onClick={() => openTMI("myGameCreatingDialog")}
+          className="btn spe-outline w-100 mb-1"
+        ><strong className="txt-clr-primary">Tạo phòng chơi trực tuyến</strong></button>
+
+        <button
+          onClick={() => { openTMI("myGameFindingDialog") }}
+          className="btn spe-outline w-100 mb-1"
+        >Tìm người chơi</button>
+
+        <Link to={"/rooms"}><button className="btn spe-outline w-100">Khám phá</button></Link>
+
+        <hr className="my-4"></hr>
+
+        <Link to={"/settings"}><button className="btn spe-outline w-100">Cài đặt</button></Link>
       </div>
     </div>
   )

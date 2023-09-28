@@ -1,12 +1,12 @@
+.btn-no-padd,
 .btn {
   cursor: pointer;
   user-select: none;
-  padding: 12px 24px;
   background-color: var(--clr-background);
 }
 
-.btn:hover {
-  background-color: rgba(var(--clr-rgb-onBackground), .05);
+.btn {
+  padding: 12px 24px;
 }
 
 .btn-transparent {
@@ -15,6 +15,8 @@
   background-color: transparent;
 }
 
-.btn-transparent:hover {
-  background-color: rgba(var(--clr-rgb-onBackground), .05);
+.btn:hover,
+.btn-transparent:hover,
+.btn-no-padd:hover {
+  background-color: rgb(var(--clr-rgb-subOutline));
 }

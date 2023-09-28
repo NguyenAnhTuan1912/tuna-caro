@@ -1,4 +1,4 @@
-/* FONT */
+/* EXTRA FONT SIZE */
 .fs-xxl {
   font-size: calc(var(--fs) * 4);
 }
@@ -10,7 +10,8 @@
 .fs-l {
   font-size: calc(var(--fs) * 3);
 }
-/* === */
+
+/* FONT SIZE */
 .fs-0 {
   font-size: calc(var(--fs) * 2);
 }
@@ -35,6 +36,7 @@
   font-size: calc(var(--fs) * .81);
 }
 
+/* FONT WEIGHT */
 .fw-thin {
   font-weight: 100;
 }
@@ -71,6 +73,7 @@
   font-weight: 900;
 }
 
+/* TEXT COLOR */
 .txt-clr-primary {
   color: var(--clr-primary)
 }
@@ -105,4 +108,17 @@
 
 .txt-clr-success {
   color: var(--clr-success)
+}
+
+/* TEXT ALIGN */
+.txt-center {
+  text-align: center;
+}
+
+.txt-left {
+  text-align: left;
+}
+
+.txt-right {
+  text-align: right;
 }

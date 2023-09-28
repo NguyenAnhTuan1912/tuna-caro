@@ -14,7 +14,7 @@ import './SettingsPage.styles.css';
 export default function SettingsPage(props: SettingsPageProps) {
   return (
     <div className="settings-page full-container p-2">
-      <h1>Cài đặt</h1>
+      <h1 className="txt-center">Cài đặt</h1>
       <div className="settings">
         <h3>Hệ thống</h3>
         <div className="ps-1 pt-1">

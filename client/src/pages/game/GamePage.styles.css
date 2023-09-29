@@ -1,0 +1,11 @@
+.game-page {
+  overflow: hidden;
+  width: 100%;
+  height: calc(100vh - 86px);
+}
+
+.grid-controller {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}

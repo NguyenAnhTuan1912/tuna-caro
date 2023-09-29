@@ -1,0 +1,22 @@
+.btn-no-padd,
+.btn {
+  cursor: pointer;
+  user-select: none;
+  background-color: var(--clr-background);
+}
+
+.btn {
+  padding: 12px 24px;
+}
+
+.btn-transparent {
+  cursor: pointer;
+  user-select: none;
+  background-color: transparent;
+}
+
+.btn:hover,
+.btn-transparent:hover,
+.btn-no-padd:hover {
+  background-color: rgb(var(--clr-rgb-subOutline));
+}

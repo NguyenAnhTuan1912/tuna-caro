@@ -1,0 +1,7 @@
+#gridContainer {
+  cursor: pointer;
+}
+
+.grid-float-container {
+  position: fixed;
+}

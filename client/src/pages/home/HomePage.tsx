@@ -15,9 +15,7 @@ export default function HomePage(props: HomePageProps) {
     <div className="home-page full-container p-2">
       <h1 className="txt-center">Trang chủ</h1>
       <div className="home-page-menu w-100 pt-4">
-        <button
-          className="btn spe-outline w-100"
-        >Chơi hai người</button>
+        <Link to={"/game"}><button className="btn spe-outline w-100">Chơi 2 người</button></Link>
 
         <hr className="my-4"></hr>
 

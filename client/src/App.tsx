@@ -52,7 +52,7 @@ function App() {
         <Route
           path='/game'
           element={
-            <BaseLayout headerTitle={"Game"}>
+            <BaseLayout headerTitle={"Game"} shownFooter={false}>
               <GamePage />
             </BaseLayout>
           }

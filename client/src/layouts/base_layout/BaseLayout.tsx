@@ -5,6 +5,11 @@ import Footer from 'src/components/footer/Footer';
 
 import { BaseLayoutProps } from './BaseLayout.props';
 
+/**
+ * Use this component to create a base layout for pages.
+ * @param props 
+ * @returns 
+ */
 export default function BaseLayout(props: BaseLayoutProps) {
   return (
     <>
@@ -12,7 +17,7 @@ export default function BaseLayout(props: BaseLayoutProps) {
         title={props.headerTitle}
       />
       { props.children }
-      <Footer />
+      { (props.shownFooter === true || props.shownFooter === undefined) && <Footer /> }
     </>
   )
 }

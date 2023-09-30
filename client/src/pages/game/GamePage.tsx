@@ -9,10 +9,23 @@ import { GamePageProps } from './GamePage.props';
 // Import styles
 import './GamePage.styles.css';
 
+interface GamePageElements {
+  page: HTMLDivElement | null
+}
+
 export default function GamePage(props: GamePageProps) {
+  const elementRefs = React.useRef<GamePageElements>({
+    page: null
+  });
+
+  React.useEffect(() => {
+    elementRefs.current.page?.scrollTo({ top: 750, left: 750 });
+  }, []);
+
   return (
-    <div className="game-page">
+    <div ref={ref => elementRefs.current.page = ref} className="game-page">
       <Grid
+        height={"100%"}
         renderItem={(beh) => (
           <div className="grid-controller p-1 flex-box flex-col">
             <span

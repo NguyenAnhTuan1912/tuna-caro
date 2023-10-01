@@ -1,4 +1,4 @@
-#gridContainer {
+#grid {
   cursor: pointer;
 }
 
@@ -13,6 +13,7 @@
   width: 300%;
   height: 300vh;
   transform: scale(1);
+  transform-origin: 0 0;
 }
 
 .grid-float-container {

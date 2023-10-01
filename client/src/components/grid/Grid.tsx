@@ -1,5 +1,8 @@
 import React from 'react'
 
+// Import utils
+import { NumberUtils } from 'src/utils/number';
+
 // Import types
 import { GridProps, GridBehaviorFns } from './Grid.props'
 
@@ -77,10 +80,22 @@ function zoom(elements: GridElements, squareSize: number, s: number, options?: Z
   elements.bigSquareRect?.setAttribute("height", `${newBigSquareSize}`);
 }
 
-function scale<T extends HTMLElement>(element: T, value: number, limit: (value: number) => boolean) {
-  const scaleValue = getScaleValue(element);
-  if(limit(scaleValue))
-    element.style.setProperty("transform", `scale(${scaleValue + value})`);
+/**
+ * Use to scale a `element` with initial `value` and a `limit` function. If this element can scale, then return
+ * new scaleValue, if not, return old value.
+ * @param element 
+ * @param value 
+ * @param limit 
+ * @returns 
+ */
+function scale<T extends HTMLElement>(element: T, value: number, limit: (value: number) => boolean, scaleValue: number) {
+  scaleValue = scaleValue ? scaleValue : getScaleValue(element);
+  if(limit(scaleValue)) {
+    scaleValue = NumberUtils.roundTo(scaleValue + value);
+    element.style.setProperty("transform", `scale(${scaleValue})`);
+    return scaleValue;
+  }
+  return scaleValue;
 }
 
 /**
@@ -127,12 +142,40 @@ export default function Grid({
     s: 5,
     maxT: 70,
     minT: 30,
+    /**
+     * Max scalable value of GridWrapper
+     */
     maxSVOGridWrapper: 2,
+    /**
+     * Min scalable value of GridWrapper
+     */
     minSVOGridWrapper: 1,
+    /**
+     * Center X of Scrollable
+     */
     centerXOfScrollable: 0,
+    /**
+     * Center Y of Scrollable
+     */
     centerYOfScrollable: 0,
     isMouseDown: false,
-    isSpaceDown: false
+    isSpaceDown: false,
+    /**
+     * Original scroll height of grid
+     */
+    originalScrollHGrid: elementRefs.current.grid?.scrollHeight,
+    /**
+     * Original scroll width of grid
+     */
+    originalScrollWGrid: elementRefs.current.grid?.scrollWidth,
+    /**
+     * Current scale value of Grid Wrapper.
+     */
+    currentScaleValue: 1,
+    /**
+     * Height of header
+     */
+    headerHeight: 0
   });
 
   /**
@@ -141,10 +184,20 @@ export default function Grid({
   const behaviorFns: GridBehaviorFns = React.useMemo(() => {
     return {
       zoomIn: function() {
-        scale(elementRefs.current.gridWrapper!, 0.1, (val) => val < gridData.current.maxSVOGridWrapper);
+        gridData.current.currentScaleValue = scale(
+          elementRefs.current.gridWrapper!,
+          0.1,
+          (val) => val < gridData.current.maxSVOGridWrapper,
+          gridData.current.currentScaleValue
+        );
       },
       zoomOut: function() {
-        scale(elementRefs.current.gridWrapper!, -(0.1), (val) => val > gridData.current.minSVOGridWrapper);
+        gridData.current.currentScaleValue = scale(
+          elementRefs.current.gridWrapper!,
+          -(0.1),
+          (val) => val > gridData.current.minSVOGridWrapper,
+          gridData.current.currentScaleValue
+        );
       }
     }
   }, []);
@@ -177,6 +230,7 @@ export default function Grid({
       handleKeydownOnGridBase: function(e: KeyboardEvent) {
         if(e.key === " " && e.target === document.body) {
           e.preventDefault();
+          elementRefs.current.grid!.style.cursor = "grab";
           gridData.current.isSpaceDown = true;
         }
       },
@@ -184,6 +238,7 @@ export default function Grid({
       handleKeyupOnGridBase: function(e: KeyboardEvent) {
         if(e.key === " " && e.target === document.body) {
           e.preventDefault();
+          elementRefs.current.grid!.style.cursor = "pointer";
           gridData.current.isSpaceDown = false;
         }
       }
@@ -192,12 +247,26 @@ export default function Grid({
 
   // TO DO: Process all the behaviour in here.
   React.useEffect(() => {
+    let boundingRectOfGrid = elementRefs.current.grid?.getBoundingClientRect();
+    // Set some values
     if(!gridData.current.centerXOfScrollable) {
       gridData.current.centerXOfScrollable = (elementRefs.current.gridWrapper?.offsetWidth! - window.innerWidth) / 2;
     }
 
     if(!gridData.current.centerYOfScrollable) {
       gridData.current.centerYOfScrollable = (elementRefs.current.gridWrapper?.offsetHeight! - window.innerHeight) / 2;
+    }
+
+    if(!gridData.current.originalScrollWGrid) {
+      gridData.current.originalScrollWGrid = boundingRectOfGrid?.width;
+    }
+
+    if(!gridData.current.originalScrollHGrid) {
+      gridData.current.originalScrollHGrid = boundingRectOfGrid?.height;
+    }
+
+    if(!gridData.current.headerHeight) {
+      gridData.current.headerHeight = document.getElementById("app-header")?.offsetHeight!;
     }
 
     // Initially scroll to center of grid.
@@ -234,11 +303,27 @@ export default function Grid({
       <div ref={ref => elementRefs.current.gridWrapper = ref} className="grid-wrapper">
         <svg
           ref={ref => elementRefs.current.grid = ref}
-          id="gridContainer"
+          id="grid"
           width={width}
           height={height}
           xmlns="http://www.w3.org/2000/svg"
           onClick={(e) => {
+            let headerHeight = document.getElementById("app-header")?.offsetHeight!;
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+            let scrolledX = elementRefs.current.gridBase?.scrollLeft;
+            let scrolledY = elementRefs.current.gridBase?.scrollTop;
+            let coorX = NumberUtils.roundTo((clientX + scrolledX!) / gridData.current.currentScaleValue);
+            let coorY = NumberUtils.roundTo((clientY + scrolledY! - headerHeight) / gridData.current.currentScaleValue);
+            let boundingRectOfGrid = elementRefs.current.grid?.getBoundingClientRect();
+            let deltaSW = Math.abs(boundingRectOfGrid?.width! - gridData.current.originalScrollWGrid!);
+            let deltaSH = Math.abs(boundingRectOfGrid?.height! - gridData.current.originalScrollHGrid!);
+
+            console.log(`Scale value: ${gridData.current.currentScaleValue}`);
+            console.log(`Client X, Y: ${clientX}, ${clientY}`);
+            console.log(`Scrolled X, Y: ${scrolledX}, ${scrolledY}`);
+            console.log(`Coordinate: ${coorX}, ${coorY}`);
+            console.log(`Delta ${deltaSW}, ${deltaSH}`);
           }}
         >
           <defs>
@@ -266,20 +351,22 @@ export default function Grid({
             </pattern>
           </defs>
           {/* Test */}
-          <path
-            d="M 1515, 1515
-            m 15, 0
-            a 15,15 0 1,0 -30,0
-            a 15,15 0 1,0  30,0
-            M 405, 405
-            m 15, 0
-            a 15,15 0 1,0 -30,0
-            a 15,15 0 1,0  30,0
+          {/* <path
+            d="
+              M 1515, 1515
+              m 15, 0
+              a 15,15 0 1,0 -30,0
+              a 15,15 0 1,0  30,0
+              M 405, 405
+              m 15, 0
+              a 15,15 0 1,0 -30,0
+              a 15,15 0 1,0  30,0
             "
             stroke="red"
             strokeWidth="2"
             fill="none"
-          />
+          /> */}
+          <circle cx="1815" cy="1215" r={(gridData.current.t / 2) - 5} stroke="red" strokeWidth="2" fill="none" />
           <rect width="100%" height="100%" fill="url(#bigSquare)" />
         </svg>
       </div>

@@ -1,7 +1,16 @@
 .game-page {
-  overflow: hidden;
   width: 100%;
   height: calc(100vh - 86px);
+}
+
+.guide {
+  position: fixed;
+  top: 86px;
+  right: 0;
+}
+
+.keyguide {
+  background-color: var(--clr-background);
 }
 
 .grid-controller {

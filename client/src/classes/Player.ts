@@ -7,9 +7,9 @@ export class Player {
   mark?: string;
   isWinner!: boolean;
 
-  constructor(id: string) {
+  constructor(id: string, name?: string) {
     this.id = id;
-    this.name = "player-" + id;
+    this.name = name ? name : "player-" + id;
     this.isWinner = false;
   }
 

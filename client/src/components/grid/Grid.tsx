@@ -163,11 +163,11 @@ export default function Grid({
     /**
      * Original scroll height of grid
      */
-    originalScrollHGrid: elementRefs.current.grid?.scrollHeight,
+    originalScrollHGrid: 0,
     /**
      * Original scroll width of grid
      */
-    originalScrollWGrid: elementRefs.current.grid?.scrollWidth,
+    originalScrollWGrid: 0,
     /**
      * Current scale value of Grid Wrapper.
      */
@@ -258,11 +258,11 @@ export default function Grid({
     }
 
     if(!gridData.current.originalScrollWGrid) {
-      gridData.current.originalScrollWGrid = boundingRectOfGrid?.width;
+      gridData.current.originalScrollWGrid = boundingRectOfGrid?.width!;
     }
 
     if(!gridData.current.originalScrollHGrid) {
-      gridData.current.originalScrollHGrid = boundingRectOfGrid?.height;
+      gridData.current.originalScrollHGrid = boundingRectOfGrid?.height!;
     }
 
     if(!gridData.current.headerHeight) {
@@ -315,17 +315,18 @@ export default function Grid({
             let scrolledY = elementRefs.current.gridBase?.scrollTop;
             let coorX = NumberUtils.roundTo((clientX + scrolledX!) / gridData.current.currentScaleValue);
             let coorY = NumberUtils.roundTo((clientY + scrolledY! - headerHeight) / gridData.current.currentScaleValue);
-            let boundingRectOfGrid = elementRefs.current.grid?.getBoundingClientRect();
-            let deltaSW = Math.abs(boundingRectOfGrid?.width! - gridData.current.originalScrollWGrid!);
-            let deltaSH = Math.abs(boundingRectOfGrid?.height! - gridData.current.originalScrollHGrid!);
+            let unitCoorX = Math.floor(coorX / gridData.current.t);
+            let unitCoorY = Math.floor(coorY / gridData.current.t);
 
-            console.log(`Scale value: ${gridData.current.currentScaleValue}`);
-            console.log(`Client X, Y: ${clientX}, ${clientY}`);
-            console.log(`Scrolled X, Y: ${scrolledX}, ${scrolledY}`);
-            console.log(`Coordinate: ${coorX}, ${coorY}`);
-            console.log(`Delta ${deltaSW}, ${deltaSH}`);
+            props.emitCoordinate(unitCoorX, unitCoorY, gridData.current.t);
+            // console.log(`Scale value: ${gridData.current.currentScaleValue}`);
+            // console.log(`Client X, Y: ${clientX}, ${clientY}`);
+            // console.log(`Scrolled X, Y: ${scrolledX}, ${scrolledY}`);
+            // console.log(`Coordinate: ${coorX}, ${coorY}`);
+            // console.log(`Delta ${deltaSW}, ${deltaSH}`);
           }}
         >
+          {/* Static element */}
           <defs>
             <pattern
               ref={ref => elementRefs.current.square = ref}
@@ -350,24 +351,10 @@ export default function Grid({
               />
             </pattern>
           </defs>
-          {/* Test */}
-          {/* <path
-            d="
-              M 1515, 1515
-              m 15, 0
-              a 15,15 0 1,0 -30,0
-              a 15,15 0 1,0  30,0
-              M 405, 405
-              m 15, 0
-              a 15,15 0 1,0 -30,0
-              a 15,15 0 1,0  30,0
-            "
-            stroke="red"
-            strokeWidth="2"
-            fill="none"
-          /> */}
-          <circle cx="1815" cy="1215" r={(gridData.current.t / 2) - 5} stroke="red" strokeWidth="2" fill="none" />
           <rect width="100%" height="100%" fill="url(#bigSquare)" />
+          <circle cx="75.5" cy="40.5" r="15" fill="none" stroke="red" strokeWidth="2"></circle>
+          {/* X and O will go here */}
+          { props.renderSVGElements && props.renderSVGElements() }
         </svg>
       </div>
       { props.renderItem && props.renderItem(behaviorFns) }

@@ -1,5 +1,12 @@
 import React from 'react';
 
+// Import class objects
+import { Game } from 'src/classes/Game';
+import { Player } from 'src/classes/Player';
+
+// Import hooks
+import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
+
 // Import components
 import Grid from 'src/components/grid/Grid';
 
@@ -18,7 +25,11 @@ interface KeyGuideProps {
   keys: string;
 }
 
-
+/**
+ * Component is used to render a guide for keys.
+ * @param props 
+ * @returns 
+ */
 function KeyGuide(props: KeyGuideProps) {
   return (
     <div className="keyguide">
@@ -29,23 +40,76 @@ function KeyGuide(props: KeyGuideProps) {
 }
 
 /**
- * Component use to render page of Game.
+ * Component is used to render page of Game.
  * @param props 
  * @returns 
  */
 export default function GamePage(props: GamePageProps) {
+  const [gameState, gameStateFns] = useStateWESSFns({
+    game: new Game("game-01", "Hello", new Player("player01", "Tuna Nguyen"), new Player("player02", "Tony"))
+  }, function(changeState) {
+    return {
+      /**
+       * Use to add mark to `markMap`.
+       * @param x 
+       * @param y 
+       * @param t 
+       */
+      addMark: function(x: number, y: number, t: number) {
+        changeState("game", function(game) {
+          let key = Game.createKey(x, y);
+          let less = 5;
+          let result;
+          let element = <path key={key} d={game.createPathDForX(x, y, t, less)} fill="none" stroke="red" strokeWidth="2" />;
+
+          if(game.currentTurn === "O") {
+            let cx = x * t + (t / 2);
+            let cy = y * t + (t / 2);
+            element = <circle key={key} cx={cx} cy={cy} r={t / 2 - less} fill="none" stroke="blue" strokeWidth="2"></circle>;
+          }
+
+          game.addMarkInfo(
+            key,
+            game.currentTurn,
+            element
+          );
+
+          if(game.currentTurn === "X") game.setTurn("O")
+          else game.setTurn("X");
+
+          result = game.findWinner(x, y);
+
+          if(result) {
+            game.setWinner(result.player);
+            console.log("Winner: ", result);
+          }
+          
+          return game;
+        });
+      }
+    }
+  });
+
   const elementRefs = React.useRef<GamePageElements>({
     page: null
   });
 
   React.useEffect(() => {
-    elementRefs.current.page?.scrollTo({ top: 750, left: 750 });
   }, []);
 
   return (
     <div ref={ref => elementRefs.current.page = ref} className="game-page">
       <Grid
         height={"100%"}
+        emitCoordinate={(x, y, t) => {
+          if(!gameState.game.hasMarkIn(x, y) && !gameState.game.hasWinner())
+            gameStateFns.addMark(x, y, t);
+        }}
+        renderSVGElements={() => {
+          return gameState.game.renderMarks(function(value) {
+            return value?.element!;
+          });
+        }}
         renderItem={(beh) => (
           <>
             <div className="guide p-1 m-3">
@@ -63,13 +127,13 @@ export default function GamePage(props: GamePageProps) {
                 onClick={() => { beh.zoomIn() }}
                 className="material-symbols-outlined btn-no-padd outline p-1"
               >
-                  add
+                add
               </span>
               <span
                 onClick={() => { beh.zoomOut() }}
                 className="material-symbols-outlined btn-no-padd spe-outline p-1"
               >
-                  remove
+                remove
               </span>
             </div>
           </>

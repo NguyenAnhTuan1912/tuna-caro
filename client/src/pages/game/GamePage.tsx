@@ -80,7 +80,7 @@ export default function GamePage(props: GamePageProps) {
           result = game.findWinner(x, y);
 
           if(result) {
-            game.setWiner(result.player);
+            game.setWinner(result.player);
             console.log("Winner: ", result);
           }
           
@@ -96,8 +96,6 @@ export default function GamePage(props: GamePageProps) {
 
   React.useEffect(() => {
   }, []);
-
-  console.log("Game: ", gameState.game);
 
   return (
     <div ref={ref => elementRefs.current.page = ref} className="game-page">

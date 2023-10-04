@@ -1,6 +1,10 @@
 import { MyMap } from "src/objects/MyMap";
 import { Player } from "./Player";
 
+export type Coordinate = {
+  x: number;
+  y: number;
+};
 export type GameStatus = "Waiting" | "Playing";
 export type MarkType = "X" | "O";
 export type MarkInfoMapType = MyMap<string, MarkInfoType>;
@@ -30,12 +34,40 @@ export type DirectionCheckResultType = Array<{
  * Create a direction checker. Each case has 2 directions to check.
  */
 class DirectionChecker {
-  isDirecA!: boolean;
-  isDirecB!: boolean;
+  private A!: {
+    isDirecA: boolean;
+    isDirecB: boolean;
+  };
+  private B!: {
+    isDirecA: boolean;
+    isDirecB: boolean;
+  };
+  private C!: {
+    isDirecA: boolean;
+    isDirecB: boolean;
+  };
+  private D!: {
+    isDirecA: boolean;
+    isDirecB: boolean;
+  }
 
   constructor() {
-    this.isDirecA = true;
-    this.isDirecB = true;
+    this.A = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.B = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.C = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.D = {
+      isDirecA: true,
+      isDirecB: true
+    };
   }
 
   /**
@@ -44,30 +76,44 @@ class DirectionChecker {
    * @param table 
    * @returns 
    */
-  getDirectionChecker(table: MarkInfoMapType) {
+  getDirectionCheck(table: MarkInfoMapType) {
     let that = this;
-    return function(value: MarkInfoType, rowA: number, rowB: number, colA: number, colB: number) {
+    return function(value: MarkInfoType, _: CheckCaseLabels, rowA: number, rowB: number, colA: number, colB: number) {
       let coorA = Game.createKey(rowA, colA);
       let coorB = Game.createKey(rowB, colB);
       
-      if(table.get(coorA)?.value !== value.value && that.isDirecA) {
-        that.isDirecA = false;
+      if(table.get(coorA)?.value !== value.value && that[_].isDirecA) {
+        that[_].isDirecA = false;
       }
   
-      if(table.get(coorB)?.value !== value.value && that.isDirecB) {
-        that.isDirecB = false;
+      if(table.get(coorB)?.value !== value.value && that[_].isDirecB) {
+        that[_].isDirecB = false;
       }
       
-      return WinnerFinder.createDirectionCheckResult(coorA, that.isDirecA, coorB, that.isDirecB);
+      return WinnerFinder.createDirectionCheckResult(coorA, that[_].isDirecA, coorB, that[_].isDirecB);
     }
   }
 
   /**
-   * Reset directions for other cases.
+   * Use this method to reset all cases for other uses.
    */
   reset() {
-    this.isDirecA = true;
-    this.isDirecB = true;
+    this.A = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.B = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.C = {
+      isDirecA: true,
+      isDirecB: true
+    };
+    this.D = {
+      isDirecA: true,
+      isDirecB: true
+    };
   }
 }
 
@@ -113,6 +159,12 @@ class WinnerFinder {
     ];
   }
 
+  /**
+   * Use this method to update cases in `directionCheck`.
+   * @param $ 
+   * @param _ 
+   * @param result 
+   */
   private updateCase($: CheckWinnerCaseType, _: CheckCaseLabels, result: DirectionCheckResultType) {
     if(result[0] && result[0].isSatisfactory) {
       $[_]["satisfactionTimes"] += 1;
@@ -125,6 +177,66 @@ class WinnerFinder {
     }
   
     if(result[0].coor === result[1].coor) $[_]["satisfactionTimes"] -= 1;
+  }
+
+  /**
+   * Use this method to perform last check if "winner" is actually win.
+   * @param from 
+   * @param to 
+   */
+  private boundaryCheck(table: MarkInfoMapType, mark: MarkType, prevFrom: Coordinate, nextTo: Coordinate) {
+    let markAtFrom = table.get(Game.createKey(prevFrom.x, prevFrom.y));
+    let markAtTo = table.get(Game.createKey(nextTo.x, nextTo.y));
+
+    // If one of marks is undefined, then "winner" is actually win.
+    if(!markAtFrom || !markAtTo) return true;
+
+    // If there are different marks at boundaries, that mean "winner" is not win.
+    if(
+      markAtFrom.value !== mark
+      && markAtTo.value !== mark
+    ) {
+      console.log("Not win bro!");
+      return false;
+    };
+    return true;
+  }
+
+  /**
+   * Use this method to generally check for 4 cases.
+   * @param value 
+   * @param cases 
+   * @param directionCheck 
+   * @param c 
+   * @param times 
+   * @param rowA 
+   * @param rowB 
+   * @param colA 
+   * @param colB 
+   * @param callWhenTrue 
+   * @returns 
+   */
+  check<T extends Function>(
+    value: MarkInfoType,
+    cases: CheckWinnerCaseType,
+    directionCheck: T,
+    c: CheckCaseLabels,
+    times: number,
+    rowA: number, rowB: number, colA: number, colB: number,
+    callWhenTrue: () => void
+  ) {
+    let caseACheck = directionCheck(value, c, rowA, rowB, colA, colB);
+      
+    // Update case `c`
+    this.updateCase(cases, c, caseACheck);
+
+    if(times === cases[c].satisfactionTimes) {
+      // Set boundary when case `c`
+      callWhenTrue();
+      return WinnerFinder.createResult(value?.value, cases[c]["from"], cases[c]["to"]);
+    }
+
+    return undefined;
   }
 
   /**
@@ -145,33 +257,114 @@ class WinnerFinder {
         satisfactionTimes: 0,
         from: "",
         to: ""
+      },
+      B: {
+        satisfactionTimes: 0,
+        from: "",
+        to: ""
+      },
+      C: {
+        satisfactionTimes: 0,
+        from: "",
+        to: ""
+      },
+      D: {
+        satisfactionTimes: 0,
+        from: "",
+        to: ""
       }
     };
 
     let times = 5;
-    let directionChecker = this.directionChecker.getDirectionChecker(table);
+    let result;
+    let directionCheck = this.directionChecker.getDirectionCheck(table);
+    let boundaryCoors = {
+      from: { x: 0, y: 0 },
+      to: { x: 0, y: 0 }
+    };
     
     for(let i = 0; i < 5; i++) {
       // Case A
-      let caseACheck = directionChecker(value, row, row, col - i, col + i);
-      
-      // Update case A
-      this.updateCase(cases, "A", caseACheck);
-
-      if(times === cases["A"].satisfactionTimes) {
-        return WinnerFinder.createResult(value?.value, cases["A"]["from"], cases["A"]["to"]);
+      if(
+        (result = this.check(
+          value,
+          cases,
+          directionCheck,
+          "A",
+          times,
+          row, row, col - i, col + i,
+          () => {
+            // Set boundary when case A
+            Game.setCoordinate(boundaryCoors.from, row, col - i - 1);
+            Game.setCoordinate(boundaryCoors.to, row, col + 1);
+          }))
+      ) {
+        break;
       }
-      // Reset for resuse in other cases.
-      this.directionChecker.reset();
 
       // Case B
+      if(
+        (result = this.check(
+          value,
+          cases,
+          directionCheck,
+          "B",
+          times,
+          row - i, row + i, col, col,
+          () => {
+            // Set boundary when case A
+            Game.setCoordinate(boundaryCoors.from, row - i - 1, col);
+            Game.setCoordinate(boundaryCoors.to, row + 1, col);
+          }))
+      ) {
+        break;
+      }
 
       // Case C
+      if(
+        (result = this.check(
+          value,
+          cases,
+          directionCheck,
+          "C",
+          times,
+          row - i, row + i, col - i, col + i,
+          () => {
+            // Set boundary when case A
+            Game.setCoordinate(boundaryCoors.from, row - i - 1, col - i - 1);
+            Game.setCoordinate(boundaryCoors.to, row + 1, col + 1);
+          }))
+      ) {
+        break;
+      }
 
       // Case D
+      if(
+        (result = this.check(
+          value,
+          cases,
+          directionCheck,
+          "D",
+          times,
+          row - i, row + i, col + i, col - i,
+          () => {
+            // Set boundary when case A
+            Game.setCoordinate(boundaryCoors.from, row - i - 1, col + i + 1);
+            Game.setCoordinate(boundaryCoors.to, row + 1, col - 1);
+          }))
+      ) {
+        break;
+      }
+
+      // Reset
+      this.directionChecker.reset();
     }
     
-    return undefined;
+    if(result && !this.boundaryCheck(table, value.value, boundaryCoors.from, boundaryCoors.to)) {
+      return undefined;
+    }
+
+    return result;
   }
 }
 
@@ -189,6 +382,8 @@ export class Game {
   private markInfoMap!: MarkInfoMapType | null;
   private winnerFinder!: WinnerFinder | null;
 
+  static MarkInfoKeyPattern = /\((\d+),(\d+)\)/;
+
   constructor(id: string, name: string, player1: Player, player2: Player) {
     this.id = id;
     this.name = name;
@@ -200,6 +395,29 @@ export class Game {
     this.currentTurn = "X";
     this.markInfoMap = new MyMap();
     this.winnerFinder = new WinnerFinder(this.markInfoMap);
+  }
+
+  /**
+   * Use to create key for `MarkInfoMap`.
+   * @param unitCoorX 
+   * @param unitCoorY 
+   * @returns 
+   */
+  static createKey(unitCoorX: number, unitCoorY: number) {
+    return `(${unitCoorX},${unitCoorY})`;
+  }
+
+  /**
+   * Use to set coordinate.
+   * @param o 
+   * @param x 
+   * @param y 
+   * @returns 
+   */
+  static setCoordinate(o: Coordinate, x: number, y: number) {
+    o.x = x;
+    o.y = y;
+    return o;
   }
 
   // Use to clear some properties.
@@ -225,7 +443,7 @@ export class Game {
     this.currentTurn = turn;
   }
 
-  setWiner(mark: MarkType) {
+  setWinner(mark: MarkType) {
     this.players![mark].isWinner = true;
   }
 
@@ -286,16 +504,6 @@ export class Game {
     let bottomRight = `${coorX + t - less},${coorY + t - less}`;
 
     return `M ${topLeft} L ${bottomRight}  M ${topRight}  L ${bottomLeft} `;
-  }
-
-  /**
-   * Use to create key for `MarkInfoMap`.
-   * @param unitCoorX 
-   * @param unitCoorY 
-   * @returns 
-   */
-  static createKey(unitCoorX: number, unitCoorY: number) {
-    return `(${unitCoorX},${unitCoorY})`;
   }
 
   /**

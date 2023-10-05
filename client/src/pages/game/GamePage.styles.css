@@ -15,6 +15,50 @@
 
 .grid-controller {
   position: fixed;
-  bottom: 0;
   right: 0;
+  bottom: 0;
+}
+
+.turn-info {
+  position: fixed;
+  left: 0;
+  top: 86px;
+}
+
+.game-page.O {
+  border: 5px solid rgba(255, 0, 0, .5);
+}
+
+.game-page.X {
+  border: 5px solid rgba(0, 0, 255, .5);
+}
+
+.game-page.O .end-line {
+  stroke: blue;
+}
+
+.game-page.X .end-line {
+  stroke: red;
+}
+
+.x-mark {
+  color: red;
+}
+
+.o-mark {
+  color: blue;
+}
+
+.mark {
+  stroke-dashoffset: 10;
+  animation: draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes draw {
+  from {
+    stroke-dasharray: 0 100%;
+  }
+  to {
+    stroke-dasharray: 100% 100%;
+  }
 }

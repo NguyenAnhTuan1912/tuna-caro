@@ -1,5 +1,8 @@
 import React from 'react'
 
+// Import classes
+import { Game } from 'src/classes/Game';
+
 // Import utils
 import { NumberUtils } from 'src/utils/number';
 
@@ -135,7 +138,7 @@ export default function Grid({
     /**
      * `t` is a variable that is used to define "How big is a square?".
      */
-    t: 30,
+    t: Game.t,
     /**
      * `s` is a constant that is used to defined "How many squares in a big square?".
      */

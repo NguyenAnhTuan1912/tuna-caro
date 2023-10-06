@@ -14,10 +14,10 @@ interface EndLineProps {
  * @returns 
  */
 export default function EndLine(props: EndLineProps) {
-  let topLeft = `${props.from.x * Game.t},${props.from.y * Game.t}`;
-  let bottomRight = `${props.to.x * Game.t},${props.to.y * Game.t}`;
+  let firstPoint = `${props.from.x * Game.t},${props.from.y * Game.t}`;
+  let secondPoint = `${props.to.x * Game.t},${props.to.y * Game.t}`;
 
   return (
-    <path className="end-line mark" d={`M ${topLeft} L ${bottomRight}`} fill="none" strokeWidth="2" />
+    <path className="end-line mark" d={`M ${firstPoint} L ${secondPoint}`} fill="none" strokeWidth="2" />
   )
 }

@@ -114,6 +114,23 @@ function getScaleValue<T extends HTMLElement>(element: T) {
 }
 
 /**
+ * Use to scroll to 
+ * @param wrapper 
+ * @param insideBox 
+ * @param scaleValue 
+ */
+function scrollToCenter(wrapper: HTMLElement, insideBox: HTMLElement, scaleValue: number = 1) {
+  let wrapperHeight = wrapper.offsetHeight;
+  let wrapperWidth = wrapper.offsetWidth;
+  let h = insideBox.offsetHeight;
+  let w = insideBox.offsetWidth;
+  let t = (h * scaleValue - wrapperHeight) / 2;
+  let l = (w * scaleValue - wrapperWidth) / 2;
+
+  wrapper.scrollTo({ top: t, left: l });
+}
+
+/**
  * This component render a infinite vector grid. Support zoom in - out.
  * @param props 
  * @returns 
@@ -193,6 +210,7 @@ export default function Grid({
           (val) => val < gridData.current.maxSVOGridWrapper,
           gridData.current.currentScaleValue
         );
+        scrollToCenter(elementRefs.current.gridBase!, elementRefs.current.gridWrapper!, gridData.current.currentScaleValue);
       },
       zoomOut: function() {
         gridData.current.currentScaleValue = scale(
@@ -201,6 +219,7 @@ export default function Grid({
           (val) => val > gridData.current.minSVOGridWrapper,
           gridData.current.currentScaleValue
         );
+        scrollToCenter(elementRefs.current.gridBase!, elementRefs.current.gridWrapper!, gridData.current.currentScaleValue);
       }
     }
   }, []);
@@ -222,10 +241,11 @@ export default function Grid({
         if(gridData.current.isMouseDown && gridData.current.isSpaceDown) {
           let centerXOfGrid = (elementRefs.current.gridWrapper!.offsetWidth) / 2;
           let centerYOfGrid = (elementRefs.current.gridWrapper!.offsetHeight) / 2;
-          let centerX = e.pageX - window.scrollX;
-          let centerY = e.pageY - window.scrollY;
-          let dx = centerXOfGrid - centerX;
-          let dy = centerYOfGrid - centerY;
+          let clientX = e.clientX;
+          let clientY = e.clientY;
+          let dx = centerXOfGrid - clientX;
+          let dy = centerYOfGrid - clientY;
+
           elementRefs.current.gridBase?.scroll({ top: dy, left: dx });
         }
       },
@@ -233,6 +253,8 @@ export default function Grid({
       handleKeydownOnGridBase: function(e: KeyboardEvent) {
         if(e.key === " " && e.target === document.body) {
           e.preventDefault();
+          let currentScrollHeight = elementRefs.current.gridBase?.scrollHeight!;
+          let currentScrollLeft = elementRefs.current.gridBase?.scrollLeft!;
           elementRefs.current.grid!.style.cursor = "grab";
           gridData.current.isSpaceDown = true;
         }
@@ -272,11 +294,7 @@ export default function Grid({
       gridData.current.headerHeight = document.getElementById("app-header")?.offsetHeight!;
     }
 
-    // Initially scroll to center of grid.
-    elementRefs.current.gridBase?.scrollTo({
-      top: gridData.current.centerYOfScrollable,
-      left: gridData.current.centerXOfScrollable
-    });
+    scrollToCenter(elementRefs.current.gridBase!, elementRefs.current.gridWrapper!);
 
     // Register event handlers
     document.body.addEventListener("keydown", eventHandlers.handleKeydownOnGridBase);
@@ -311,6 +329,7 @@ export default function Grid({
           height={height}
           xmlns="http://www.w3.org/2000/svg"
           onClick={(e) => {
+            if(gridData.current.isSpaceDown) return;
             let headerHeight = document.getElementById("app-header")?.offsetHeight!;
             let clientX = e.clientX;
             let clientY = e.clientY;

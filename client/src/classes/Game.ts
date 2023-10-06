@@ -196,7 +196,6 @@ class WinnerFinder {
       $[_]["to"] = result[1].coor;
       $[_]["toCoor"].x = result[1].x;
       $[_]["toCoor"].y = result[1].y;
-
     }
   
     if(result[0].coor === result[1].coor) $[_]["satisfactionTimes"] -= 1;
@@ -313,7 +312,7 @@ class WinnerFinder {
     let endline = {
       from: { x: 0, y: 0 },
       to: { x: 0, y: 0 }
-    }
+    };
     
     for(let i = 0; i < 5; i++) {
       // Case A
@@ -370,7 +369,7 @@ class WinnerFinder {
           times,
           row - i, row + i, col - i, col + i,
           () => {
-            // Set boundary when case A
+            // Set boundary when case C
             Game.setCoordinate(boundaryCoors.from, cases["C"].fromCoor.x - 1, cases["C"].fromCoor.y - 1);
             Game.setCoordinate(boundaryCoors.to, cases["C"].toCoor.x + 1, cases["C"].toCoor.y + 1);
 
@@ -392,30 +391,31 @@ class WinnerFinder {
           times,
           row - i, row + i, col + i, col - i,
           () => {
-            // Set boundary when case A
+            // Set boundary when case D
             Game.setCoordinate(boundaryCoors.from, cases["D"].fromCoor.x - 1, cases["D"].fromCoor.y + 1);
             Game.setCoordinate(boundaryCoors.to, cases["D"].toCoor.x + 1, cases["D"].toCoor.y - 1);
 
             // Set endline
             Game.setCoordinate(endline.from, cases["D"].fromCoor.x, cases["D"].fromCoor.y + 1);
             Game.setCoordinate(endline.to, cases["D"].toCoor.x + 1, cases["D"].toCoor.y);
+
           }))
       ) {
         break;
       }
-
-      // Reset
-      this.directionChecker.reset();
     }
+
+    // Reset
+    this.directionChecker.reset();
     
     if(result && !this.boundaryCheck(table, value.value, boundaryCoors.from, boundaryCoors.to)) {
       return undefined;
     }
 
     if(result) {
-      console.log("Boundaries: ", boundaryCoors);
-      return { ...result, endline }
+      return { ...result, endline };
     };
+
     return undefined;
   }
 }

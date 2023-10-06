@@ -6,11 +6,13 @@ export class Player {
   name!: string;
   mark?: string;
   isWinner!: boolean;
+  score!: number;
 
   constructor(id: string, name?: string) {
     this.id = id;
-    this.name = name ? name : "player-" + id;
+    this.name = name ? name : "Player-" + id;
     this.isWinner = false;
+    this.score = 0;
   }
 
   setName(name: string) {
@@ -23,5 +25,9 @@ export class Player {
 
   setIsWinner(isWinner: boolean) {
     this.isWinner = isWinner;
+  }
+
+  reset() {
+    this.isWinner = false;
   }
 }

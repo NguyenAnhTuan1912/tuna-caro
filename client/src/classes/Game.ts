@@ -15,19 +15,27 @@ export interface MarkInfoType {
 export type CheckCaseLabels = "A" | "B" | "C" | "D";
 export interface CheckWinnerCaseType {
   [Key: string]: {
-    satisfactionTimes: number,
-    from: string,
-    to: string
+    satisfactionTimes: number;
+    from: string;
+    to: string;
+    fromCoor: Coordinate;
+    toCoor: Coordinate;
   }
 }
 export interface ResultType {
-  player: Player;
+  player: MarkType;
   from: string;
   to: string;
+  endline: {
+    from: Coordinate;
+    to: Coordinate;
+  }
 }
 export type DirectionCheckResultType = Array<{
-  coor: string;
+  x: number;
+  y: number;
   isSatisfactory: boolean;
+  coor: string;
 }>;
 
 /**
@@ -90,7 +98,10 @@ class DirectionChecker {
         that[_].isDirecB = false;
       }
       
-      return WinnerFinder.createDirectionCheckResult(coorA, that[_].isDirecA, coorB, that[_].isDirecB);
+      return WinnerFinder.createDirectionCheckResult(
+        rowA, colA, coorA, that[_].isDirecA,
+        rowB, colB, coorB, that[_].isDirecB
+      );
     }
   }
 
@@ -146,16 +157,23 @@ class WinnerFinder {
 
   /**
    * Create direction check result. Can be A, B, C or D case.
+   * @param xa 
+   * @param ya 
    * @param coorA 
-   * @param isDrtA 
+   * @param isDirecA 
+   * @param xb 
+   * @param yb 
    * @param coorB 
-   * @param isDrtB 
+   * @param isDirecB 
    * @returns 
    */
-  static createDirectionCheckResult(coorA: string, isDirecA: boolean, coorB: string, isDirecB: boolean): DirectionCheckResultType {
+  static createDirectionCheckResult(
+    xa: number, ya: number, coorA: string, isDirecA: boolean,
+    xb: number, yb: number, coorB: string, isDirecB: boolean
+  ): DirectionCheckResultType {
     return [
-      { coor: coorA, isSatisfactory: isDirecA },
-      { coor: coorB, isSatisfactory: isDirecB }
+      { x: xa, y: ya, coor: coorA, isSatisfactory: isDirecA },
+      { x: xb, y: yb, coor: coorB, isSatisfactory: isDirecB }
     ];
   }
 
@@ -169,11 +187,16 @@ class WinnerFinder {
     if(result[0] && result[0].isSatisfactory) {
       $[_]["satisfactionTimes"] += 1;
       $[_]["from"] = result[0].coor;
+      $[_]["fromCoor"].x = result[0].x;
+      $[_]["fromCoor"].y = result[0].y;
     }
   
     if(result[1] && result[1].isSatisfactory) {
       $[_]["satisfactionTimes"] += 1;
       $[_]["to"] = result[1].coor;
+      $[_]["toCoor"].x = result[1].x;
+      $[_]["toCoor"].y = result[1].y;
+
     }
   
     if(result[0].coor === result[1].coor) $[_]["satisfactionTimes"] -= 1;
@@ -195,10 +218,7 @@ class WinnerFinder {
     if(
       markAtFrom.value !== mark
       && markAtTo.value !== mark
-    ) {
-      console.log("Not win bro!");
-      return false;
-    };
+    ) return false;
     return true;
   }
 
@@ -225,7 +245,7 @@ class WinnerFinder {
     rowA: number, rowB: number, colA: number, colB: number,
     callWhenTrue: () => void
   ) {
-    let caseACheck = directionCheck(value, c, rowA, rowB, colA, colB);
+    let caseACheck: DirectionCheckResultType = directionCheck(value, c, rowA, rowB, colA, colB);
       
     // Update case `c`
     this.updateCase(cases, c, caseACheck);
@@ -240,12 +260,12 @@ class WinnerFinder {
   }
 
   /**
-   * This method will check "Who is winner?". The process will be:
+   * This method will check "Who is winner?". Receive `x` and `y` are unit coor.
    * @param row 
    * @param col 
    * @returns 
    */
-  checkWinner(row: number, col: number) {
+  checkWinner(row: number, col: number): ResultType | undefined {
     let rCoor = Game.createKey(row, col);
     let table = this.markInfoMap.deref()!
     let value = table.get(rCoor);
@@ -256,22 +276,30 @@ class WinnerFinder {
       A: {
         satisfactionTimes: 0,
         from: "",
-        to: ""
+        to: "",
+        fromCoor: { x: 0, y: 0 },
+        toCoor: { x: 0, y: 0 }
       },
       B: {
         satisfactionTimes: 0,
         from: "",
-        to: ""
+        to: "",
+        fromCoor: { x: 0, y: 0 },
+        toCoor: { x: 0, y: 0 }
       },
       C: {
         satisfactionTimes: 0,
         from: "",
-        to: ""
+        to: "",
+        fromCoor: { x: 0, y: 0 },
+        toCoor: { x: 0, y: 0 }
       },
       D: {
         satisfactionTimes: 0,
         from: "",
-        to: ""
+        to: "",
+        fromCoor: { x: 0, y: 0 },
+        toCoor: { x: 0, y: 0 }
       }
     };
 
@@ -282,6 +310,10 @@ class WinnerFinder {
       from: { x: 0, y: 0 },
       to: { x: 0, y: 0 }
     };
+    let endline = {
+      from: { x: 0, y: 0 },
+      to: { x: 0, y: 0 }
+    }
     
     for(let i = 0; i < 5; i++) {
       // Case A
@@ -295,8 +327,12 @@ class WinnerFinder {
           row, row, col - i, col + i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row, col - i - 1);
-            Game.setCoordinate(boundaryCoors.to, row, col + 1);
+            Game.setCoordinate(boundaryCoors.from, cases["A"].fromCoor.x, cases["A"].fromCoor.y - 1);
+            Game.setCoordinate(boundaryCoors.to, cases["A"].toCoor.x, cases["A"].toCoor.y + 1);
+
+            // Set endline
+            Game.setCoordinate(endline.from, cases["A"].fromCoor.x + 0.5, cases["A"].fromCoor.y);
+            Game.setCoordinate(endline.to, cases["A"].toCoor.x + 0.5, cases["A"].toCoor.y + 1);
           }))
       ) {
         break;
@@ -313,8 +349,12 @@ class WinnerFinder {
           row - i, row + i, col, col,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col);
+            Game.setCoordinate(boundaryCoors.from, cases["B"].fromCoor.x - 1, cases["B"].fromCoor.y);
+            Game.setCoordinate(boundaryCoors.to, cases["B"].toCoor.x + 1, cases["B"].toCoor.y);
+
+            // Set endline
+            Game.setCoordinate(endline.from, cases["B"].fromCoor.x, cases["B"].fromCoor.y + 0.5);
+            Game.setCoordinate(endline.to, cases["B"].toCoor.x + 1, cases["B"].toCoor.y + 0.5);
           }))
       ) {
         break;
@@ -331,8 +371,12 @@ class WinnerFinder {
           row - i, row + i, col - i, col + i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col - i - 1);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col + 1);
+            Game.setCoordinate(boundaryCoors.from, cases["C"].fromCoor.x - 1, cases["C"].fromCoor.y - 1);
+            Game.setCoordinate(boundaryCoors.to, cases["C"].toCoor.x + 1, cases["C"].toCoor.y + 1);
+
+            // Set endline
+            Game.setCoordinate(endline.from, cases["C"].fromCoor.x, cases["C"].fromCoor.y);
+            Game.setCoordinate(endline.to, cases["C"].toCoor.x + 1, cases["C"].toCoor.y + 1);
           }))
       ) {
         break;
@@ -349,8 +393,12 @@ class WinnerFinder {
           row - i, row + i, col + i, col - i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col + i + 1);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col - 1);
+            Game.setCoordinate(boundaryCoors.from, cases["D"].fromCoor.x - 1, cases["D"].fromCoor.y + 1);
+            Game.setCoordinate(boundaryCoors.to, cases["D"].toCoor.x + 1, cases["D"].toCoor.y - 1);
+
+            // Set endline
+            Game.setCoordinate(endline.from, cases["D"].fromCoor.x, cases["D"].fromCoor.y + 1);
+            Game.setCoordinate(endline.to, cases["D"].toCoor.x + 1, cases["D"].toCoor.y);
           }))
       ) {
         break;
@@ -364,7 +412,11 @@ class WinnerFinder {
       return undefined;
     }
 
-    return result;
+    if(result) {
+      console.log("Boundaries: ", boundaryCoors);
+      return { ...result, endline }
+    };
+    return undefined;
   }
 }
 
@@ -383,6 +435,14 @@ export class Game {
   private winnerFinder!: WinnerFinder | null;
 
   static MarkInfoKeyPattern = /\((\d+),(\d+)\)/;
+  /**
+   * `less` define size of "square" around Circle (O) and Path (X).
+   */
+  static less = 5;
+  /**
+   * `t` is a variable that is used to define "How big is a square?".
+   */
+  static t = 30;
 
   constructor(id: string, name: string, player1: Player, player2: Player) {
     this.id = id;
@@ -392,9 +452,7 @@ export class Game {
       "X": player1,
       "O": player2
     };
-    this.currentTurn = "X";
-    this.markInfoMap = new MyMap();
-    this.winnerFinder = new WinnerFinder(this.markInfoMap);
+    this.init();
   }
 
   /**
@@ -418,6 +476,44 @@ export class Game {
     o.x = x;
     o.y = y;
     return o;
+  }
+
+  /**
+   * Use this method to get d string for path to draw "X".
+   * @param unitCoorX 
+   * @param unitCoorY 
+   * @param t 
+   * @param less
+   * @returns 
+   */
+  static createPathDForX(unitCoorX: number, unitCoorY: number, t: number, less: number) {
+    let coorX = unitCoorX * t;
+    let coorY = unitCoorY * t;
+    let topLeft = `${coorX + less},${coorY + less}`;
+    let topRight = `${coorX + t - less},${coorY + less}`;
+    let bottomLeft = `${coorX + less},${coorY + t - less}`;
+    let bottomRight = `${coorX + t - less},${coorY + t - less}`;
+
+    return `M ${topLeft} L ${bottomRight}  M ${topRight}  L ${bottomLeft}`;
+  }
+
+  /**
+   * Use this method to get coordinate from key.
+   * @param key 
+   * @returns 
+   */
+  static getCoordinateFromKey(key: string): Array<number> {
+    let result = key.match(Game.MarkInfoKeyPattern) as Array<string>;
+    return [parseInt(result[1]), parseInt(result[2])];
+  }
+
+  /**
+   * Use this method to init game's state.
+   */
+  init() {
+    this.currentTurn = "X";
+    this.markInfoMap = new MyMap();
+    this.winnerFinder = new WinnerFinder(this.markInfoMap);
   }
 
   // Use to clear some properties.
@@ -444,6 +540,7 @@ export class Game {
   }
 
   setWinner(mark: MarkType) {
+    this.players![mark].score += 1;
     this.players![mark].isWinner = true;
   }
 
@@ -488,25 +585,6 @@ export class Game {
   }
 
   /**
-   * Use this method to get d string for path to draw "X".
-   * @param unitCoorX 
-   * @param unitCoorY 
-   * @param t 
-   * @param less
-   * @returns 
-   */
-  createPathDForX(unitCoorX: number, unitCoorY: number, t: number, less: number) {
-    let coorX = unitCoorX * t;
-    let coorY = unitCoorY * t;
-    let topLeft = `${coorX + less},${coorY + less}`;
-    let topRight = `${coorX + t - less},${coorY + less}`;
-    let bottomLeft = `${coorX + less},${coorY + t - less}`;
-    let bottomRight = `${coorX + t - less},${coorY + t - less}`;
-
-    return `M ${topLeft} L ${bottomRight}  M ${topRight}  L ${bottomLeft} `;
-  }
-
-  /**
    * Use to check if this unit coordinate has any mark. Return boolean.
    * @param unitCoorX 
    * @param unitCoorY 
@@ -523,6 +601,24 @@ export class Game {
     if(this.players!["X"].isWinner) return true;
     if(this.players!["O"].isWinner) return true;
     return false;
+  }
+
+  /**
+   * Use this method to reset entire the state of game.
+   */
+  reset() {
+    this.players!["X"].reset();
+    this.players!["O"].reset();
+    this.init();
+  }
+
+  /**
+   * Use this method to get user's information.
+   * @param mark 
+   * @returns 
+   */
+  getPlayerInformation(mark: MarkType) {
+    return this.players![mark];
   }
 
   // FIND WINNER

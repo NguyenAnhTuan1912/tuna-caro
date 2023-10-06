@@ -15,12 +15,6 @@ export default function Header(props: HeaderProps) {
             : props.title
       }
       <div className="flex-box ait-center">
-        <button className="btn-transparent no-outline rounded-8 p-1 me-1">
-          <span><i className="twa twa-flag-vietnam"></i> <strong>VIE</strong></span>
-        </button>
-        <button className="btn-transparent no-outline rounded-8 p-1 me-1">
-          <span className="material-symbols-outlined">dark_mode</span>
-        </button>
         <button
           onClick={() => { openTMI("mySideMenu") }}
           className="btn-transparent no-outline rounded-8 p-1"

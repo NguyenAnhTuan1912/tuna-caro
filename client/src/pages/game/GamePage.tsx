@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Import class objects
-import { Game, MarkType, Coordinate } from 'src/classes/Game';
+import { Game } from 'src/classes/Game';
 import { Player } from 'src/classes/Player';
 
 // Import hooks
@@ -9,6 +9,9 @@ import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 
 // Import components
 import Grid from 'src/components/grid/Grid';
+import Mark from './Mark';
+import EndLine from './EndLine';
+import ScoreBoard from './ScoreBoard';
 
 // Import types
 import { GamePageProps } from './GamePage.props';
@@ -20,68 +23,6 @@ interface GamePageElements {
   page: HTMLDivElement | null
 }
 
-interface KeyGuideProps {
-  title: string;
-  keys: string;
-}
-
-interface MarkProps {
-  mark: MarkType;
-  x: number;
-  y: number;
-  t: number;
-}
-
-interface EndLineProps {
-  from: Coordinate;
-  to: Coordinate;
-}
-
-/**
- * Component is used to render a guide for keys.
- * @param props 
- * @returns 
- */
-function KeyGuide(props: KeyGuideProps) {
-  return (
-    <div className="keyguide">
-      <span className="me-1">{props.title}</span>
-      <span className="fw-bold">{props.keys}</span>
-    </div>
-  );
-}
-
-/**
- * Component is used to render mark O or X depend on what is `mark`. Receive coordinate and `t` constant.
- * @param props 
- * @returns 
- */
-function Mark(props: MarkProps) {
-  if(props.mark === "O") {
-    let cx = props.x * props.t + (props.t / 2);
-    let cy = props.y * props.t + (props.t / 2);
-    return <circle className="o-mark mark" cx={cx} cy={cy} r={props.t / 2 - Game.less} fill="none" stroke="blue" strokeWidth="2"></circle>;
-  }
-
-  return (
-    <path className="x-mark mark" d={Game.createPathDForX(props.x, props.y, props.t, Game.less)} fill="none" stroke="red" strokeWidth="2" />
-  )
-}
-
-/**
- * Compunent is used to render the end line of game when game has winner.
- * @param props 
- * @returns 
- */
-function EndLine(props: EndLineProps) {
-  let topLeft = `${props.from.x * Game.t},${props.from.y * Game.t}`;
-  let bottomRight = `${props.to.x * Game.t},${props.to.y * Game.t}`;
-
-  return (
-    <path className="end-line mark" d={`M ${topLeft} L ${bottomRight}`} fill="none" strokeWidth="2" />
-  )
-}
-
 /**
  * Component is used to render page of Game.
  * @param props 
@@ -89,7 +30,7 @@ function EndLine(props: EndLineProps) {
  */
 export default function GamePage(props: GamePageProps) {
   const [gameState, gameStateFns] = useStateWESSFns({
-    game: new Game("game-01", "Hello", new Player("player01", "Tuna Nguyen"), new Player("player02", "Tony"))
+    game: new Game("game-01", "2 players game", new Player("01"), new Player("02"))
   }, function(changeState) {
     return {
       /**
@@ -136,6 +77,16 @@ export default function GamePage(props: GamePageProps) {
           
           return game;
         });
+      },
+
+      /**
+       * Use this function to reset the game.
+       */
+      resetGame: function() {
+        changeState("game", function(game) {
+          game.reset();
+          return game;
+        });
       }
     }
   });
@@ -165,17 +116,7 @@ export default function GamePage(props: GamePageProps) {
         }}
         renderItem={(beh) => (
           <>
-            <div className="guide p-1 m-3">
-              <KeyGuide
-                title='Di chuyển: giữ'
-                keys='Space + LMB'
-              />
-              <KeyGuide
-                title='Đánh dấu:'
-                keys='LMB'
-              />
-            </div>
-            <div className="turn-info p-1 m-3">
+            <div className="game-info p-1 m-3">
               <h3 className="flex-box ait-center">LƯỢT
                 {
                   gameState.game.currentTurn === "X"
@@ -183,8 +124,19 @@ export default function GamePage(props: GamePageProps) {
                     : <span className="material-symbols-outlined o-mark ms-1 fs-1">radio_button_unchecked</span>
                 }
               </h3>
+              <ScoreBoard extendClassName='mt-2' game={gameState.game} />
             </div>
             <div className="grid-controller p-1 m-3 flex-box flex-col">
+              {
+                gameState.game.hasWinner() && (
+                  <span
+                    onClick={() => { gameStateFns.resetGame() }}
+                    className="material-symbols-outlined btn-no-padd spe-outline p-1 mb-4"
+                  >
+                    restart_alt
+                  </span>
+                )
+              }
               <span
                 onClick={() => { beh.zoomIn() }}
                 className="material-symbols-outlined btn-no-padd outline p-1"

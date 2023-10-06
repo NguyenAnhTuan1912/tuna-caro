@@ -9,28 +9,24 @@
   right: 0;
 }
 
-.keyguide {
-  background-color: var(--clr-background);
-}
-
 .grid-controller {
   position: fixed;
   right: 0;
   bottom: 0;
 }
 
-.turn-info {
+.game-info {
   position: fixed;
   left: 0;
   top: 86px;
 }
 
 .game-page.O {
-  border: 5px solid rgba(255, 0, 0, .5);
+  border: 5px solid rgba(0, 0, 255, .5);
 }
 
 .game-page.X {
-  border: 5px solid rgba(0, 0, 255, .5);
+  border: 5px solid rgba(255, 0, 0, .5);
 }
 
 .game-page.O .end-line {

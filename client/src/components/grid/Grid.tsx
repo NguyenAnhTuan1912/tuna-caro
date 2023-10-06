@@ -322,11 +322,6 @@ export default function Grid({
             let unitCoorY = Math.floor(coorY / gridData.current.t);
 
             props.emitCoordinate(unitCoorX, unitCoorY, gridData.current.t);
-            // console.log(`Scale value: ${gridData.current.currentScaleValue}`);
-            // console.log(`Client X, Y: ${clientX}, ${clientY}`);
-            // console.log(`Scrolled X, Y: ${scrolledX}, ${scrolledY}`);
-            // console.log(`Coordinate: ${coorX}, ${coorY}`);
-            // console.log(`Delta ${deltaSW}, ${deltaSH}`);
           }}
         >
           {/* Static element */}
@@ -355,7 +350,6 @@ export default function Grid({
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#bigSquare)" />
-          <circle cx="75.5" cy="40.5" r="15" fill="none" stroke="red" strokeWidth="2"></circle>
           {/* X and O will go here */}
           { props.renderSVGElements && props.renderSVGElements() }
         </svg>

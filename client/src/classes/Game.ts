@@ -327,8 +327,8 @@ class WinnerFinder {
           row, row, col - i, col + i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row, col - i - 1);
-            Game.setCoordinate(boundaryCoors.to, row, col + 1);
+            Game.setCoordinate(boundaryCoors.from, cases["A"].fromCoor.x, cases["A"].fromCoor.y - 1);
+            Game.setCoordinate(boundaryCoors.to, cases["A"].toCoor.x, cases["A"].toCoor.y + 1);
 
             // Set endline
             Game.setCoordinate(endline.from, cases["A"].fromCoor.x + 0.5, cases["A"].fromCoor.y);
@@ -349,8 +349,8 @@ class WinnerFinder {
           row - i, row + i, col, col,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col);
+            Game.setCoordinate(boundaryCoors.from, cases["B"].fromCoor.x - 1, cases["B"].fromCoor.y);
+            Game.setCoordinate(boundaryCoors.to, cases["B"].toCoor.x + 1, cases["B"].toCoor.y);
 
             // Set endline
             Game.setCoordinate(endline.from, cases["B"].fromCoor.x, cases["B"].fromCoor.y + 0.5);
@@ -371,8 +371,8 @@ class WinnerFinder {
           row - i, row + i, col - i, col + i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col - i - 1);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col + 1);
+            Game.setCoordinate(boundaryCoors.from, cases["C"].fromCoor.x - 1, cases["C"].fromCoor.y - 1);
+            Game.setCoordinate(boundaryCoors.to, cases["C"].toCoor.x + 1, cases["C"].toCoor.y + 1);
 
             // Set endline
             Game.setCoordinate(endline.from, cases["C"].fromCoor.x, cases["C"].fromCoor.y);
@@ -393,8 +393,8 @@ class WinnerFinder {
           row - i, row + i, col + i, col - i,
           () => {
             // Set boundary when case A
-            Game.setCoordinate(boundaryCoors.from, row - i - 1, col + i + 1);
-            Game.setCoordinate(boundaryCoors.to, row + 1, col - 1);
+            Game.setCoordinate(boundaryCoors.from, cases["D"].fromCoor.x - 1, cases["D"].fromCoor.y + 1);
+            Game.setCoordinate(boundaryCoors.to, cases["D"].toCoor.x + 1, cases["D"].toCoor.y - 1);
 
             // Set endline
             Game.setCoordinate(endline.from, cases["D"].fromCoor.x, cases["D"].fromCoor.y + 1);
@@ -413,7 +413,7 @@ class WinnerFinder {
     }
 
     if(result) {
-      console.log("Cases: ", cases);
+      console.log("Boundaries: ", boundaryCoors);
       return { ...result, endline }
     };
     return undefined;
@@ -452,9 +452,7 @@ export class Game {
       "X": player1,
       "O": player2
     };
-    this.currentTurn = "X";
-    this.markInfoMap = new MyMap();
-    this.winnerFinder = new WinnerFinder(this.markInfoMap);
+    this.init();
   }
 
   /**
@@ -509,6 +507,15 @@ export class Game {
     return [parseInt(result[1]), parseInt(result[2])];
   }
 
+  /**
+   * Use this method to init game's state.
+   */
+  init() {
+    this.currentTurn = "X";
+    this.markInfoMap = new MyMap();
+    this.winnerFinder = new WinnerFinder(this.markInfoMap);
+  }
+
   // Use to clear some properties.
   clear() {
     this.players = null;
@@ -533,6 +540,7 @@ export class Game {
   }
 
   setWinner(mark: MarkType) {
+    this.players![mark].score += 1;
     this.players![mark].isWinner = true;
   }
 
@@ -593,6 +601,24 @@ export class Game {
     if(this.players!["X"].isWinner) return true;
     if(this.players!["O"].isWinner) return true;
     return false;
+  }
+
+  /**
+   * Use this method to reset entire the state of game.
+   */
+  reset() {
+    this.players!["X"].reset();
+    this.players!["O"].reset();
+    this.init();
+  }
+
+  /**
+   * Use this method to get user's information.
+   * @param mark 
+   * @returns 
+   */
+  getPlayerInformation(mark: MarkType) {
+    return this.players![mark];
   }
 
   // FIND WINNER

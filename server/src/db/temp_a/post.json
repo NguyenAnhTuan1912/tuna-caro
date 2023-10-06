@@ -1,0 +1,72 @@
+[
+  {
+    "id": "post_01",
+    "author": "user_01",
+    "name": "How to build a server with NodeJS and Express?",
+    "type": "technology",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_02",
+    "author": "user_02",
+    "name": "What is Design Pattern?",
+    "type": "technology",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_03",
+    "author": "user_01",
+    "name": "Hosting NodeJS server with Render.",
+    "type": "technology",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_04",
+    "author": "user_03",
+    "name": "230 public schools are closed.",
+    "type": "news",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_05",
+    "author": "user_04",
+    "name": "How old is the sun?",
+    "type": "space",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_06",
+    "author": "user_05",
+    "name": "How far is moon?",
+    "type": "space",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_07",
+    "author": "user_02",
+    "name": "Making a cake with straw berry.",
+    "type": "cooking",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_08",
+    "author": "user_06",
+    "name": "Delicious spagetti!!!",
+    "type": "cooking",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_09",
+    "author": "user_03",
+    "name": "Earth quarke attack...",
+    "type": "news",
+    "date": 1690945742336
+  },
+  {
+    "id": "post_10",
+    "author": "user_06",
+    "name": "When is GTA VI released?",
+    "type": "game",
+    "date": 1690945742336
+  }
+]

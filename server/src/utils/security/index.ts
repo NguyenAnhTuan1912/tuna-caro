@@ -1,9 +1,9 @@
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 
 import { Time } from "utils/time";
+import { NumberUtils } from "utils/number";
 
 import { EncodeOptions } from "types";
 
@@ -12,64 +12,26 @@ const privateKeys = {
 }
 
 /**
- * Cipher pattern:
- * data_cipher:expired_date_cipher:created_date_cipher
+ * Use this method to create random ID.
+ * @param prefix
+ * @param numParts
+ * @param numCharsInPart
  */
+const getRandomID = (function() {
+  let alphabet = "abcdefghijklmnopqrstuvw0123456789xyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let alphabetN = alphabet.length;
+  return function(prefix: string, numParts: number = 3, numCharsInPart: number = 5) {
+    let id = prefix + "-";
+    for(let i = 0; i < numParts; i++) {
+      for(let j = 0; j < numCharsInPart; j++) {
+        id += alphabet[NumberUtils.getRandomNumber(0, alphabetN - 2)];
+      }
+      id += "-";
+    }
 
-/**
- * Use to encode an `data` to `token`.
- * @param data 
- * @param key 
- * @param options 
- * @returns 
- */
-function encode(data: any, options?: EncodeOptions) {
-  try {
-    // const fullExp = Date.now() + options?.expireTime * 1000;
-    // const exp = Math.floor(fullExp / 1000);
-    options = Object.assign<EncodeOptions, EncodeOptions | undefined>(
-      {
-        expireTime: "1h"
-      },
-      options
-    );
-    const payload = {
-      ...data
-    };
-
-    const token = jwt.sign(payload, privateKeys.jwt, { expiresIn: options?.expireTime });
-    return token;
-  } catch (error) {
-    return "";
+    return id.substring(0, id.length - 1);
   }
-};
-
-/**
- * Use to verify a token, and return the `payload`.
- * @param data 
- * @param key 
- */
-function verify(token: string) {
-  try {
-    let payload = jwt.verify(token, privateKeys.jwt);
-    return payload;
-  } catch (error) {
-    return undefined;
-  }
-};
-
-/**
- * Use to decode a `token` to `data` (payload).
- * @param token 
- * @returns 
- */
-function decode(token: string) {
-  try {
-    return jwt.decode(token);
-  } catch (error) {
-    return undefined;
-  }
-};
+})();
 
 /**
  * Use to hash a `data` string.
@@ -99,10 +61,8 @@ const scopes: {[key: string]: string} = {
 }
 
 export const Security = {
-  encode,
-  decode,
-  verify,
   hash,
   compareHash,
-  scopes
+  scopes,
+  getRandomID
 }

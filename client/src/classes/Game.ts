@@ -429,10 +429,10 @@ export class Game {
   status!: GameStatus;
   currentTurn!: MarkType;
   
-  private password?: string;
-  private players!: { [key: string]: Player } | null;
-  private markInfoMap!: MarkInfoMapType | null;
-  private winnerFinder!: WinnerFinder | null;
+  private _password?: string;
+  private _players!: { [key: string]: Player } | null;
+  private _markInfoMap!: MarkInfoMapType | null;
+  private _winnerFinder!: WinnerFinder | null;
 
   static MarkInfoKeyPattern = /\((\d+),(\d+)\)/;
   /**
@@ -448,7 +448,7 @@ export class Game {
     this.id = id;
     this.name = name;
     this.status = "Waiting";
-    this.players = {
+    this._players = {
       "X": player1,
       "O": player2
     };
@@ -512,27 +512,27 @@ export class Game {
    */
   init() {
     this.currentTurn = "X";
-    this.markInfoMap = new MyMap();
-    this.winnerFinder = new WinnerFinder(this.markInfoMap);
+    this._markInfoMap = new MyMap();
+    this._winnerFinder = new WinnerFinder(this._markInfoMap);
   }
 
   // Use to clear some properties.
   clear() {
-    this.players = null;
-    this.markInfoMap = null;
-    this.winnerFinder = null;
+    this._players = null;
+    this._markInfoMap = null;
+    this._winnerFinder = null;
   }
 
   /*
     SETTERS
   */
   setPassword(password: string) {
-    this.password = password;
+    this._password = password;
   }
 
   setPlayer(turn: string, player: Player) {
     player.setMark(turn);
-    if(!this.players![turn]) this.players![turn] = player;
+    if(!this._players![turn]) this._players![turn] = player;
   }
 
   setTurn(turn: MarkType) {
@@ -540,19 +540,19 @@ export class Game {
   }
 
   setWinner(mark: MarkType) {
-    this.players![mark].score += 1;
-    this.players![mark].isWinner = true;
+    this._players![mark].score += 1;
+    this._players![mark].isWinner = true;
   }
 
   /*
     GETTERS
   */
   getPassword() {
-    return this.password;
+    return this._password;
   }
 
   getPlayer(turn: MarkType) {
-    return this.players![turn];
+    return this._players![turn];
   }
 
   /**
@@ -561,7 +561,7 @@ export class Game {
    * @returns 
    */
   renderMarks(fn: (value: MarkInfoType | undefined, key?: string) => JSX.Element) {
-    return this.markInfoMap!.map(fn);
+    return this._markInfoMap!.map(fn);
   }
 
   /**
@@ -571,8 +571,8 @@ export class Game {
    * @param element 
    */
   addMarkInfo(coordinate: string, mark: MarkType, element: JSX.Element) {
-    if(!this.markInfoMap!.get(coordinate))
-      this.markInfoMap!.set(coordinate, { value: mark, element });
+    if(!this._markInfoMap!.get(coordinate))
+      this._markInfoMap!.set(coordinate, { value: mark, element });
   }
 
   /**
@@ -581,7 +581,7 @@ export class Game {
    * @returns 
    */
   comparePassword(password: string) {
-    return this.password === password;
+    return this._password === password;
   }
 
   /**
@@ -591,15 +591,15 @@ export class Game {
    * @returns 
    */
   hasMarkIn(unitCoorX: number, unitCoorY: number) {
-    return Boolean(this.markInfoMap!.get(Game.createKey(unitCoorX, unitCoorY)));
+    return Boolean(this._markInfoMap!.get(Game.createKey(unitCoorX, unitCoorY)));
   }
 
   /**
    * Use to check "Is game complete?" or "Has winner?"
    */
   hasWinner() {
-    if(this.players!["X"].isWinner) return true;
-    if(this.players!["O"].isWinner) return true;
+    if(this._players!["X"].isWinner) return true;
+    if(this._players!["O"].isWinner) return true;
     return false;
   }
 
@@ -607,8 +607,8 @@ export class Game {
    * Use this method to reset entire the state of game.
    */
   reset() {
-    this.players!["X"].reset();
-    this.players!["O"].reset();
+    this._players!["X"].reset();
+    this._players!["O"].reset();
     this.init();
   }
 
@@ -618,7 +618,7 @@ export class Game {
    * @returns 
    */
   getPlayerInformation(mark: MarkType) {
-    return this.players![mark];
+    return this._players![mark];
   }
 
   // FIND WINNER
@@ -628,6 +628,6 @@ export class Game {
    * @param col 
    */
   findWinner(row: number, col: number) {
-    return this.winnerFinder?.checkWinner(row, col);
+    return this._winnerFinder?.checkWinner(row, col);
   }
 }

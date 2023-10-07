@@ -12,6 +12,7 @@ import { MyInputProps } from './MyInput.props'
 export default function MyInput({
   label,
   error,
+  replaceClassName,
   ...props
 }: MyInputProps) {
   const [ inputState, setInputState ] = React.useState({
@@ -19,7 +20,7 @@ export default function MyInput({
   });
 
   let labelClassName = StringUtils.concate(props.replaceLabelClassName ?? "label-input", [ props.labelClassName ]);
-  let inputClassName = StringUtils.concate(props.replaceClassName ?? "my-input", [ props.className ]);
+  let inputClassName = StringUtils.concate(replaceClassName ?? "my-input", [ props.className ]);
 
   if(error) {
     props.onChange = (e) => {

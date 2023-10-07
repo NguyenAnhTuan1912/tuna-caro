@@ -2,6 +2,15 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 
+// Import APIs
+import { OtherAPIs } from './apis/others';
+
+// Import socket
+import { MySocket, socket } from './apis/socket';
+
+// Import hoooks
+import { useStateWESSFns } from './hooks/useStateWESSFns';
+
 // Import layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
 import HomePage from './pages/home/HomePage';
@@ -15,6 +24,19 @@ import GameCreatingDialog from './components/dialog/GameCreatingDialog';
 import GameFindingDialog from './components/dialog/GameFindingDialog';
 
 function App() {
+  React.useEffect(() => {
+    async function init() {
+      // Call API to get ID.
+      const responseData = await OtherAPIs.getRandomID();
+      console.log("ID: ", responseData.data);
+
+      // Handshake to socket on server
+      socket.handshake();
+    };
+
+    init();
+  }, []);
+
   return (
     <>
       <Routes>

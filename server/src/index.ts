@@ -15,12 +15,13 @@ import cors from "cors";
 import MyServer from "classes/MyServer";
 import ServerBuilder from "classes/ServerBuilder";
 
+// Import env
+import { env } from 'env';
+
 // DBs
 import Temp_ADB from "db/temp_a";
 
-import PostRouter from "modules/post";
-
-const ExpressServer = new MyServer({ port: process.env.PORT || "3000" });
+const ExpressServer = new MyServer({ port: process.env.PORT || "5000" });
 const builder = new ServerBuilder({ server: ExpressServer });
 
 /**
@@ -29,15 +30,13 @@ const builder = new ServerBuilder({ server: ExpressServer });
 
 // Build something before start
 // Build middle-wares
-builder.buildMiddleWare(cors({ origin: "*" }));
+builder.buildMiddleWare(cors({ origin: env.REQUEST_ORIGIN, credentials: true }));
 builder.buildMiddleWare(bodyParser.json());
 builder.buildMiddleWare(bodyParser.urlencoded({ extended: true }));
 
 // Build API
 // http://localhost:3000/api/post?id=post_01
 // http://localhost:3000/api/posts
-let base = "/api";
-builder.buildAPI(base, PostRouter);
 
 // Connect to DB
 builder.buildDBConnection(Temp_ADB.connect());

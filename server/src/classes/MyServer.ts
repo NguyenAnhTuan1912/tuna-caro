@@ -5,14 +5,20 @@
 import http, { Server } from "http";
 import express, { Express, Router } from "express";
 
+// Import classes
+import { MySocket } from "./MySocket";
+
+// Import utils
 import Utils from "utils";
 
+// Import types
 import { ServerOptions } from "types";
 
 export default class MyServer {
   port!: string;
   app!: Express;
   instance!: Server;
+  socket!: MySocket;
 
   apis!: Array<{ base: string, router: Router }>;
   middleWares!: Array<any>;
@@ -22,6 +28,8 @@ export default class MyServer {
     this.port = options.port;
     this.app = express();
     this.instance = http.createServer(this.app);
+    this.socket = new MySocket({ httpServer: this.instance });
+
     this.apis = [];
     this.middleWares = [];
     this.dbConnections = [];
@@ -46,7 +54,9 @@ export default class MyServer {
           return Utils.RM.responseJSON(
             res,
             200,
-            Utils.RM.getResponseMessage(false, undefined, "Welcome to Tunanguyen Server. You can have perfect experience in here.")
+            Utils.RM.getResponseMessage(false, {
+              id: Utils.Security.getRandomID("carogame")
+            }, "Welcome to Tunanguyen Server. You can have perfect experience in here.")
           );
         } catch (error: any) {
           return Utils.RM.responseJSON(

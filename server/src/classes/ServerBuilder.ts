@@ -35,4 +35,8 @@ export default class ServerBuilder {
   buildDBConnection(connection: Promise<boolean>) {
     this.server.dbConnections.push(connection);
   }
+
+  buildSocketEvent(name: string, listener: (...args: []) => void) {
+    this.server.socket.addEvent(name, listener);
+  }
 }

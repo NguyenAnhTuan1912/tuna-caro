@@ -6,7 +6,7 @@ import { TunangnModal } from 'tunangn-react-modal';
 import { OtherAPIs } from './apis/others';
 
 // Import socket
-import { MySocket, socket } from './apis/socket';
+import { MySocket, socket, Message } from './apis/socket';
 
 // Import hoooks
 import { useStateWESSFns } from './hooks/useStateWESSFns';
@@ -27,11 +27,19 @@ function App() {
   React.useEffect(() => {
     async function init() {
       // Call API to get ID.
-      const responseData = await OtherAPIs.getRandomID();
-      console.log("ID: ", responseData.data);
+      // const responseData = await OtherAPIs.getRandomID();
+      // console.log("ID: ", responseData.data);
 
       // Handshake to socket on server
-      socket.handshake();
+      // socket.handshake();
+
+      // Emit game for testing
+      // socket.emit(MySocket.EventNames.emitGame);
+
+      // Add event for testing
+      // socket.addEventListener(MySocket.EventNames.emitGame, function(message: Message<any>) {
+      //   console.log(message);
+      // });
     };
 
     init();

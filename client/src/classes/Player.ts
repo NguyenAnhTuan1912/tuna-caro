@@ -15,19 +15,8 @@ export class Player {
     this.score = 0;
   }
 
-  setName(name: string) {
-    this.name = name;
-  }
-
-  setMark(mark: string) {
-    this.mark = mark;
-  }
-
-  setIsWinner(isWinner: boolean) {
-    this.isWinner = isWinner;
-  }
-
   reset() {
+    this.score = 0;
     this.isWinner = false;
   }
 }

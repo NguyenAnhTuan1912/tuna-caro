@@ -20,8 +20,8 @@ const privateKeys = {
 const getRandomID = (function() {
   let alphabet = "abcdefghijklmnopqrstuvw0123456789xyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let alphabetN = alphabet.length;
-  return function(prefix: string, numParts: number = 3, numCharsInPart: number = 5) {
-    let id = prefix + "-";
+  return function(prefix?: string, numParts: number = 3, numCharsInPart: number = 5) {
+    let id = prefix ? prefix + "-" : "";
     for(let i = 0; i < numParts; i++) {
       for(let j = 0; j < numCharsInPart; j++) {
         id += alphabet[NumberUtils.getRandomNumber(0, alphabetN - 2)];

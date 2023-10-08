@@ -21,6 +21,9 @@ import { env } from 'env';
 // DBs
 import Temp_ADB from "db/temp_a";
 
+// Import socket events
+import { EmitGameSEListener } from "socket_events/game/emitGame";
+
 const ExpressServer = new MyServer({ port: process.env.PORT || "5000" });
 const builder = new ServerBuilder({ server: ExpressServer });
 
@@ -37,6 +40,9 @@ builder.buildMiddleWare(bodyParser.urlencoded({ extended: true }));
 // Build API
 // http://localhost:3000/api/post?id=post_01
 // http://localhost:3000/api/posts
+
+// Build Socket
+builder.buildSocketEvent(EmitGameSEListener.name, EmitGameSEListener.fn);
 
 // Connect to DB
 builder.buildDBConnection(Temp_ADB.connect());

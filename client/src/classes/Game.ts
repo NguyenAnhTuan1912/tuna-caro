@@ -531,7 +531,7 @@ export class Game {
   }
 
   setPlayer(turn: string, player: Player) {
-    player.setMark(turn);
+    player.mark = turn;
     if(!this._players![turn]) this._players![turn] = player;
   }
 

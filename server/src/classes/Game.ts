@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 
 // Import classes
-import { Player } from "./Player";
+import { Player, PlayerType } from "./Player";
 
 // Import utils
 import Utils from "utils";
@@ -12,6 +12,16 @@ export type Coordinate = {
 };
 export type GameStatus = "Waiting" | "Playing";
 export type MarkType = "X" | "O";
+
+export interface GameType {
+  id: string;
+  name: string;
+  status: GameStatus;
+  currentTurn: MarkType;
+  host: Player;
+  password?: string;
+  players: { [key: string]: PlayerType } | null;
+};
 
 /**
  * There are some rule in game:
@@ -41,12 +51,22 @@ export class Game {
   private _password?: string;
   private _players!: { [key: string]: Player } | null;
 
-  constructor(id: string, name: string, status: GameStatus, currentTurn: MarkType) {
-    this.id = id;
-    this.name = name;
-    this.status = status;
-    this.currentTurn = currentTurn;
-    this._players = {};
+  constructor(game: GameType);
+  constructor(id: string | GameType, name: string, status: GameStatus, currentTurn: MarkType);
+  constructor(_: string | GameType, name?: string, status?: GameStatus, currentTurn?: MarkType) {
+    if(typeof _ === "string") {
+      this.id = _;
+      this.name = name!;
+      this.status = status!;
+      this.currentTurn = currentTurn!;
+      this._players = {};
+    } else {
+      this.id = _.id;
+      this.name = _.name;
+      this.status = _.status;
+      this.currentTurn = _.currentTurn;
+      this._players = {};
+    }
   }
 
   /**

@@ -1,6 +1,9 @@
 import React from 'react';
 import { CustomizedModalItemProps } from 'tunangn-react-modal';
 
+// Import hooks
+import { usePlayer } from 'src/hooks/usePlayer';
+
 // Import components
 import ProfileCard from '../profile_card/ProfileCard';
 import KeyGuide from '../key_guide/KeyGuide';
@@ -8,6 +11,7 @@ import KeyGuide from '../key_guide/KeyGuide';
 export default function SideMenu(props: CustomizedModalItemProps) {
   const sideMenuRef = React.useRef<HTMLDivElement>(null);
   const data = props.item.getData();
+  const { player } = usePlayer();
 
   React.useEffect(() => {
     props.utils.runAnimation!(sideMenuRef.current!);
@@ -18,13 +22,15 @@ export default function SideMenu(props: CustomizedModalItemProps) {
       ref={sideMenuRef}
       className="side-menu-container"
       style={props.utils.getContainerStyle({
-        minWidth: "420px",
+        width: "100%",
+        maxWidth: "475px",
+        minWidth: "300px",
         padding: ".75rem",
         borderLeft: "2px solid var(--clr-onBackground)"
       })}
     >
         {/* Header */}
-        <div className="flex-box ait-center jc-space-between">
+        <div className="flex-box ait-center jc-space-between mb-3">
           <span
             className="material-symbols-outlined btn-transparent p-1 rounded-4"
             onClick={() => props.close({ isAgree: false, message: "Fuck you" })}
@@ -32,18 +38,21 @@ export default function SideMenu(props: CustomizedModalItemProps) {
             close
           </span>
           <div className="flex-box ait-center jc-space-between">
-            <strong>ID:</strong>
-            <span
-              className="material-symbols-outlined btn-transparent rounded-4 ms-1"
-            >
-              content_copy
-            </span>
+            <strong className="me-1">ID: </strong>
+              <p className="flex-box ait-center">
+                {player.id}
+                <span
+                  className="material-symbols-outlined btn-transparent rounded-4 ms-1"
+                >
+                  content_copy
+                </span>
+              </p>
           </div>
         </div>
 
         {/* Content */}
         <div>
-          <ProfileCard isVertical canEdit />
+          <ProfileCard player={player} isVertical canEdit />
         </div>
 
         <div className="p-1">

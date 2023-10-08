@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Socket } from "socket.io";
 
 import MyServer from "./MyServer";
 
@@ -36,7 +37,7 @@ export default class ServerBuilder {
     this.server.dbConnections.push(connection);
   }
 
-  buildSocketEvent(name: string, listener: (...args: []) => void) {
-    this.server.socket.addEvent(name, listener);
+  buildSocketEvent<O>(name: string, listener: (socket: Socket, o: O, ...args: any[]) => void) {
+    this.server.socket.addEventListener(name, listener);
   }
 }

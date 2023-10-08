@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 // Import class objects
 import { Game } from 'src/classes/Game';
@@ -29,6 +30,12 @@ interface GamePageElements {
  * @returns 
  */
 export default function GamePage(props: GamePageProps) {
+  /**
+   * Type of game, there are 2 types of game:
+   * - offline: allow 2 players play in the same device.
+   * - online: allow 2 players play in various device through internet.
+   */
+  let { type } = useParams();
   const [gameState, gameStateFns] = useStateWESSFns({
     game: new Game("game-01", "2 players game", new Player("01"), new Player("02"))
   }, function(changeState) {

@@ -22,7 +22,7 @@ export default function ProfileCard(props: ProfileCardProps) {
 
       {/* Name */}
       <div className={"flex-box flex-col" + (props.isVertical ? " mt-1" : " ms-1 ait-flex-start")}>
-        <h2>Chưa có tên ???</h2>
+        <h2 className="txt-center">{props.player.name}</h2>
         {
           props.canEdit && (
             <button

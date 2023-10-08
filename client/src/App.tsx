@@ -10,6 +10,7 @@ import { MySocket, socket, Message } from './apis/socket';
 
 // Import hoooks
 import { useStateWESSFns } from './hooks/useStateWESSFns';
+import { usePlayerActions } from './hooks/usePlayer';
 
 // Import layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
@@ -24,22 +25,15 @@ import GameCreatingDialog from './components/dialog/GameCreatingDialog';
 import GameFindingDialog from './components/dialog/GameFindingDialog';
 
 function App() {
+  const playerDispatcher = usePlayerActions();
+
   React.useEffect(() => {
     async function init() {
       // Call API to get ID.
-      // const responseData = await OtherAPIs.getRandomID();
-      // console.log("ID: ", responseData.data);
+      playerDispatcher.getPlayerIDAsyncThunk();
 
       // Handshake to socket on server
-      // socket.handshake();
-
-      // Emit game for testing
-      // socket.emit(MySocket.EventNames.emitGame);
-
-      // Add event for testing
-      // socket.addEventListener(MySocket.EventNames.emitGame, function(message: Message<any>) {
-      //   console.log(message);
-      // });
+      socket.handshake();
     };
 
     init();
@@ -52,7 +46,7 @@ function App() {
         <Route
           path='/'
           element={
-            <BaseLayout headerTitle={"Home"}>
+            <BaseLayout headerTitle={"Trang chủ"}>
               <HomePage />
             </BaseLayout>
           }
@@ -62,7 +56,7 @@ function App() {
         <Route
           path='/settings'
           element={
-            <BaseLayout headerTitle={"Settings"}>
+            <BaseLayout headerTitle={"Cài đặt"}>
               <SettingsPage />
             </BaseLayout>
           }
@@ -72,7 +66,7 @@ function App() {
         <Route
           path='/rooms'
           element={
-            <BaseLayout headerTitle={"Rooms"}>
+            <BaseLayout headerTitle={"Phòng"}>
               <GameRoomPage />
             </BaseLayout>
           }
@@ -80,7 +74,7 @@ function App() {
 
         {/* Game Page */}
         <Route
-          path='/game'
+          path='/game/:type'
           element={
             <BaseLayout headerTitle={"Game"} shownFooter={false}>
               <GamePage />

@@ -55,7 +55,7 @@ export default class MyServer {
             res,
             200,
             Utils.RM.getResponseMessage(false, {
-              id: Utils.Security.getRandomID()
+              id: Utils.Security.getRandomID("", 2, 8)
             }, "Welcome to Tunanguyen Server. You can have perfect experience in here.")
           );
         } catch (error: any) {

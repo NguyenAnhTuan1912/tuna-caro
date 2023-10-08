@@ -12,10 +12,10 @@ import "./HomePage.styles.css";
 
 export default function HomePage(props: HomePageProps) {
   return (
-    <div className="home-page full-container p-2">
+    <div className="home-page p-2">
       <h1 className="txt-center">Trang chủ</h1>
       <div className="home-page-menu w-100 pt-4">
-        <Link to={"/game"}><button className="btn spe-outline w-100">Chơi 2 người</button></Link>
+        <Link to={"/game/offline"}><button className="btn spe-outline w-100">Chơi 2 người</button></Link>
 
         <hr className="my-4"></hr>
 

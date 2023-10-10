@@ -19,7 +19,7 @@ import { ReduxAction } from "../state.types";
 export const PlayerSlice = createSlice({
   name: "player",
   initialState: {
-    player: new Player()
+    self: new Player()
   },
   reducers: {
     /**
@@ -28,7 +28,7 @@ export const PlayerSlice = createSlice({
      * @param payload 
      */
     setPlayerIDAction: function(state, action: ReduxAction<string>) {
-      state.player.id = action.payload;
+      state.self.id = action.payload;
     },
 
     /**
@@ -37,7 +37,7 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerNameAction: function(state, action: ReduxAction<string>) {
-      state.player.name = action.payload;
+      state.self.name = action.payload;
     },
 
     /**
@@ -46,15 +46,15 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerAction: function(state, action: ReduxAction<PlayerType>) {
-      if(action.payload.id) state.player.id = action.payload.id;
-      if(action.payload.name) state.player.id = action.payload.name;
+      if(action.payload.id) state.self.id = action.payload.id;
+      if(action.payload.name) state.self.id = action.payload.name;
     }
   },
   
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
-      state.player.id = action.payload;
-      state.player.name = `Player[${action.payload}]`;
+      state.self.id = action.payload;
+      state.self.name = `Player[${action.payload}]`;
     });
   }
 });
@@ -65,7 +65,7 @@ export const PlayerSlice = createSlice({
  * @returns 
  */
 export function playerSelector(state: any): Player {
-  return state.player.player;
+  return state.player.self;
 }
 
 export const {

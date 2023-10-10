@@ -1,5 +1,5 @@
 import { MyMap } from "src/objects/MyMap";
-import { Player } from "./Player";
+import { Player, PlayerType } from "./Player";
 
 export type Coordinate = {
   x: number;
@@ -8,11 +8,13 @@ export type Coordinate = {
 export type GameStatus = "Waiting" | "Playing";
 export type MarkType = "X" | "O";
 export type MarkInfoMapType = MyMap<string, MarkInfoType>;
+export type CheckCaseLabels = "A" | "B" | "C" | "D";
+
 export interface MarkInfoType {
   value: MarkType;
   element: JSX.Element;
-}
-export type CheckCaseLabels = "A" | "B" | "C" | "D";
+};
+
 export interface CheckWinnerCaseType {
   [Key: string]: {
     satisfactionTimes: number;
@@ -21,7 +23,8 @@ export interface CheckWinnerCaseType {
     fromCoor: Coordinate;
     toCoor: Coordinate;
   }
-}
+};
+
 export interface ResultType {
   player: MarkType;
   from: string;
@@ -30,13 +33,24 @@ export interface ResultType {
     from: Coordinate;
     to: Coordinate;
   }
-}
+};
+
 export type DirectionCheckResultType = Array<{
   x: number;
   y: number;
   isSatisfactory: boolean;
   coor: string;
 }>;
+
+export interface GameType {
+  id: string;
+  name: string;
+  status: GameStatus;
+  currentTurn: MarkType;
+  host?: Player;
+  password: string;
+  players: { [key: string]: PlayerType } | null;
+};
 
 /**
  * Create a direction checker. Each case has 2 directions to check.
@@ -452,6 +466,10 @@ export class Game {
       "X": player1,
       "O": player2
     };
+
+    // Init something
+    this._players["X"].init();
+    this._players["O"].init();
     this.init();
   }
 

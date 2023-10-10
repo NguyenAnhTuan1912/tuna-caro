@@ -2,15 +2,9 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 
-// Import APIs
-import { OtherAPIs } from './apis/others';
-
-// Import socket
-import { MySocket, socket, Message } from './apis/socket';
-
 // Import hoooks
-import { useStateWESSFns } from './hooks/useStateWESSFns';
 import { usePlayerActions } from './hooks/usePlayer';
+import { useSocket } from './hooks/useSocket';
 
 // Import layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
@@ -26,6 +20,7 @@ import GameFindingDialog from './components/dialog/GameFindingDialog';
 
 function App() {
   const playerDispatcher = usePlayerActions();
+  const { socket } = useSocket();
 
   React.useEffect(() => {
     async function init() {
@@ -37,6 +32,10 @@ function App() {
     };
 
     init();
+
+    return function() {
+      socket.disconnect();
+    }
   }, []);
 
   return (

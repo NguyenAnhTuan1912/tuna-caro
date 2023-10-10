@@ -17,11 +17,20 @@ export class Player {
   score!: number;
 
   constructor();
-  constructor(id?: string, name?: string)
-  constructor(id?: string, name?: string) {
-    if(id) {
-      this.id = id;
-      this.name = name ? name : `Player[${id}]`;
+  constructor(_?: PlayerType);
+  constructor(_?: string | PlayerType, name?: string)
+  constructor(_?: string | PlayerType, name?: string) {
+    if(_ && typeof _ === "string") {
+      this.id = _;
+      this.name = name ? name : `Player[${_}]`;
+    }
+    
+    if(_ && typeof _ !== "string") {
+      this.id = _.id;
+      this.name = _.name;
+      this.mark = _.mark;
+      this.isWinner = _.isWinner;
+      this.score = _.score;
     }
   }
 
@@ -38,5 +47,18 @@ export class Player {
    */
   reset() {
     this.init();
+  }
+
+  /**
+   * Use this method to get data of player (not include method).
+   */
+  getInformation(): PlayerType {
+    return {
+      id: this.id,
+      name: this.name,
+      mark: this.mark,
+      isWinner: this.isWinner ? this.isWinner : false,
+      score: this.score ? this.score : 0
+    }
   }
 }

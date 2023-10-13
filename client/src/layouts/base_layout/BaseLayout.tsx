@@ -13,9 +13,14 @@ import { BaseLayoutProps } from './BaseLayout.props';
 export default function BaseLayout(props: BaseLayoutProps) {
   return (
     <>
-      <Header
-        title={props.headerTitle}
-      />
+      {
+        (props.shownHeader === true || props.shownHeader === undefined)
+        && (
+          <Header
+            title={props.headerTitle}
+          />
+        )
+      }
       { props.children }
       { (props.shownFooter === true || props.shownFooter === undefined) && <Footer /> }
     </>

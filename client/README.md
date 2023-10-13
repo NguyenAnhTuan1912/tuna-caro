@@ -1,1 +1,1 @@
-# Client App Of Caro game
+# Caro game front-end application

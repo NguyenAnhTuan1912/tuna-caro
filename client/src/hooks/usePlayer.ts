@@ -1,9 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
 
-// Import classes
+// Import from classes
 import { PlayerType } from 'src/classes/Player';
 
-// Import thunks
+// Import from state
+import { AppDispatch } from 'src/state';
 import { getPlayerIDAsyncThunk } from "src/state/player/thunks";
 
 // Import actions
@@ -19,7 +20,7 @@ export const {
   usePlayerState,
   usePlayerActions
 } = (function() {
-  const createPlayerActionFns = function(dispatch: any) {
+  const createPlayerActionFns = function(dispatch: AppDispatch) {
     return {
       getPlayerIDAsyncThunk: function() {
         dispatch(getPlayerIDAsyncThunk());
@@ -33,7 +34,7 @@ export const {
         dispatch(setPlayerNameAction(name));
       },
 
-      setPlayerAction: function(player: PlayerType) {
+      setPlayerAction: function(player: Partial<PlayerType>) {
         dispatch(setPlayerAction(player));
       }
     }

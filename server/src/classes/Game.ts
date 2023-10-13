@@ -51,21 +51,27 @@ export class Game {
   private _password?: string;
   private _players!: { [key: string]: Player } | null;
 
+  private static __hasArgsDefaultConstruct__(o: Game, id: string, name?: string, status?: GameStatus, currentTurn?: MarkType) {
+    o.id = id ? id : Utils.Security.getRandomID("game", 2);
+    o.name = name ? name : "Phòng của ";
+    o.status = status ? status : "Waiting";
+    o.currentTurn = currentTurn ? currentTurn : "X";
+    o._players = {};
+  }
+
   constructor(game: GameType);
-  constructor(id: string | GameType, name: string, status: GameStatus, currentTurn: MarkType);
+  constructor(id?: string | GameType, name?: string, status?: GameStatus, currentTurn?: MarkType);
   constructor(_: string | GameType, name?: string, status?: GameStatus, currentTurn?: MarkType) {
     if(typeof _ === "string") {
-      this.id = _;
-      this.name = name!;
-      this.status = status!;
-      this.currentTurn = currentTurn!;
-      this._players = {};
+      Game.__hasArgsDefaultConstruct__(
+        this,
+        _, name, status, currentTurn
+      );
     } else {
-      this.id = _.id;
-      this.name = _.name;
-      this.status = _.status;
-      this.currentTurn = _.currentTurn;
-      this._players = {};
+      Game.__hasArgsDefaultConstruct__(
+        this,
+        _.id, _.name, _.status, _.currentTurn
+      );
     }
   }
 
@@ -76,11 +82,13 @@ export class Game {
   setPlayer(player: Player) {
     if(!this._players!["X"]) {
       this.host = player;
-      this._players!["X"] = player;
+      this._players!["X"] = player as Player;
+      return;
     }
 
     if(!this._players!["O"]) {
       this._players!["O"] = player;
+      return;
     }
   }
 
@@ -134,6 +142,28 @@ export class Game {
     // Notification to remain player.
     // socket.to(this.id).emit();
     socket.leave(this.id);
+  }
+
+  /**
+   * Use this method to check if game has password.
+   * @returns 
+   */
+  hasPassword() {
+    return Boolean(this._password);
+  }
+
+  /**
+   * Use this method to switch turn.
+   */
+  switchTurn() {
+    this.currentTurn = this.currentTurn === "X" ? "O" : "X";
+  }
+
+  /**
+   * Use this method to switch status.
+   */
+  swithStatus() {
+    this.status = this.status === "Playing" ? "Waiting" : "Playing";
   }
 
   /**

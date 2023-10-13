@@ -468,8 +468,8 @@ export class Game {
     };
 
     // Init something
-    this._players["X"].init();
-    this._players["O"].init();
+    this._players["X"].initForGame();
+    this._players["O"].initForGame();
     this.init();
   }
 
@@ -548,15 +548,28 @@ export class Game {
     this._password = password;
   }
 
+  /**
+   * Use this method to set player.
+   * @param turn 
+   * @param player 
+   */
   setPlayer(turn: string, player: Player) {
     player.mark = turn;
-    if(!this._players![turn]) this._players![turn] = player;
+    this._players![turn] = player;
   }
 
+  /**
+   * Use this method to set turn.
+   * @param turn 
+   */
   setTurn(turn: MarkType) {
     this.currentTurn = turn;
   }
 
+  /**
+   * Use this method to set winner.
+   * @param mark 
+   */
   setWinner(mark: MarkType) {
     this._players![mark].score += 1;
     this._players![mark].isWinner = true;
@@ -571,6 +584,28 @@ export class Game {
 
   getPlayer(turn: MarkType) {
     return this._players![turn];
+  }
+
+  /*
+    OTHER METHODS
+  */
+ /**
+  * Use this method to remove a player by `id` or `mark`.
+  * @param playerId 
+  */
+  removePlayer(playerId: string): any;
+  removePlayer(mark: MarkType): any;
+  removePlayer(g: string | MarkType) {
+    if(typeof g !== "string") {
+      delete this._players![g];
+      return;
+    }
+
+    if(this._players!["X"]!.id === g) {
+      delete this._players!["X"];
+    } else if(this._players!["O"]!.id === g) {
+      delete this._players!["O"];
+    }
   }
 
   /**

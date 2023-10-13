@@ -1,11 +1,11 @@
 .game-page {
   width: 100%;
-  height: calc(100vh - 86px);
+  height: 100vh;
 }
 
 .guide {
   position: fixed;
-  top: 86px;
+  top: 0;
   right: 0;
 }
 
@@ -18,7 +18,7 @@
 .game-info {
   position: fixed;
   left: 0;
-  top: 86px;
+  top: 0;
 }
 
 .game-page.O {

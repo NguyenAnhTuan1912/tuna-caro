@@ -2,9 +2,11 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 
-// Import hoooks
+// Import from apis
+import { mySocket } from 'src/apis/socket';
+
+// Import from hooks
 import { usePlayerActions } from './hooks/usePlayer';
-import { useSocket } from './hooks/useSocket';
 
 // Import layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
@@ -19,22 +21,33 @@ import GameCreatingDialog from './components/dialog/GameCreatingDialog';
 import GameFindingDialog from './components/dialog/GameFindingDialog';
 
 function App() {
+  console.log("Render App");
   const playerDispatcher = usePlayerActions();
-  const { socket } = useSocket();
 
   React.useEffect(() => {
     async function init() {
+      console.log("[App] Run init().");
       // Call API to get ID.
       playerDispatcher.getPlayerIDAsyncThunk();
 
-      // Handshake to socket on server
-      socket.handshake();
+      // Init
+      mySocket.init((message) => {
+        let data = message.data!;
+        console.log("SocketID: ", data);
+        playerDispatcher.setPlayerAction({
+          socketId: data.socketId
+        });
+      });
+
+      mySocket.handshake();
     };
 
+    console.log("App ~ useEffect");
     init();
 
     return function() {
-      socket.disconnect();
+      console.log("Disconnect socket");
+      mySocket.disconnect();
     }
   }, []);
 
@@ -75,7 +88,7 @@ function App() {
         <Route
           path='/game/:type'
           element={
-            <BaseLayout headerTitle={"Game"} shownFooter={false}>
+            <BaseLayout headerTitle={"Game"} shownFooter={false} shownHeader={false}>
               <GamePage />
             </BaseLayout>
           }

@@ -4,11 +4,13 @@ import { openTMI } from 'tunangn-react-modal';
 
 // Import classes
 import { GameType } from 'src/classes/Game';
-import { Message } from 'src/apis/socket';
+
+// Import from api/soket
+import { mySocket, Message, MySocket } from 'src/apis/socket';
 
 // Import hooks
-import { useSocket } from 'src/hooks/useSocket';
 import { useGlobalData } from 'src/hooks/useGlobalData';
+import { usePlayer } from 'src/hooks/usePlayer';
 
 // Import component
 
@@ -19,26 +21,46 @@ import { HomePageProps } from './HomePage.props';
 import "./HomePage.styles.css";
 
 export default function HomePage(props: HomePageProps) {
+  console.log("Render Home");
   const navigate = useNavigate();
-  const { socket, EventNames } = useSocket();
+  const { player } = usePlayer();
   const { changeData } = useGlobalData();
 
   React.useEffect(() => {
-    const listener = socket.addEventListener(EventNames.emitGame, (m: Message<GameType>) => {
-      if(m.isError) return;
-      let data = m.data!;
-      changeData("game", function(game) {
-        if(!game) return game;
-        game.id = data.id;
-        game.name = data.name;
-        game.password = data.password;
-        return game;
-      });
-      navigate("/game/online");
-    });
+    let emitGameListener = mySocket.addEventListener(
+      MySocket.EventNames.emitGame,
+      (m: Message<GameType>) => {
+        if(m.isError) return;
+        let data = m.data!;
+        console.log("Game: ", data);
+        changeData("game", function(game) {
+          if(!game) return game;
+          game.id = data.id;
+          game.name = data.name;
+          game.password = data.password;
+          return game;
+        });
+        navigate("/game/online");
+      }
+    );
+
+    // Set up `join_game` listener for player who want to join.
+    let joinGameListener = mySocket.addEventListener(
+      MySocket.EventNames.joinGame,
+      (m: Message<GameType>) => {
+        let game = m.data!;
+        console.log("[HomePage] Message: ", m);
+        changeData("game", function() {
+          return game;
+        });
+        navigate("/game/online");
+      }
+    );
 
     return function() {
-      socket.removeEventListener(EventNames.emitGame, listener);
+      console.log("Unsubscribe EMIT_GAME");
+      mySocket.removeEventListener(MySocket.EventNames.emitGame, emitGameListener);
+      mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
     }
   }, []);
 
@@ -54,15 +76,20 @@ export default function HomePage(props: HomePageProps) {
           onClick={() => {
             openTMI("myGameCreatingDialog").then(result => {
               if(!result.isAgree) return;
-
-              socket.emit(EventNames.emitGame, {
-                isError: false,
-                eventName: EventNames.emitGame,
-                data: {
-                  name: result.data.name,
-                  password: result.data.password
-                }
-              });
+              mySocket.emit(
+                MySocket.EventNames.emitGame,
+                MySocket.createMessage(
+                  MySocket.EventNames.emitGame,
+                  undefined,
+                  {
+                    player: player,
+                    game: {
+                      name: result.data.name,
+                      password: result.data.password
+                    }
+                  }
+                )
+              );
             })
           }}
           className="btn spe-outline w-100 mb-1"
@@ -70,10 +97,27 @@ export default function HomePage(props: HomePageProps) {
 
         <button
           onClick={() => {
-            openTMI("myGameFindingDialog")
+            openTMI("myGameFindingDialog").then(result => {
+              if(!result.isAgree) return;
+              console.log("GameFinding result: ", result);
+              mySocket.emit(
+                MySocket.EventNames.joinGame,
+                MySocket.createMessage(
+                  MySocket.EventNames.joinGame,
+                  undefined,
+                  {
+                    player: player,
+                    game: {
+                      id: result.data.id,
+                      password: result.data.password
+                    }
+                  }
+                )
+              );
+            })
           }}
           className="btn spe-outline w-100 mb-1"
-        >Tìm người chơi</button>
+        >Tìm phòng</button>
 
         <Link to={"/rooms"}><button className="btn spe-outline w-100">Khám phá</button></Link>
 

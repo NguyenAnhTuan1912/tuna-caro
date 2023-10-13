@@ -17,6 +17,8 @@ import './index.css';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+// Render components
 root.render(
   <Provider store={store}>
     <BrowserRouter>

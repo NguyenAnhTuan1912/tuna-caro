@@ -1,31 +1,46 @@
-// Import classes
-import { MySocket } from "classes/MySocket";
-import { GameList } from "classes/GameList";
+// Import from classes
+import { MySocket, Message } from "classes/MySocket";
 import { Game, GameType } from "classes/Game";
+import { Player, PlayerType } from "classes/Player";
 
-// Import templates
-// import { createSocketEvent } from "templates/socket_events";
-import { Socket } from "socket.io";
+// Import from templates
+import { createSEListenerWrapper } from "templates/socket_events";
 
-// export const EmitGameSEListener = createSocketEvent<GameList>("emitGame",
-//   function(socket, o, gameInfo: GameType) {
-//     o.addGame(gameInfo.id, new Game(gameInfo));
-//     socket.emit(MySocket.EventNames.emitGame, "");
-//   }
-// );
+interface EmitGameMessageDataType {
+  game: GameType;
+  player: PlayerType;
+}
 
-export const EmitGameSEListener = {
+/**
+ * Containing event name and listener for `emit_game` event.
+ */
+export const EmitGameSELWrapperInfo = {
   name: MySocket.EventNames.emitGame,
-  fn: function(socket: Socket, gameList: GameList, gameInfo: GameType) {
-    gameList.addGame(socket, gameInfo.id, new Game(gameInfo));
+  wrapper: createSEListenerWrapper(function(io, socket, o) {
+    return function __EMITGAME__(message: Message<EmitGameMessageDataType>) {
+      const { game, player } = message.data!;
+      const newGame = new Game(game);
 
-    // After add game to list and create a socket room, message back to player.
-    socket.emit(
-      MySocket.EventNames.emitGame,
-      MySocket.createMessage(
+      // Set host
+      // Because this is the first player, this player will consider as host.
+      newGame.setPlayer(new Player(player));
+
+      // Set password
+      if(game.password) newGame.setPassword(game.password);
+
+      // Add game.
+      // Room will be created in this stage.
+      o.gameList.addGame(socket, newGame.id, newGame);
+
+      // After the game is added to list and create a socket room, message back to player.
+      socket.emit(
         MySocket.EventNames.emitGame,
-        "Create game successfully."
-      )
-    );
-  }
+        MySocket.createMessage(
+          MySocket.EventNames.emitGame,
+          "Create game successfully.",
+          newGame
+        )
+      );
+    }
+  })
 };

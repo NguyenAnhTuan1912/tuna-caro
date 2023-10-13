@@ -14,19 +14,24 @@ interface ScoreBoardProps {
  * @returns 
  */
 export default function ScoreBoard(props: ScoreBoardProps) {
-  let playerX = props.game.getPlayerInformation("X");
-  let playerO = props.game.getPlayerInformation("O");
+  let firstPlayer = props.game.getPlayerInformation("first");
+  let secondPlayer = props.game.getPlayerInformation("second");
+
+  let fpName = firstPlayer ? firstPlayer.name : "Unknow01";
+  let spName = secondPlayer ? secondPlayer.name : "Unknow02";
+  let fpScore = firstPlayer ? firstPlayer.score : 0;
+  let spScore = secondPlayer ? secondPlayer.score : 0;
 
   return React.useMemo(() => (
     <div className={"score-board" + (props.extendClassName ? " " + props.extendClassName : "")}>
       <p>
-        <span className="x-mark">{playerX.name}</span>:
-        <strong className="mx-1 x-mark">{playerX.score}</strong>
+        <span className="x-mark">{fpName}</span>:
+        <strong className="mx-1 x-mark">{fpScore}</strong>
       </p>
       <p>
-        <span className="o-mark">{playerO.name}</span>:
-        <strong className="mx-1 o-mark">{playerO.score}</strong>
+        <span className="o-mark">{spName}</span>:
+        <strong className="mx-1 o-mark">{spScore}</strong>
       </p>
     </div>
-  ), [playerX.score, playerO.score]);
+  ), [fpName, fpScore, spName, spScore]);
 }

@@ -21,8 +21,11 @@ import { env } from 'env';
 // DBs
 import Temp_ADB from "db/temp_a";
 
-// Import socket events
-import { EmitGameSEListener } from "socket_events/game/emitGame";
+// Import socket event listener wrappers
+import { EmitGameSELWrapperInfo } from "socket_events/game/emitGame";
+import { JoinGameSELWrapperInfo } from "socket_events/game/joinGame";
+import { EmitMarkSELWrapperInfo } from "socket_events/game/emitMark";
+import { LeaveGameSELWrapperInfo } from "socket_events/game/leaveGame";
 
 const ExpressServer = new MyServer({ port: process.env.PORT || "5000" });
 const builder = new ServerBuilder({ server: ExpressServer });
@@ -42,7 +45,10 @@ builder.buildMiddleWare(bodyParser.urlencoded({ extended: true }));
 // http://localhost:3000/api/posts
 
 // Build Socket
-builder.buildSocketEvent(EmitGameSEListener.name, EmitGameSEListener.fn);
+builder.buildSocketEventWrapper(EmitGameSELWrapperInfo.name, EmitGameSELWrapperInfo.wrapper);
+builder.buildSocketEventWrapper(JoinGameSELWrapperInfo.name, JoinGameSELWrapperInfo.wrapper);
+builder.buildSocketEventWrapper(EmitMarkSELWrapperInfo.name, EmitMarkSELWrapperInfo.wrapper);
+builder.buildSocketEventWrapper(LeaveGameSELWrapperInfo.name, LeaveGameSELWrapperInfo.wrapper);
 
 // Connect to DB
 builder.buildDBConnection(Temp_ADB.connect());

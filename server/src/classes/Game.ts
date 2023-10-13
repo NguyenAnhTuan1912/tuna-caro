@@ -12,6 +12,7 @@ export type Coordinate = {
 };
 export type GameStatus = "Waiting" | "Playing";
 export type MarkType = "X" | "O";
+export type PlayersKeyType = "first" | "second";
 
 export interface GameType {
   id: string;
@@ -49,23 +50,46 @@ export class Game {
   host!: Player;
   
   private _password?: string;
-  private _players!: { [key: string]: Player } | null;
+  private _players!: { [key: string]: Player | undefined } | undefined;
+
+  private static __hasArgsDefaultConstruct__(o: Game, id: string, name?: string, status?: GameStatus, currentTurn?: MarkType) {
+    o.id = id ? id : Utils.Security.getRandomID("game", 2);
+    o.name = name ? name : "Phòng của ";
+    o.status = status ? status : "Waiting";
+    o.currentTurn = currentTurn ? currentTurn : "X";
+    o._players = {
+      "first": undefined,
+      "second": undefined
+    };
+  }
 
   constructor(game: GameType);
-  constructor(id: string | GameType, name: string, status: GameStatus, currentTurn: MarkType);
+  constructor(id?: string | GameType, name?: string, status?: GameStatus, currentTurn?: MarkType);
   constructor(_: string | GameType, name?: string, status?: GameStatus, currentTurn?: MarkType) {
     if(typeof _ === "string") {
-      this.id = _;
-      this.name = name!;
-      this.status = status!;
-      this.currentTurn = currentTurn!;
-      this._players = {};
+      Game.__hasArgsDefaultConstruct__(
+        this,
+        _, name, status, currentTurn
+      );
     } else {
-      this.id = _.id;
-      this.name = _.name;
-      this.status = _.status;
-      this.currentTurn = _.currentTurn;
-      this._players = {};
+      Game.__hasArgsDefaultConstruct__(
+        this,
+        _.id, _.name, _.status, _.currentTurn
+      );
+    }
+  }
+
+  /**
+   * Use this static method to iterate players.
+   * @param o 
+   * @param cb 
+   */
+  static iteratePlayers(o: Game, cb: (player: Player, index: number) => void) {
+    let players = o.getPlayers(true) as (Array<Player>);
+    let index = 0;
+    for(let player of players) {
+      cb(player, index);
+      index++;
     }
   }
 
@@ -74,23 +98,38 @@ export class Game {
    * @param player 
    */
   setPlayer(player: Player) {
-    if(!this._players!["X"]) {
+    if(!this._players!["first"]) {
+      player.mark = player.mark ? player.mark : "X";
       this.host = player;
-      this._players!["X"] = player;
+      this._players!["first"] = player as Player;
+      return;
     }
 
-    if(!this._players!["O"]) {
-      this._players!["O"] = player;
+    if(!this._players!["second"]) {
+      player.mark = this.host.mark === "X" ? "O" : "X";
+      this._players!["second"] = player;
+      return;
     }
   }
 
   /**
-   * Use this method to get information of player by `mark`.
-   * @param mark 
-   * @returns 
+   * Use this method to get player by id;
+   * @param playerId 
    */
-  getPlayerByMark(mark: MarkType) {
-    return this._players![mark];
+  getPlayerById(playerId: string) {
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.id === playerId });
+  }
+
+  /**
+   * Use this method to get the player whose `id` does not match with `playerId`.
+   * @param playerId 
+   */
+  getPlayerByExceptedId(playerId: string) {
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.id !== playerId });
   }
 
   /**
@@ -99,23 +138,64 @@ export class Game {
    * @returns 
    */
   getPlayerByName(name: string) {
-    if(this._players!["X"].name === name) {
-      return this._players!["X"];
-    };
+    if(!this._players) return undefined;
 
-    if(this._players!["O"].name === name) {
-      this._players!["O"];
-    };
+    let players = this.getPlayers(true) as Array<Player>;
 
-    return;
+    return players.find(player => { if(player) return player.name === name });
+  }
+
+  /**
+   * Use this method to get ordinal number of player in `_players`.
+   * @param playerId 
+   */
+  getPlayerONumById(playerId: string) {
+    let target = "second";
+
+    // Find
+    Game.iteratePlayers(this, (player, index) => {
+      if(player && player.id === playerId) target = index === 0 ? "first" : "second"
+    });
+
+    return target;
+  }
+
+  /**
+   * Use this method to get non-host player.
+   */
+  getNonHostPlayer() {
+    if(!this._players) return;
+    let players = this.getPlayers(true) as Array<Player>;
+    return players.find(player => { if(player) return player === this.host });
+  }
+
+  /**
+   * Use this method to get all players.
+   * @param isArray
+   */
+  getPlayers(isArray: boolean = false) {
+    if(isArray) {
+      if(!this._players) return [];
+      return [this._players["first"], this._players["second"]];
+    }
+
+    if(!this._players) return {};
+
+    return this._players!;
   }
 
   /**
    * Use this method to remove player from game. Except host.
+   * @param socket 
+   * @param playerId 
+   * @returns 
    */
-  removePlayer(socket: Socket) {
-    socket.in(this.id).disconnectSockets();
-    delete this._players!["O"];
+  removePlayer( playerId: string) {
+    if(!this._players) return;
+    let onum = this.getPlayerONumById(playerId);
+
+    // Delete from _players
+    delete this._players[onum];
   }
 
   /**
@@ -126,14 +206,64 @@ export class Game {
    * - Not host: just remove "O" player and reset score.
    * @param socket 
    */
-  leaveGame(socket: Socket, playerId: string) {
-    if(this.host.id === playerId) {
-      this.host = this._players!["O"];
+  leaveGame(playerId: string) {
+    if(!this._players) return;
+    let onum = this.getPlayerONumById(playerId);
+    // Get non host player (this will check `is host in this game?`)
+    let nonHostPlayer = this.getNonHostPlayer()!;
+
+    if(this.host.id === playerId && nonHostPlayer) {
+      this.host = nonHostPlayer;
     }
-    
-    // Notification to remain player.
-    // socket.to(this.id).emit();
-    socket.leave(this.id);
+
+    // Delete this player.
+    delete this._players[onum];
+  }
+
+  /**
+   * Use this method to check if game has password.
+   * @returns 
+   */
+  hasPassword() {
+    return Boolean(this._password);
+  }
+
+  /**
+   * Use this method to switch turn.
+   */
+  switchTurn() {
+    this.currentTurn = this.currentTurn === "X" ? "O" : "X";
+  }
+
+  /**
+   * Use this method to switch status.
+   */
+  swithStatus() {
+    this.status = this.status === "Playing" ? "Waiting" : "Playing";
+  }
+
+  /**
+   * Use this method to check if the room is full
+   */
+  isFull() {
+    let count = 0;
+    Game.iteratePlayers(this, (player) => {
+      if(player) count++;
+    });
+
+    return count === 2 ? true : false;
+  }
+
+  /**
+   * Use this method to check if the room is empty
+   */
+  isEmpty() {
+    let count = 0;
+    Game.iteratePlayers(this, (player) => {
+      if(player) count++;
+    });
+
+    return count === 0 ? true : false;
   }
 
   /**

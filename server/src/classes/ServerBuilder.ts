@@ -3,7 +3,15 @@ import { Socket } from "socket.io";
 
 import MyServer from "./MyServer";
 
+// Import from classes
+import { MySocket, ListenerFn } from "./MySocket";
+
+// Import from templates
+import { CreateSEListenerWrapperCallback } from "templates/socket_events"; 
+
+// Import from types
 import { ServerBuilderOptions } from "types";
+
 
 export default class ServerBuilder {
   server!: MyServer
@@ -37,7 +45,11 @@ export default class ServerBuilder {
     this.server.dbConnections.push(connection);
   }
 
-  buildSocketEvent<O>(name: string, listener: (socket: Socket, o: O, ...args: any[]) => void) {
-    this.server.socket.addEventListener(name, listener);
+  buildSocketEvent(name: string, listener: ListenerFn) {
+    this.server.socketIO.addEventListener(name, listener);
+  }
+
+  buildSocketEventWrapper(name: string, wrapper: CreateSEListenerWrapperCallback) {
+    this.server.socketIO.addEventListenerWrapper(name, wrapper);
   }
 }

@@ -12,11 +12,11 @@ import { LocalStorageUtils } from 'src/utils/localstorage';
 export const getPlayerIDAsyncThunk = createAsyncThunk(
   "/getPlayerIDAsyncThunk",
   async function(state, api) {
-    let id = LocalStorageUtils.getItem<string>("socketID");
+    let id = LocalStorageUtils.getItem<string>("playerId");
 
     if(!id) {
       id = (await OtherAPIs.getRandomID()).data.id;
-      LocalStorageUtils.setItem("socketID", id);
+      LocalStorageUtils.setItem("playerId", id);
     }
 
     return id;

@@ -1,5 +1,6 @@
 export interface PlayerType {
   id: string;
+  socketId?: string;
   name: string;
   mark?: string;
   isWinner: boolean;
@@ -11,33 +12,39 @@ export interface PlayerType {
  */
 export class Player {
   id!: string;
+  socketId!: string;
   name!: string;
   mark?: string;
   isWinner!: boolean;
   score!: number;
 
+  private static __hasArgsDefaultConstruct__(o: Player, id: string, name?: string, mark?: string, isWinner?: boolean, score?: number) {
+    o.id = id;
+    o.name = name ? name : `Player[${id}]`;
+    if(mark) o.mark = mark;
+    if(isWinner) o.isWinner = isWinner;
+    if(score) o.score = score;
+  }
+
   constructor();
-  constructor(_?: PlayerType);
-  constructor(_?: string | PlayerType, name?: string)
-  constructor(_?: string | PlayerType, name?: string) {
+  constructor(player: PlayerType);
+  constructor(id: string);
+  constructor(id: string, name: string);
+  constructor(id: string, name: string, mark: string, isWinner: boolean, score: number);
+  constructor(_?: string | PlayerType, name?: string, mark?: string, isWinner?: boolean, score?: number) {
     if(_ && typeof _ === "string") {
-      this.id = _;
-      this.name = name ? name : `Player[${_}]`;
+      Player.__hasArgsDefaultConstruct__(this, _, name, mark, isWinner, score);
     }
     
     if(_ && typeof _ !== "string") {
-      this.id = _.id;
-      this.name = _.name;
-      this.mark = _.mark;
-      this.isWinner = _.isWinner;
-      this.score = _.score;
+      Player.__hasArgsDefaultConstruct__(this, _.id, _.name, _.mark, _.isWinner, _.score);
     }
   }
 
   /**
    * Use this method to init state of player when enter game, including `score` and `isWinner`.
    */
-  init() {
+  initForGame() {
     this.score = 0;
     this.isWinner = false;
   }
@@ -46,7 +53,20 @@ export class Player {
    * Use this method to reset state of user in game, including `score` and `isWinner`.
    */
   reset() {
-    this.init();
+    this.initForGame();
+  }
+
+  /**
+   * Use this method to set information for player.
+   * @param player 
+   */
+  setPlayer(player: Partial<PlayerType>) {
+    for(let prop in player) {
+      let key = prop as keyof PlayerType;
+      if(prop !== "id" && player[key]) {
+        (this as any)[key] = player[key];
+      }
+    }
   }
 
   /**

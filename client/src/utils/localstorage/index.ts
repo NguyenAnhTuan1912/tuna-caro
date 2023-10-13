@@ -1,5 +1,5 @@
 const StoreKeys = {
-  "socketID": "_socid"
+  "playerId": "_plyid"
 };
 
 type Keys = keyof typeof StoreKeys;

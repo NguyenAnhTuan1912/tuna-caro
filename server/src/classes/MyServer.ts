@@ -18,7 +18,7 @@ export default class MyServer {
   port!: string;
   app!: Express;
   instance!: Server;
-  socket!: MySocket;
+  socketIO!: MySocket;
 
   apis!: Array<{ base: string, router: Router }>;
   middleWares!: Array<any>;
@@ -28,7 +28,7 @@ export default class MyServer {
     this.port = options.port;
     this.app = express();
     this.instance = http.createServer(this.app);
-    this.socket = new MySocket({ httpServer: this.instance });
+    this.socketIO = new MySocket({ httpServer: this.instance });
 
     this.apis = [];
     this.middleWares = [];

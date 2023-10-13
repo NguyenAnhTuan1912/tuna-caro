@@ -6,9 +6,6 @@ import { Player, PlayerType } from "src/classes/Player";
 // Import thunks
 import { getPlayerIDAsyncThunk } from "./thunks";
 
-// Import utils
-import { LocalStorageUtils } from "src/utils/localstorage";
-
 // Import types
 import { ReduxAction } from "../state.types";
 
@@ -45,9 +42,8 @@ export const PlayerSlice = createSlice({
      * @param state 
      * @param action 
      */
-    setPlayerAction: function(state, action: ReduxAction<PlayerType>) {
-      if(action.payload.id) state.self.id = action.payload.id;
-      if(action.payload.name) state.self.id = action.payload.name;
+    setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
+      state.self.setPlayer(action.payload);
     }
   },
   

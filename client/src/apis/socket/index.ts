@@ -3,17 +3,22 @@ import { io, Socket } from "socket.io-client";
 // Import constant
 import { API_ROOT } from 'src/utils/constant';
 
+// Private instance
+let __private__: MySocket | null = null;
+
 export interface Message<T> {
   eventName: string;
   isError: boolean;
   text?: string;
-  data?: T
+  data?: T;
 }
 
 export type EventNames = keyof typeof MySocket.EventNames;
 
 export class MySocket {
   private _socket!: Socket;
+
+  private static _canInit: boolean = true;
   static EventNames = {
     /**
      * Init a connection between client and server.
@@ -42,8 +47,9 @@ export class MySocket {
   };
 
   constructor() {
+    // Apply singleton pattern.
+    if(__private__) return __private__;
     this._socket = io(API_ROOT);
-    this._init();
   }
 
   /**
@@ -63,16 +69,20 @@ export class MySocket {
     }
   }
 
-  private _init() {
-    this._socket.on(MySocket.EventNames.initial, (message) => {
-      console.log(message);
+  /**
+   * Use this method to init socket.
+   * @param cb 
+   */
+  init(cb: (message: Message<{ socketId: string }>) => void) {
+    if(!MySocket._canInit) return;
+    this._socket.on(MySocket.EventNames.initial, (message: Message<{ socketId: string }>) => {
+      cb(message);
     });
+    MySocket._canInit = false;
   }
 
   /**
-   * FOR FUN
-   * 
-   * Use this method to say hello to caro server.
+   * Use this method to say hello to caro server and get socketId.
    */
   handshake() {
     this._socket.emit(MySocket.EventNames.initial, "Hello from client app of caro-game");
@@ -82,6 +92,8 @@ export class MySocket {
    * Use this method to disconnect socket connection without reconnect.
    */
   disconnect() {
+    MySocket._canInit = true;
+    this._socket.removeListener(MySocket.EventNames.initial);
     this._socket.disconnect();
   }
 
@@ -120,3 +132,11 @@ export class MySocket {
     }
   }
 }
+
+// Create private instance
+if(!__private__) __private__ = new MySocket();
+
+/**
+ * A `MySocket` instance, use to commuticate in socket conversation.
+ */
+export const mySocket = new MySocket();

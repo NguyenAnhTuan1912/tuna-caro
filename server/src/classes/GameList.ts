@@ -24,13 +24,20 @@ export class GameList {
     socket.join(game.id);
     this._games.set(id, game);
   }
+  
+  /**
+   * Use this method to get information of a game.
+   * @param id 
+   */
+  getGame(id: string) {
+    return this._games.get(id);
+  }
 
   /**
    * Use this method to remove a game from list with its `id`.
    * @param id 
    */
-  removeGame(socket: Socket, id: string) {
-    socket.leave(id);
+  removeGame(id: string) {
     this._games.delete(id);
   }
 }

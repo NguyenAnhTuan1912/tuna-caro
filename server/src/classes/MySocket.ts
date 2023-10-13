@@ -7,11 +7,14 @@ import { env } from 'env';
 // Import classes
 import { GameList } from "./GameList";
 
+// Import from templates
+import { CreateSEListenerWrapperCallback } from "templates/socket_events";
+
 interface MySocketOptions {
   httpServer: Server
 }
 
-interface Message<T> {
+export interface Message<T> {
   eventName: string;
   isError: boolean;
   text?: string;
@@ -20,15 +23,30 @@ interface Message<T> {
 
 export type EventNames = keyof typeof MySocket.EventNames;
 
-
-interface Listener<O, T> {
-  name: string;
-  fn: (socket: Socket, o: O, ...args: any[]) => void;
+export type SocketListnerFn = (...args: Array<any>) => void;
+export type ListenerFn = (socket: Socket, ...args: any[]) => void;
+export type ListenerWrapperFn = (socket: Socket) => SocketListnerFn;
+export interface SEListenerObjectsType {
+  gameList: GameList;
 }
+
+export interface ListenerInfo {
+  name: string;
+  fn: ListenerFn;
+}
+
+export interface ListenerWrapperInfo {
+  name: string;
+  fn: ListenerWrapperFn;
+}
+
 
 
 /**
  * Create a instance to manage all socket events inside app. Like a central of socket events.
+ * There are 2 ways that listener can be added:
+ * - Throught the SEListener Wrapper.
+ * - Or direct listener function.
  */
 export class MySocket {
   private _io!: SocketServer;
@@ -37,12 +55,33 @@ export class MySocket {
      * Init a connection between client and server.
      */
     initial: "initial",
-    emitGame: "emit_game"
+    /**
+     * This event is all about create game and emit it to server. Then
+     * get it back with `id`.
+     */
+    emitGame: "emit_game",
+    /**
+     * This event is all about when a player mark to table, this will emit the message and
+     * listen to this event, then opposite player can catch the change.
+     */
+    emitMark: "emit_mark",
+    /**
+     * This event is all about a player join a game, this will emit the message and listen to this event.
+     * So a player join a game, and opposite player will know about it.
+     */
+    joinGame: "join_game",
+    /**
+     * This event is all about a player leave the game, this will emit the message and listen to this event.
+     * If a player leave the game, opposite player will know and app will calculate and re-render to sync with state.
+     */
+    leaveGame: "leave_game"
   };
 
+  private _listeners: Array<ListenerInfo> | null;
+  private _listenerWrapper: Array<ListenerWrapperInfo> | null;
+
   // Objects
-  private _gameList!: GameList;
-  private _listeners: Array<Listener<any, any>> | null;
+  private __o__!: SEListenerObjectsType;
 
   constructor(options: MySocketOptions) {
     this._io = new SocketServer(options.httpServer, {
@@ -51,8 +90,11 @@ export class MySocket {
         credentials: true
       }
     });
-    this._gameList = new GameList();
+    this.__o__ = {
+      gameList: new GameList()
+    };
     this._listeners = [];
+    this._listenerWrapper = [];
 
     // Init
     setTimeout(() => this._init(), 0);
@@ -80,19 +122,37 @@ export class MySocket {
    */
   private _init() {
     this._io.on("connection", (socket) => {
+      console.log("Game in list: ", this.__o__.gameList);
+      
+      console.log("SocketID: ", socket.id);
+      console.log("Rooms: ", socket.rooms);
+
+      socket.on("disconnect", () => {
+        socket.removeAllListeners();
+      });
+
       socket.on(MySocket.EventNames.initial, (message) => {
-        console.log("SocketID: ", socket.id);
-        console.log(message);
+        socket.emit(
+          MySocket.EventNames.initial,
+          MySocket.createMessage(
+            MySocket.EventNames.initial,
+            "Hello from Server app of caro game.",
+            {
+              socketId: socket.id
+            }
+          )
+        );
+      });
 
-        socket.emit(MySocket.EventNames.initial, "Hello from Server app of caro game.");
-
-        this._listeners?.forEach((data) => {
-          socket.on(data.name, (...args) => {
-            data.fn(socket, args);
-          });
+      this._listeners?.forEach((data) => {
+        socket.on(data.name, (...args) => {
+          data.fn(socket, args);
         });
+      });
 
-        if(this._listeners) this._listeners = null;
+      this._listenerWrapper?.forEach((data) => {
+        let listener = data.fn(socket);
+        socket.on(data.name, listener);
       });
     });
   }
@@ -102,14 +162,25 @@ export class MySocket {
    * @param name 
    * @param listener 
    */
-  addEventListener<O>
-  (name: string, listener: (socket: Socket, o: O, ...args: any[]) => void)
+  addEventListener(name: string, listener: (socket: Socket, o: SEListenerObjectsType, ...args: any[]) => void)
   {
-    switch(name) {
-      case MySocket.EventNames.emitGame: {
-        this._listeners!.push({ name, fn: (socket, ...args: any[]) => { listener(socket, this._gameList as O, ...args) } });
-        return;
-      }
-    }
+    let that = this;
+    this._listeners!.push({
+      name,
+      fn: (socket, ...args: any[]) => { listener(socket, that.__o__, ...args) }
+    });
+  }
+
+  /**
+   * Use this method to add event listener wrapper.
+   * @param name 
+   * @param wrapper 
+   */
+  addEventListenerWrapper(name: string, wrapper: CreateSEListenerWrapperCallback) {
+    let that = this;
+    this._listenerWrapper!.push({
+      name,
+      fn: (socket) => { return wrapper(this._io, socket, that.__o__) }
+    });
   }
 }

@@ -32,14 +32,13 @@ export default function HomePage(props: HomePageProps) {
       (m: Message<GameType>) => {
         if(m.isError) return;
         let data = m.data!;
-        console.log("Game: ", data);
-        changeData("game", function(game) {
-          if(!game) return game;
-          game.id = data.id;
-          game.name = data.name;
-          game.password = data.password;
-          return game;
+        
+        console.log("Event: ", m);
+
+        changeData("game", function() {
+          return data;
         });
+
         navigate("/game/online");
       }
     );
@@ -50,9 +49,11 @@ export default function HomePage(props: HomePageProps) {
       (m: Message<GameType>) => {
         let game = m.data!;
         console.log("[HomePage] Message: ", m);
+        
         changeData("game", function() {
           return game;
         });
+
         navigate("/game/online");
       }
     );

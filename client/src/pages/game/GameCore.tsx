@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Import class objects
-import { Game, MarkType } from 'src/classes/Game';
+import { Game, PlayersKeyType } from 'src/classes/Game';
 import { Player, PlayerType } from 'src/classes/Player';
 
 // Import hooks
@@ -30,26 +30,7 @@ interface GamePageElements {
  */
 export default function GameCore(props: GameCoreProps) {
   const [gameState, gameStateFns] = useStateWESSFns({
-    game: new Game(
-      props.game.id!,
-      props.game.name!,
-      // Create player "X"
-      new Player(
-        props.playerX.id,
-        props.playerX.name,
-        "X",
-        false,
-        0
-      ),
-      // Create player "O"
-      new Player(
-        props.playerO.id,
-        props.playerO.name,
-        "O",
-        false,
-        0
-      )
-    )
+    game: new Game(props.game.id!, props.game.name!)
   }, function(changeState) {
     return {
       /**
@@ -111,11 +92,27 @@ export default function GameCore(props: GameCoreProps) {
        * Use this function to add player to game.
        * @param player 
        */
-      appendPlayer: function(turn: string, player: PlayerType) {
+      appendPlayer: function(key: PlayersKeyType, player: PlayerType | Player) {
         changeState("game", function(game) {
           // Set new player.
-          game.setPlayer(turn, new Player(player));
-          console.log("Game after add player: ", game);
+          if(player instanceof Player) {
+            game.setPlayer(key, player);
+          } else {
+            console.log("Create new then add: ", player);
+            game.setPlayer(key, new Player(player));
+          }
+          console.log(`Get player ${key}: `, game.getPlayer(key));
+          return game;
+        });
+      },
+
+      /**
+       * Use this function to set host.
+       */
+      setHost: function(player: Player) {
+        changeState("game", function(game) {
+          // Set host
+          game.setHost(player);
           return game;
         });
       },
@@ -124,10 +121,11 @@ export default function GameCore(props: GameCoreProps) {
        * Use this function to remove a player from game.
        * @param g 
        */
-      removePlayer: function(g: MarkType | string) {
+      removePlayer: function(g: PlayersKeyType | string) {
         changeState("game", function(game) {
           // If a player leave the game or is kicked by host. The game will be reset.
           game.removePlayer(g);
+          console.log("Remain: ", game.getPlayers(true));
           game.reset();
           return game;
         });
@@ -140,6 +138,32 @@ export default function GameCore(props: GameCoreProps) {
   });
 
   React.useEffect(() => {
+    // Change something
+    if(!props.host) {
+      let firstPlayer = new Player("01");
+      let secondPlayer = new Player("02");
+
+      firstPlayer.initForGame();
+      secondPlayer.initForGame();
+
+      // Set mark
+      firstPlayer.mark = "X";
+      secondPlayer.mark = "O";
+
+      gameStateFns.appendPlayer("first", firstPlayer);
+      gameStateFns.appendPlayer("second", secondPlayer);
+    } else {
+      let firstPlayer = new Player(props.host);
+      let secondPlayer;
+
+      if(props.game._players && props.game._players["second"]) secondPlayer = new Player(props.game._players["second"]);
+
+      gameStateFns.appendPlayer("first", firstPlayer);
+      if(secondPlayer) gameStateFns.appendPlayer("second", secondPlayer);
+
+      gameStateFns.setHost(firstPlayer);
+    }
+
     if(props.useEffectCB) {
       console.log("GameCore setup useEffect.");
       return props.useEffectCB(gameStateFns);
@@ -151,6 +175,11 @@ export default function GameCore(props: GameCoreProps) {
       <Grid
         height={"100%"}
         emitCoordinate={(x, y, t) => {
+          if(
+            props.preventClickWhenTurn
+            && props.preventClickWhenTurn === gameState.game.currentTurn
+          ) return;
+
           if(gameState.game.hasWinner()) return;
 
           if(!gameState.game.hasMarkIn(x, y)) {

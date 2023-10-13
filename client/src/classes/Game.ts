@@ -7,6 +7,7 @@ export type Coordinate = {
 };
 export type GameStatus = "Waiting" | "Playing";
 export type MarkType = "X" | "O";
+export type PlayersKeyType = "first" | "second";
 export type MarkInfoMapType = MyMap<string, MarkInfoType>;
 export type CheckCaseLabels = "A" | "B" | "C" | "D";
 
@@ -48,8 +49,8 @@ export interface GameType {
   status: GameStatus;
   currentTurn: MarkType;
   host?: Player;
-  password: string;
-  players: { [key: string]: PlayerType } | null;
+  _password: string;
+  _players: { [key: string]: PlayerType } | null;
 };
 
 /**
@@ -442,9 +443,10 @@ export class Game {
   name!: string;
   status!: GameStatus;
   currentTurn!: MarkType;
+  host!: Player;
   
   private _password?: string;
-  private _players!: { [key: string]: Player } | null;
+  private _players!: { [key: string]: Player | null } | null;
   private _markInfoMap!: MarkInfoMapType | null;
   private _winnerFinder!: WinnerFinder | null;
 
@@ -458,18 +460,16 @@ export class Game {
    */
   static t = 30;
 
-  constructor(id: string, name: string, player1: Player, player2: Player) {
+  constructor(id: string, name: string) {
     this.id = id;
     this.name = name;
     this.status = "Waiting";
     this._players = {
-      "X": player1,
-      "O": player2
+      "first": null,
+      "second": null
     };
 
     // Init something
-    this._players["X"].initForGame();
-    this._players["O"].initForGame();
     this.init();
   }
 
@@ -497,7 +497,7 @@ export class Game {
   }
 
   /**
-   * Use this method to get d string for path to draw "X".
+   * Use this static method to get d string for path to draw "X".
    * @param unitCoorX 
    * @param unitCoorY 
    * @param t 
@@ -516,13 +516,27 @@ export class Game {
   }
 
   /**
-   * Use this method to get coordinate from key.
+   * Use this static method to get coordinate from key.
    * @param key 
    * @returns 
    */
   static getCoordinateFromKey(key: string): Array<number> {
     let result = key.match(Game.MarkInfoKeyPattern) as Array<string>;
     return [parseInt(result[1]), parseInt(result[2])];
+  }
+
+  /**
+   * Use this static method to iterate players.
+   * @param o 
+   * @param cb 
+   */
+  static iteratePlayers(o: Game, cb: (player: Player, index: number) => void) {
+    let players = o.getPlayers(true) as (Array<Player>);
+    let index = 0;
+    for(let player of players) {
+      cb(player, index);
+      index++;
+    }
   }
 
   /**
@@ -553,9 +567,9 @@ export class Game {
    * @param turn 
    * @param player 
    */
-  setPlayer(turn: string, player: Player) {
-    player.mark = turn;
-    this._players![turn] = player;
+  setPlayer(key: PlayersKeyType, player: Player) {
+    if(!this._players) return;
+    this._players[key] = player;
   }
 
   /**
@@ -570,20 +584,80 @@ export class Game {
    * Use this method to set winner.
    * @param mark 
    */
-  setWinner(mark: MarkType) {
-    this._players![mark].score += 1;
-    this._players![mark].isWinner = true;
+  setWinner(key: string) {
+    if(!this._players) return;
+
+    Game.iteratePlayers(this, player => {
+      if(player.mark === key) {
+        player.score += 1;
+        player.isWinner = true;
+      }
+    });
+  }
+
+  /**
+   * Use this method to set host for game.
+   * @param player
+   */
+  setHost(player: Player): any;
+  setHost(key: string): any;
+  setHost(g: Player | string) {
+    if(!this._players) return;
+
+    if(typeof g === "string") {
+      this.host = this._players[g]!;
+      return;
+    }
+
+    this.host = g;
   }
 
   /*
     GETTERS
   */
+ /**
+  * Use this method to get password.
+  * @returns 
+  */
   getPassword() {
     return this._password;
   }
 
-  getPlayer(turn: MarkType) {
-    return this._players![turn];
+  /**
+   * Use this method to get player.
+   * @param turn 
+   * @returns 
+   */
+  getPlayer(key: PlayersKeyType) {
+    if(!this._players) return;
+    return this._players[key];
+  }
+
+  /**
+   * Use this method to get all players.
+   * @param isArray
+   */
+  getPlayers(isArray: boolean = false) {
+    if(isArray) {
+      let result: Array<any> = [];
+      if(!this._players) return result;
+
+      // Check if `first` player is exist.
+      if(this._players["first"]) {
+        result.push(this._players["first"]);
+      }
+
+      // Check if `second` player is exist.
+      if(this._players["second"]) {
+        result.push(this._players["second"]);
+      }
+      return result;
+
+    }
+
+    if(!this._players) return {};
+
+    return this._players!;
   }
 
   /*
@@ -594,17 +668,15 @@ export class Game {
   * @param playerId 
   */
   removePlayer(playerId: string): any;
-  removePlayer(mark: MarkType): any;
-  removePlayer(g: string | MarkType) {
-    if(typeof g !== "string") {
-      delete this._players![g];
-      return;
-    }
+  removePlayer(key: PlayersKeyType): any;
+  removePlayer(g: PlayersKeyType | string) {
+    if(!this._players) return;
+    if(this._players[g]) { delete this._players[g]; return; };
 
-    if(this._players!["X"]!.id === g) {
-      delete this._players!["X"];
-    } else if(this._players!["O"]!.id === g) {
-      delete this._players!["O"];
+    if(this._players["first"] && this._players["first"].id === g) {
+      delete this._players["first"];
+    } else if(this._players["second"] && this._players["second"].id === g) {
+      delete this._players["second"];
     }
   }
 
@@ -651,27 +723,39 @@ export class Game {
    * Use to check "Is game complete?" or "Has winner?"
    */
   hasWinner() {
-    if(this._players!["X"].isWinner) return true;
-    if(this._players!["O"].isWinner) return true;
-    return false;
+    if(!this._players) return false;
+    let result = (this.getPlayers(true) as Array<Player>).some(player => {
+      if(player) return player.isWinner;
+      return false;
+    });
+
+    return result;
   }
 
   /**
    * Use this method to reset entire the state of game.
    */
   reset() {
-    this._players!["X"].reset();
-    this._players!["O"].reset();
+    Game.iteratePlayers(this, (player, index) => {
+      if(!player) return;
+      if(index === 0 && !player.mark) player.mark = "X";
+      if(index === 1 && !player.mark) player.mark = "O";
+
+      // Reset winner status
+      player.reset();
+      player.isWinner = false;
+    });
     this.init();
   }
 
   /**
    * Use this method to get user's information.
-   * @param mark 
+   * @param key 
    * @returns 
    */
-  getPlayerInformation(mark: MarkType) {
-    return this._players![mark];
+  getPlayerInformation(key: PlayersKeyType) {
+    if(!this._players) return;
+    return this._players![key];
   }
 
   // FIND WINNER

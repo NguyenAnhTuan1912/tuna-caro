@@ -27,9 +27,10 @@ export class Player {
   }
 
   constructor();
-  constructor(player?: PlayerType);
-  constructor(id?: string, name?: string)
-  constructor(id?: string, name?: string, mark?: string, isWinner?: boolean, score?: number)
+  constructor(player: PlayerType);
+  constructor(id: string);
+  constructor(id: string, name: string);
+  constructor(id: string, name: string, mark: string, isWinner: boolean, score: number);
   constructor(_?: string | PlayerType, name?: string, mark?: string, isWinner?: boolean, score?: number) {
     if(_ && typeof _ === "string") {
       Player.__hasArgsDefaultConstruct__(this, _, name, mark, isWinner, score);

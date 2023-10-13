@@ -122,7 +122,7 @@ export class MySocket {
    */
   private _init() {
     this._io.on("connection", (socket) => {
-      // console.log("Game in list: ", this.__o__.gameList);
+      console.log("Game in list: ", this.__o__.gameList);
       
       console.log("SocketID: ", socket.id);
       console.log("Rooms: ", socket.rooms);

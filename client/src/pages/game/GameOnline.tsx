@@ -1,7 +1,9 @@
 import React from 'react';
 import { snackbar } from 'tunangn-react-modal';
+import { useNavigate } from 'react-router-dom'; 
 
 // Import from classes
+import { Game } from 'src/classes/Game';
 import { PlayerType } from 'src/classes/Player';
 
 // Import from apis
@@ -24,15 +26,21 @@ import { MarkSocketMessageType } from './Game.props';
  */
 export default function GameOnline() {
   const { player } = usePlayer();
-  const { data } = useGlobalData();
+  const { getData } = useGlobalData();
+  const navigate = useNavigate();
+  const data = getData();
   
+  console.log("GameOnline ~ Data: ", data);
+
   return (
     <GameCore
       useEffectCB={function(args) {
         let emitMarkListener = mySocket.addEventListener(
           MySocket.EventNames.emitMark,
           (m: Message<MarkSocketMessageType>) => {
-            
+            let data = m.data;
+            let { x, y } = data?.coor!;
+            args.addMark(x, y, Game.t);
           }
         );
     
@@ -43,23 +51,41 @@ export default function GameOnline() {
             let player = m.data!;
             // Add player to game.
             // Because first player always "X", so the second will be "O".
-            console.log("[GameOnline] Message: ", m);
             snackbar({
-              color: "primary",
-              title: m.text
+              color: "#2798BC",
+              title: "Join",
+              content: m.text
             })
-            args.appendPlayer("O", player);
+            args.appendPlayer("second", player);
           }
         );
     
         let leaveGameListener = mySocket.addEventListener(
           MySocket.EventNames.leaveGame,
-          (m: Message<string>) => {
-    
+          (m: Message<{ playerId: string }>) => {
+            snackbar({
+              color: "#2798BC",
+              title: "Leave",
+              content: m.text
+            })
+            args.removePlayer(m.data?.playerId!);
           }
         );
     
         return function() {
+          // Leave the game
+          mySocket.emit(
+            MySocket.EventNames.leaveGame,
+            MySocket.createMessage(
+              MySocket.EventNames.leaveGame,
+              undefined,
+              {
+                gameId: data.game?.id,
+                player
+              }
+            )
+          );
+
           // Execute when exit game, that mean when GamePage is destroyed.
           mySocket.removeEventListener(MySocket.EventNames.emitMark, emitMarkListener);
           mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
@@ -74,25 +100,13 @@ export default function GameOnline() {
             coor: {
               x, y
             },
-            mark: currentTurn
+            mark: currentTurn,
+            gameId: data.game!.id
           }
         ));
       }}
       game={data.game!}
-      playerX={{
-        id: player.id,
-        name: player.name,
-        isWinner: false,
-        score: 0,
-        mark: "X"
-      }}
-      playerO={{
-        id: "",
-        name: "",
-        isWinner: false,
-        score: 0,
-        mark: "O"
-      }}
+      host={data.game && data.game.host ? data.game.host : player}
     />
   )
 }

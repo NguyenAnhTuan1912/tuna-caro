@@ -24,6 +24,19 @@ export const JoinGameSELWrapperInfo = {
         const wannaJoinPlayer = new Player(player);
         let checkPassword = true;
 
+        // Check if room is full
+        if(addedGame?.isFull()) {
+          // Send a message back to player who join.
+          socket.emit(
+            MySocket.EventNames.joinGame,
+            MySocket.createMessage(
+              MySocket.EventNames.joinGame,
+              "Phòng đã đầy."
+            )
+          );
+          return;
+        }
+
         // Checkpassword
         if(addedGame?.hasPassword()) {
           checkPassword = await addedGame.comparePassword(game.password!);
@@ -44,6 +57,9 @@ export const JoinGameSELWrapperInfo = {
         addedGame.setPlayer(wannaJoinPlayer);
         addedGame.status = "Playing";
 
+        // Add to socket room
+        socket.join(addedGame.id);
+
         // After the game is added to list and create a socket room, message back to player.
         // Send to host.
         io
@@ -62,7 +78,7 @@ export const JoinGameSELWrapperInfo = {
           MySocket.EventNames.joinGame,
           MySocket.createMessage(
             MySocket.EventNames.joinGame,
-            "Tham gia game thành công!",
+            "Bạn vừa mới vào game.",
             addedGame
           )
         );

@@ -14,20 +14,6 @@ export default function GameOffline() {
         id: "TWO_PLAYERS_GAME",
         name: "2 players game"
       }}
-      playerX={{
-        id: "01",
-        name: "Player",
-        isWinner: false,
-        score: 0,
-        mark: "X"
-      }}
-      playerO={{
-        id: "02",
-        name: "Player",
-        isWinner: false,
-        score: 0,
-        mark: "O"
-      }}
     />
   )
 }

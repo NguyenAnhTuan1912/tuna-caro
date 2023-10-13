@@ -37,8 +37,7 @@ export class GameList {
    * Use this method to remove a game from list with its `id`.
    * @param id 
    */
-  removeGame(socket: Socket, id: string) {
-    socket.leave(id);
+  removeGame(id: string) {
     this._games.delete(id);
   }
 }

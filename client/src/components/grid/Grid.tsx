@@ -253,8 +253,6 @@ export default function Grid({
       handleKeydownOnGridBase: function(e: KeyboardEvent) {
         if(e.key === " " && e.target === document.body) {
           e.preventDefault();
-          let currentScrollHeight = elementRefs.current.gridBase?.scrollHeight!;
-          let currentScrollLeft = elementRefs.current.gridBase?.scrollLeft!;
           elementRefs.current.grid!.style.cursor = "grab";
           gridData.current.isSpaceDown = true;
         }
@@ -330,13 +328,13 @@ export default function Grid({
           xmlns="http://www.w3.org/2000/svg"
           onClick={(e) => {
             if(gridData.current.isSpaceDown) return;
-            let headerHeight = document.getElementById("app-header")?.offsetHeight!;
+            // let headerHeight = document.getElementById("app-header")?.offsetHeight!;
             let clientX = e.clientX;
             let clientY = e.clientY;
             let scrolledX = elementRefs.current.gridBase?.scrollLeft;
             let scrolledY = elementRefs.current.gridBase?.scrollTop;
             let coorX = NumberUtils.roundTo((clientX + scrolledX!) / gridData.current.currentScaleValue);
-            let coorY = NumberUtils.roundTo((clientY + scrolledY! - headerHeight) / gridData.current.currentScaleValue);
+            let coorY = NumberUtils.roundTo((clientY + scrolledY!) / gridData.current.currentScaleValue);
             let unitCoorX = Math.floor(coorX / gridData.current.t);
             let unitCoorY = Math.floor(coorY / gridData.current.t);
 

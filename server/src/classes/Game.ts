@@ -24,6 +24,16 @@ export interface GameType {
   players: { [key: string]: PlayerType } | null;
 };
 
+export interface ResultType {
+  player: MarkType;
+  from: string;
+  to: string;
+  endline: {
+    from: Coordinate;
+    to: Coordinate;
+  }
+};
+
 /**
  * There are some rule in game:
  * - The first turn always "X".
@@ -175,8 +185,20 @@ export class Game {
    */
   getPlayers(isArray: boolean = false) {
     if(isArray) {
-      if(!this._players) return [];
-      return [this._players["first"], this._players["second"]];
+      let result: Array<any> = [];
+      if(!this._players) return result;
+
+      // Check if `first` player is exist.
+      if(this._players["first"]) {
+        result.push(this._players["first"]);
+      }
+
+      // Check if `second` player is exist.
+      if(this._players["second"]) {
+        result.push(this._players["second"]);
+      }
+      return result;
+
     }
 
     if(!this._players) return {};

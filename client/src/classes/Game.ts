@@ -569,6 +569,10 @@ export class Game {
    */
   setPlayer(key: PlayersKeyType, player: Player) {
     if(!this._players) return;
+
+    // Always init for game.
+    player.initForGame();
+
     this._players[key] = player;
   }
 
@@ -631,6 +635,63 @@ export class Game {
   getPlayer(key: PlayersKeyType) {
     if(!this._players) return;
     return this._players[key];
+  }
+
+  /**
+   * Use this method to get player by id;
+   * @param playerId 
+   */
+  getPlayerById(playerId: string) {
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.id === playerId });
+  }
+
+  /**
+   * Use this method to get the player whose `id` does not match with `playerId`.
+   * @param playerId 
+   */
+  getPlayerByExceptedId(playerId: string) {
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.id !== playerId });
+  }
+
+  /**
+   * Use this method to get information of player by `name`.
+   * @param name 
+   * @returns 
+   */
+  getPlayerByName(name: string) {
+    if(!this._players) return undefined;
+
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.name === name });
+  }
+
+  /**
+   * Use this method to get ordinal number of player in `_players`.
+   * @param playerId 
+   */
+  getPlayerONumById(playerId: string) {
+    let target = "second";
+
+    // Find
+    Game.iteratePlayers(this, (player, index) => {
+      if(player && player.id === playerId) target = index === 0 ? "first" : "second"
+    });
+
+    return target;
+  }
+
+  /**
+   * Use this method to get non-host player.
+   */
+  getNonHostPlayer() {
+    if(!this._players) return;
+    let players = this.getPlayers(true) as Array<Player>;
+    return players.find(player => { if(player) return player === this.host });
   }
 
   /**
@@ -736,15 +797,23 @@ export class Game {
    * Use this method to reset entire the state of game.
    */
   reset() {
-    Game.iteratePlayers(this, (player, index) => {
-      if(!player) return;
-      if(index === 0 && !player.mark) player.mark = "X";
-      if(index === 1 && !player.mark) player.mark = "O";
+    if(!this._players) return;
 
-      // Reset winner status
-      player.reset();
-      player.isWinner = false;
-    });
+    if(this._players["first"]) this._players["first"].reset();
+    if(this._players["second"]) this._players["second"].reset();
+
+    this.startNewRound();
+  }
+
+  /**
+   * Use this method to start new game.
+   */
+  startNewRound() {
+    if(!this._players) return;
+
+    if(this._players["first"]) this._players["first"].isWinner = false;
+    if(this._players["second"]) this._players["second"].isWinner = false;
+
     this.init();
   }
 

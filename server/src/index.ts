@@ -26,6 +26,8 @@ import { EmitGameSELWrapperInfo } from "socket_events/game/emitGame";
 import { JoinGameSELWrapperInfo } from "socket_events/game/joinGame";
 import { EmitMarkSELWrapperInfo } from "socket_events/game/emitMark";
 import { LeaveGameSELWrapperInfo } from "socket_events/game/leaveGame";
+import { EmitWinnerSELWrapperInfo } from "socket_events/game/emitWinner";
+import { StartNewRoundSELWrapperInfo } from "socket_events/game/startNewRound";
 
 const ExpressServer = new MyServer({ port: process.env.PORT || "5000" });
 const builder = new ServerBuilder({ server: ExpressServer });
@@ -49,6 +51,8 @@ builder.buildSocketEventWrapper(EmitGameSELWrapperInfo.name, EmitGameSELWrapperI
 builder.buildSocketEventWrapper(JoinGameSELWrapperInfo.name, JoinGameSELWrapperInfo.wrapper);
 builder.buildSocketEventWrapper(EmitMarkSELWrapperInfo.name, EmitMarkSELWrapperInfo.wrapper);
 builder.buildSocketEventWrapper(LeaveGameSELWrapperInfo.name, LeaveGameSELWrapperInfo.wrapper);
+builder.buildSocketEventWrapper(EmitWinnerSELWrapperInfo.name, EmitWinnerSELWrapperInfo.wrapper);
+builder.buildSocketEventWrapper(StartNewRoundSELWrapperInfo.name, StartNewRoundSELWrapperInfo.wrapper);
 
 // Connect to DB
 builder.buildDBConnection(Temp_ADB.connect());

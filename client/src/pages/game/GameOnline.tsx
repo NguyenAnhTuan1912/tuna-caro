@@ -1,6 +1,12 @@
+/**
+ * This is a GameCore Wrapper Component named GameOnline.
+ * Its responsibility is handle online game:
+ * - Receive and set up some information about game and players.
+ * - Handle socket events (send and receive message).
+ */
+
 import React from 'react';
 import { snackbar } from 'tunangn-react-modal';
-import { useNavigate } from 'react-router-dom'; 
 
 // Import from classes
 import { Game } from 'src/classes/Game';
@@ -17,7 +23,7 @@ import { useGlobalData } from 'src/hooks/useGlobalData';
 import GameCore from './GameCore';
 
 // Import types
-import { MarkSocketMessageType } from './Game.props';
+import { EmitMarkMessageDataType, EmitWinnerMessageDataType } from './Game.props';
 
 //
 /**
@@ -25,19 +31,30 @@ import { MarkSocketMessageType } from './Game.props';
  * @returns 
  */
 export default function GameOnline() {
+  /*
+    Player will only has 3 properties are treated as global state:
+    - Id: id code of player.
+    - Name: name of player.
+    - SocketId: id code of socket.
+
+    So the player's information must be cloned before create the game.
+  */
   const { player } = usePlayer();
   const { getData } = useGlobalData();
-  const navigate = useNavigate();
+  // Game game data here.
+  /*
+    Game data can be:
+    - Create directly when player create the game.
+    - Create and get from server when player join the game.
+  */
   const data = getData();
-  
-  console.log("GameOnline ~ Data: ", data);
 
   return (
     <GameCore
       useEffectCB={function(args) {
         let emitMarkListener = mySocket.addEventListener(
           MySocket.EventNames.emitMark,
-          (m: Message<MarkSocketMessageType>) => {
+          (m: Message<EmitMarkMessageDataType>) => {
             let data = m.data;
             let { x, y } = data?.coor!;
             args.addMark(x, y, Game.t);
@@ -60,6 +77,7 @@ export default function GameOnline() {
           }
         );
     
+        // Set up `leave_game` listener for all.
         let leaveGameListener = mySocket.addEventListener(
           MySocket.EventNames.leaveGame,
           (m: Message<{ playerId: string }>) => {
@@ -71,6 +89,25 @@ export default function GameOnline() {
             args.removePlayer(m.data?.playerId!);
           }
         );
+
+        // Set up `emit_winner` listener.
+        let emitWinnerListener = mySocket.addEventListener(
+          MySocket.EventNames.emitWinner,
+          (m: Message<EmitWinnerMessageDataType>) => {
+            let data = m.data!;
+            let { x, y } = data.coor!;
+            let winner = data.winner;
+            args.addMark(x, y, Game.t, winner, false);
+          }
+        )
+
+        // Set up `start_new_round` for all.
+        let startNewRoundListener = mySocket.addEventListener(
+          MySocket.EventNames.startNewRound,
+          (m: Message<boolean>) => {
+            if(m.data) args.startNewRound();
+          }
+        )
     
         return function() {
           // Leave the game
@@ -90,23 +127,75 @@ export default function GameOnline() {
           mySocket.removeEventListener(MySocket.EventNames.emitMark, emitMarkListener);
           mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
           mySocket.removeEventListener(MySocket.EventNames.leaveGame, leaveGameListener);
+          mySocket.removeEventListener(MySocket.EventNames.emitWinner, emitWinnerListener);
+          mySocket.removeEventListener(MySocket.EventNames.startNewRound, startNewRoundListener);
         };
       }}
-      onEmitCoordinate={function (x, y, t, currentTurn) {
-        mySocket.emit<MarkSocketMessageType>(MySocket.createMessage(
-          MySocket.EventNames.emitMark,
+
+      onResetClick={function() {
+        // Emit an message to server that the game is move to new round.
+        mySocket.emit<{ gameId: string }>(MySocket.createMessage(
+          MySocket.EventNames.startNewRound,
           undefined,
           {
-            coor: {
-              x, y
-            },
-            mark: currentTurn,
             gameId: data.game!.id
           }
         ));
       }}
+
+      onAddMark={function (x, y, t, currentTurn, winner) {
+        // If the game has winner, emit winner with new mark.
+        if(winner) {
+          mySocket.emit<EmitWinnerMessageDataType>(MySocket.createMessage(
+            MySocket.EventNames.emitWinner,
+            undefined,
+            {
+              coor: {
+                x, y
+              },
+              mark: currentTurn,
+              gameId: data.game!.id,
+              winner: winner
+            }
+          ));
+        } else {
+          // Emit mark.
+          mySocket.emit<EmitMarkMessageDataType>(MySocket.createMessage(
+            MySocket.EventNames.emitMark,
+            undefined,
+            {
+              coor: {
+                x, y
+              },
+              mark: currentTurn,
+              gameId: data.game!.id
+            }
+          ));
+        }
+      }}
+
       game={data.game!}
-      host={data.game && data.game.host ? data.game.host : player}
+      /*
+        Handle main player. There are 2 cases:
+        - Main player created the game. That fine, because the data dont need to modify before create game.
+        - Main player maybe the one who join the game. So data of them maybe different than default.
+
+        Either case 1 or case 2, the data of player in game object must be find out to merge with `mainPlayer`.
+      */
+      mainPlayer={(function() {
+        let game = data.game!;
+        let mainPlayer = player.getInformation();
+
+        for(let key in game._players) {
+          if(mainPlayer.id === game._players[key].id) {
+            mainPlayer = Object.assign(mainPlayer, game._players[key]);
+            break;
+          }
+        }
+
+        return mainPlayer;
+      })()}
+      host={data.game && data.game.host ? data.game.host : player.getInformation()}
     />
   )
 }

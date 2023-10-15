@@ -12,7 +12,7 @@ import { GridProps, GridBehaviorFns } from './Grid.props'
 // Import styles
 import './Grid.styles.css';
 
-interface GridElements {
+interface GridElementsType {
   grid: SVGSVGElement | null,
   square: SVGPatternElement | null,
   bigSquare: SVGPatternElement | null,
@@ -33,7 +33,7 @@ interface ZoomOptions {
  * @param elements 
  * @returns 
  */
-function getGridElementsAttr(elements: GridElements) {
+function getGridElementsAttr(elements: GridElementsType) {
   const squareSize = parseInt(elements.square!.getAttribute("width")!);
   const bigSquareSize = parseInt(elements.bigSquare!.getAttribute("width")!);
 
@@ -59,7 +59,7 @@ function getCoordinateForSimplePath(a: number) {
  * @param s
  * @param options
  */
-function zoom(elements: GridElements, squareSize: number, s: number, options?: ZoomOptions) {
+function zoom(elements: GridElementsType, squareSize: number, s: number, options?: ZoomOptions) {
   options = Object.assign({
     step: 10
   }, options);
@@ -140,7 +140,7 @@ export default function Grid({
   height = "100%",
   ...props
 }: GridProps) {
-  const elementRefs = React.useRef<GridElements>({
+  const elementRefs = React.useRef<GridElementsType>({
     grid: null,
     square: null,
     bigSquare: null,

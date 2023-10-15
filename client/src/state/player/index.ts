@@ -6,6 +6,9 @@ import { Player, PlayerType } from "src/classes/Player";
 // Import thunks
 import { getPlayerIDAsyncThunk } from "./thunks";
 
+// Import utils
+import { LocalStorageUtils } from "src/utils/localstorage";
+
 // Import types
 import { ReduxAction } from "../state.types";
 
@@ -16,7 +19,10 @@ import { ReduxAction } from "../state.types";
 export const PlayerSlice = createSlice({
   name: "player",
   initialState: {
-    self: new Player()
+    self: new Player(
+      LocalStorageUtils.getItem("playerId") ?? "",
+      LocalStorageUtils.getItem("playerName") ?? ""
+    )
   },
   reducers: {
     /**
@@ -34,6 +40,7 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerNameAction: function(state, action: ReduxAction<string>) {
+      LocalStorageUtils.setItem("playerName", action.payload);
       state.self.name = action.payload;
     },
 
@@ -43,6 +50,8 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
+      if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
+      console.log("State: ", state.self);
       state.self.setPlayer(action.payload);
     }
   },
@@ -50,7 +59,6 @@ export const PlayerSlice = createSlice({
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
       state.self.id = action.payload;
-      state.self.name = `Player[${action.payload}]`;
     });
   }
 });

@@ -1,5 +1,6 @@
 const StoreKeys = {
-  "playerId": "_plyid"
+  "playerId": "_plyid",
+  "playerName": "_plyn"
 };
 
 type Keys = keyof typeof StoreKeys;

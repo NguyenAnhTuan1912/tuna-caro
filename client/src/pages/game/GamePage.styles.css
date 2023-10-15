@@ -16,7 +16,10 @@
 }
 
 .game-info {
+  display: flex;
+  justify-content: space-between;
   position: fixed;
+  width: 100%;
   left: 0;
   top: 0;
 }

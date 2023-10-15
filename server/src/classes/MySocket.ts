@@ -74,7 +74,17 @@ export class MySocket {
      * This event is all about a player leave the game, this will emit the message and listen to this event.
      * If a player leave the game, opposite player will know and app will calculate and re-render to sync with state.
      */
-    leaveGame: "leave_game"
+    leaveGame: "leave_game",
+    /**
+     * This event is all about the game has player. When player hit the table and win the game, this event will be fired.
+     * Sending new information of mark and winner.
+     */
+    emitWinner: "emit_winner",
+    /**
+     * This event is all about the game move to new round. When the round has winner, host will be click the start new round
+     * in the right bottom corner. This event will send the message to another player to tell them start new round.
+     */
+    startNewRound: "start_new_round"
   };
 
   private _listeners: Array<ListenerInfo> | null;

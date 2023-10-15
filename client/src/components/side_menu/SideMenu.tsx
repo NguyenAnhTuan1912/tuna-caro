@@ -1,17 +1,12 @@
 import React from 'react';
 import { CustomizedModalItemProps } from 'tunangn-react-modal';
 
-// Import hooks
-import { usePlayer } from 'src/hooks/usePlayer';
-
 // Import components
 import ProfileCard from '../profile_card/ProfileCard';
 import KeyGuide from '../key_guide/KeyGuide';
 
 export default function SideMenu(props: CustomizedModalItemProps) {
   const sideMenuRef = React.useRef<HTMLDivElement>(null);
-  const data = props.item.getData();
-  const { player } = usePlayer();
 
   React.useEffect(() => {
     props.utils.runAnimation!(sideMenuRef.current!);
@@ -38,21 +33,21 @@ export default function SideMenu(props: CustomizedModalItemProps) {
             close
           </span>
           <div className="flex-box ait-center jc-space-between">
-            <strong className="me-1">ID: </strong>
-              <p className="flex-box ait-center">
-                {player.id}
-                <span
-                  className="material-symbols-outlined btn-transparent rounded-4 ms-1"
-                >
-                  content_copy
-                </span>
-              </p>
+            {/* <strong className="me-1">ID: </strong>
+            <p className="flex-box ait-center">
+              {player.id}
+              <span
+                className="material-symbols-outlined btn-transparent rounded-4 ms-1"
+              >
+                content_copy
+              </span>
+            </p> */}
           </div>
         </div>
 
         {/* Content */}
         <div>
-          <ProfileCard player={player} isVertical canEdit />
+          <ProfileCard isVertical canEdit />
         </div>
 
         <div className="p-1">

@@ -32,7 +32,7 @@ export class Player {
   constructor(id: string, name: string);
   constructor(id: string, name: string, mark: string, isWinner: boolean, score: number);
   constructor(_?: string | PlayerType, name?: string, mark?: string, isWinner?: boolean, score?: number) {
-    if(_ && typeof _ === "string") {
+    if(typeof _ === "string") {
       Player.__hasArgsDefaultConstruct__(this, _, name, mark, isWinner, score);
     }
     
@@ -73,12 +73,12 @@ export class Player {
    * Use this method to get data of player (not include method).
    */
   getInformation(): PlayerType {
-    return {
-      id: this.id,
-      name: this.name,
-      mark: this.mark,
-      isWinner: this.isWinner ? this.isWinner : false,
-      score: this.score ? this.score : 0
+    let result = {};
+    let keys = Object.keys(this);
+    for(let key of keys) {
+      (result as any)[key] = (this as any)[key];
     }
+
+    return result as PlayerType;
   }
 }

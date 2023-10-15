@@ -21,7 +21,6 @@ import GameCreatingDialog from './components/dialog/GameCreatingDialog';
 import GameFindingDialog from './components/dialog/GameFindingDialog';
 
 function App() {
-  console.log("Render App");
   const playerDispatcher = usePlayerActions();
 
   React.useEffect(() => {
@@ -42,7 +41,6 @@ function App() {
       mySocket.handshake();
     };
 
-    console.log("App ~ useEffect");
     init();
 
     return function() {

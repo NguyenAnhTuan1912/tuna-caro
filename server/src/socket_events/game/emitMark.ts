@@ -12,8 +12,8 @@ interface EmitMarkMessageDataType {
 }
 
 /**
- * Provide a listener to listen event `emit_mark`. This will send message to host that will
- * tell them a player has just joined the game.
+ * Provide a listener to listen event `emit_mark`. When a player is hit the table, they will send a message
+ * about new mark to server, and this will send to opposite player.
  */
 export const EmitMarkSELWrapperInfo = {
   name: MySocket.EventNames.emitMark,

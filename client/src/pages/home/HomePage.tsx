@@ -21,7 +21,6 @@ import { HomePageProps } from './HomePage.props';
 import "./HomePage.styles.css";
 
 export default function HomePage(props: HomePageProps) {
-  console.log("Render Home");
   const navigate = useNavigate();
   const { player } = usePlayer();
   const { changeData } = useGlobalData();

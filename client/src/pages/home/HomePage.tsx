@@ -26,39 +26,50 @@ export default function HomePage(props: HomePageProps) {
   const { changeData } = useGlobalData();
 
   React.useEffect(() => {
+    /*
+      Set up listener for emit_game.
+      Receive a message from server that contains a data of game. Including:
+      - id (this is so fucking important)
+      - name
+      - password
+    */
     let emitGameListener = mySocket.addEventListener(
       MySocket.EventNames.emitGame,
       (m: Message<GameType>) => {
         if(m.isError) return;
-        let data = m.data!;
-        
-        console.log("Event: ", m);
-
-        changeData("game", function() {
-          return data;
-        });
-
-        navigate("/game/online");
-      }
-    );
-
-    // Set up `join_game` listener for player who want to join.
-    let joinGameListener = mySocket.addEventListener(
-      MySocket.EventNames.joinGame,
-      (m: Message<GameType>) => {
         let game = m.data!;
-        console.log("[HomePage] Message: ", m);
-        
+
+        // Set new game.
         changeData("game", function() {
           return game;
         });
 
+        // After change the data, navigate to /game/online
+        navigate("/game/online");
+      }
+    );
+
+    /*
+      Set up `join_game` listener for player who want to join.
+      Receive a message from server contains data of player.
+      Complete data of player.
+    */
+    let joinGameListener = mySocket.addEventListener(
+      MySocket.EventNames.joinGame,
+      (m: Message<GameType>) => {
+        let game = m.data!;
+        
+        // Set new game.
+        changeData("game", function() {
+          return game;
+        });
+
+        // After set new game, navigato /game/online
         navigate("/game/online");
       }
     );
 
     return function() {
-      console.log("Unsubscribe EMIT_GAME");
       mySocket.removeEventListener(MySocket.EventNames.emitGame, emitGameListener);
       mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
     }

@@ -11,7 +11,7 @@
   background-color: var(--clr-error);
   top: 0;
   right: 0;
-  z-index: -1;
+  z-index: 0;
 }
 
 .switch-container::after {
@@ -22,12 +22,14 @@
   background-color: var(--clr-success);
   top: 0;
   left: 0;
-  z-index: -1;
+  z-index: 0;
 }
 
 .switch {
+  position: relative;
   cursor: pointer;
   width: 50%;
   height: 1rem;
   background-color: var(--clr-background);
+  z-index: 1;
 }

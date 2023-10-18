@@ -51,7 +51,6 @@ export const PlayerSlice = createSlice({
      */
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
       if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
-      console.log("State: ", state.self);
       state.self.setPlayer(action.payload);
     }
   },

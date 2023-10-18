@@ -1,3 +1,8 @@
+.settings-page {
+  height: calc(100vh - (86px + 55px));
+  background-color: var(--clr-background);
+}
+
 .settings {
   width: 100%;
   max-width: 480px;

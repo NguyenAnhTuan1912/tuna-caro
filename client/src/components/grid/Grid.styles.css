@@ -1,5 +1,6 @@
 #grid {
   cursor: pointer;
+  background-color: var(--clr-background);
 }
 
 .grid-base {
@@ -18,4 +19,8 @@
 
 .grid-float-container {
   position: fixed;
+}
+
+#square path, #bigSquare path {
+  stroke: var(--clr-outline);
 }

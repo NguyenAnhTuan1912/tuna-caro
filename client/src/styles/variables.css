@@ -1,29 +1,4 @@
 :root {
-  /* FOR COLOR */
-  --clr-primary: #2798BC;
-  --clr-rgb-primary: 39, 152, 188;
-  --clr-primary-container: #006787;
-  --clr-rgb-primary-container: 0, 103, 135;
-
-  --clr-error: #A00B0B;
-  --clr-rgb-error: 160, 11, 11;
-  --clr-error-container: #4D0000;
-  --clr-rgb-error-container: 77, 0, 0;
-
-  --clr-background: #FFF;
-  --clr-rgb-background: 255, 255, 255;
-  --clr-onBackground: #262626;
-  --clr-rgb-onBackground: 38, 38, 38;
-  --clr-outline: #C5C5C5;
-  --clr-rgb-outline: 197, 197, 197;
-  --clr-subOutline: #F1F1F1;
-  --clr-rgb-subOutline: 241, 241, 241;
-
-  --clr-success: #0EA00B;
-  --clr-rgb-success: 14, 160, 11;
-  --clr-warning: #EBC417;
-  --clr-rgb-warning: 235, 196, 23;
-
   /* FOR BORDER */
   --border-1: 1px solid;
   --border-2: 2px solid;
@@ -35,4 +10,28 @@
 
   /* FOR FONT SIZE */
   --fs: 1rem;
+
+  --clr-error: #A00B0B;
+  --clr-rgb-error: 160, 11, 11;
+  --clr-success: #0EA00B;
+  --clr-rgb-success: 14, 160, 11;
+  --clr-warning: #EBC417;
+  --clr-rgb-warning: 235, 196, 23;
+}
+
+[data-theme="default"] {
+   /*
+    Colors in application will devive
+  */
+  --clr-primary: #2798BC;
+  --clr-rgb-primary: 39, 152, 188;
+
+  --clr-background: #FFFFFF;
+  --clr-rgb-background: 255, 255, 255;
+  --clr-onBackground: #262626;
+  --clr-rgb-onBackground: 38, 38, 38;
+  --clr-outline: #C5C5C5;
+  --clr-rgb-outline: 197, 197, 197;
+  --clr-subOutline: #F1F1F1;
+  --clr-rgb-subOutline: 241, 241, 241;
 }

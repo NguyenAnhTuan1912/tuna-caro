@@ -30,7 +30,6 @@ export default function Switch(props: SwitchProps) {
   }, []);
 
   React.useEffect(() => {
-    props.onChange(status);
     if(status) {
       // When true
       switchRef.current?.animate(animationData.keyframes.whenTrue, animationData.options);
@@ -43,7 +42,11 @@ export default function Switch(props: SwitchProps) {
   return (
     <div className="switch-container outline">
       <div
-        onClick={() => {setStatus(prevState => !prevState)}}
+        onClick={() => {setStatus(prevState => {
+          let newStatus = !prevState;
+          props.onChange(newStatus);
+          return newStatus;
+        })}}
         className="switch outline-x"
         ref={switchRef}
       ></div>

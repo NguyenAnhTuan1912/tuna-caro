@@ -6,6 +6,9 @@ import DataTable from 'src/components/data_table/DataTable';
 // Import types
 import { GameRoomPageProps } from './GameRoomPage.props';
 
+// Import styles
+import './GameRoom.styles.css';
+
 const fakeData = [
   {
     name: "Phòng của tunanguyen",
@@ -95,7 +98,7 @@ const fakeData = [
 
 export default function GameRoomPage(props: GameRoomPageProps) {
   return (
-    <div className="game-room-page full-container p-2">
+    <div className="game-room-page p-2">
       <h1>Các phòng</h1>
       <DataTable
         data={fakeData}

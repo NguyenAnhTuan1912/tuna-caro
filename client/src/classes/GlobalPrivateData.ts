@@ -8,7 +8,7 @@ export interface GlobalDataType {
 const __privateData__: GlobalDataType = {
   game: null
 }
-let __privateInstance_: GlobalPrivateData | null = null;
+let __privateInstance__: GlobalPrivateData | null = null;
 
 /**
  * Use this function to change data.
@@ -25,11 +25,13 @@ function __changeData__<N extends keyof GlobalDataType>(
 }
 
 /**
- * Use this function to get private global data.
+ * __Singleton class__
+ * 
+ * Get singleton instance from this class and access to global data.
  */
 export class GlobalPrivateData {
   constructor() {
-    if(__privateInstance_) return __privateInstance_;
+    if(__privateInstance__) return __privateInstance__;
 
     this.changeData = this.changeData.bind(this);
     this.getData = this.getData.bind(this);
@@ -53,6 +55,6 @@ export class GlobalPrivateData {
   }
 }
 
-if(!__privateInstance_) __privateInstance_ = new GlobalPrivateData();
+if(!__privateInstance__) __privateInstance__ = new GlobalPrivateData();
 
 export const gpd = new GlobalPrivateData();

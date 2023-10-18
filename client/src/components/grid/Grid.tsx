@@ -349,7 +349,7 @@ export default function Grid({
             >
               <path
                 ref={ref => elementRefs.current.squarePath = ref}
-                d={getCoordinateForSimplePath(squareSize)} fill="none" stroke="gray" strokeWidth="0.5"
+                d={getCoordinateForSimplePath(squareSize)} fill="none" strokeWidth="0.5"
               />
             </pattern>
             <pattern
@@ -358,7 +358,7 @@ export default function Grid({
             >
               <path
                 ref={ref => elementRefs.current.bigSquarePath = ref}
-                d={getCoordinateForSimplePath(bigSquareSize)} fill="none" stroke="gray" strokeWidth="0.5"
+                d={getCoordinateForSimplePath(bigSquareSize)} fill="none" strokeWidth="0.5"
               />
               <rect
                 ref={ref => elementRefs.current.bigSquareRect = ref}

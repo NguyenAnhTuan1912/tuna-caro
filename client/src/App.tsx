@@ -20,28 +20,36 @@ import SideMenu from './components/side_menu/SideMenu';
 import GameCreatingDialog from './components/dialog/GameCreatingDialog';
 import GameFindingDialog from './components/dialog/GameFindingDialog';
 
+/**
+ * This component in the center of the app. Contain many component that contains many components and so on...
+ * @returns 
+ */
 function App() {
   const playerDispatcher = usePlayerActions();
 
+  // Handle some global Socket Exception
   React.useEffect(() => {
     async function init() {
-      console.log("[App] Run init().");
       // Call API to get ID.
       playerDispatcher.getPlayerIDAsyncThunk();
 
       // Init
       mySocket.init((message) => {
         let data = message.data!;
-        console.log("SocketID: ", data);
         playerDispatcher.setPlayerAction({
           socketId: data.socketId
         });
       });
 
+      // Say hello to server
       mySocket.handshake();
     };
 
+    // Init socket.
     init();
+
+    // Init theme.
+    document.documentElement.setAttribute("data-theme", "default");
 
     return function() {
       console.log("Disconnect socket");

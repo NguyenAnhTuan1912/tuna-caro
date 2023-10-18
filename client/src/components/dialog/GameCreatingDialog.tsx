@@ -38,6 +38,7 @@ export default function GameCreatingDialog(props: CustomizedModalItemProps) {
         maxWidth: "540px",
         minHeight: "360px",
         borderRadius: "0",
+        backgroundColor: "var(--clr-background)",
         border: "2px solid var(--clr-onBackground)"
       })}
     >

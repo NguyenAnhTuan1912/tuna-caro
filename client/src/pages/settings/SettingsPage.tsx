@@ -1,5 +1,8 @@
 import React from 'react'
 
+// Import hooks
+import { useSettings } from 'src/hooks/useSettings';
+
 // Import components
 import Switch from 'src/components/switch/Switch';
 import MySelect from 'src/components/my_select/MySelect';
@@ -12,8 +15,12 @@ import { SettingsPageProps } from './SettingsPage.props';
 import './SettingsPage.styles.css';
 
 export default function SettingsPage(props: SettingsPageProps) {
+  const { settings, settingsDispatcher } = useSettings();
+
+  console.log("Settings: ", settings);
+
   return (
-    <div className="settings-page full-container p-2">
+    <div className="settings-page p-2">
       <h1 className="txt-center">Cài đặt</h1>
       <div className="settings">
         <h3>Hệ thống</h3>
@@ -26,8 +33,13 @@ export default function SettingsPage(props: SettingsPageProps) {
 
           {/* Theme Setting */}
           <div className="setting mb-1">
-            <p>Chủ đề màu tối</p>
-            <Switch onChange={status => console.log(status)} />
+            <p>Màu tối</p>
+            <Switch
+              initialStatus={settings.isDarkMode}
+              onChange={status => {
+                settingsDispatcher.toggleDarkModeAction()
+              }}
+            />
           </div>
 
           {/* Language Setting */}

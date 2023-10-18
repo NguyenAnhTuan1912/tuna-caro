@@ -9,7 +9,8 @@ interface EndLineProps {
 }
 
 /**
- * Compunent is used to render the end line of game when game has winner.
+ * Component is used to render the end line of game when game has winner.
+ * Receive 2 coordinates, `from` and `to`, to draw.
  * @param props 
  * @returns 
  */

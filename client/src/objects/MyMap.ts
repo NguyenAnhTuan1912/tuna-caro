@@ -25,6 +25,36 @@ export class MyMap<K, V> extends Map<K, V> {
   }
 
   /**
+   * Use this function to check the value in map.
+   * If there are one or some value(s) satify the condition in `fn`,
+   * return true.
+   * @param fn 
+   */
+  some(fn: (value: V | undefined, key: K) => boolean) {
+    let keys = this.keys();
+    let result = false;
+    for (let key of keys) {
+      result = fn(this.get(key), key);
+      if(result) return result;
+    }
+  }
+
+  /**
+   * Use this function to check the value in map.
+   * If there are just one value doesn't satisfy the condition in `fn`,
+   * return false.
+   * @param fn 
+   */
+  every(fn: (value: V | undefined, key: K) => boolean) {
+    let keys = this.keys();
+    let result = false;
+    for (let key of keys) {
+      result = fn(this.get(key), key);
+      if(!result) return result;
+    }
+  }
+
+  /**
    * Use this method to get an __array__ of value from `from` index to `to` index.
    * Have a option for kind of return value (key, value or both).
    * @param from 

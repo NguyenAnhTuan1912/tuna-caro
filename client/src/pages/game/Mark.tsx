@@ -11,7 +11,8 @@ interface MarkProps {
 }
 
 /**
- * Component is used to render mark O or X depend on what is `mark`. Receive coordinate and `t` constant.
+ * Component is used to render mark O or X depend on what is `mark`.
+ * Receive coordinate and `t` constant.
  * @param props 
  * @returns 
  */

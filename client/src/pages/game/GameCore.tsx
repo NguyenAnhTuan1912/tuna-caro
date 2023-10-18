@@ -66,13 +66,9 @@ export default function GameCore(props: GameCoreProps) {
           if(!result) result = game.findWinner(x, y);
 
           if(result) {
-            console.log("Result: ", result);
-            console.log("Check: ", result.player !== props.mainPlayer?.mark);
-
-            // Subscribe an event here to support outside.
-            if(
-              props.onAddMark && canCallOnAddMark
-            ) props.onAddMark(x, y, t, gameState.game.currentTurn, result);
+            // Run onAddMark if game has winner.
+            if(props.onAddMark && canCallOnAddMark)
+              props.onAddMark(x, y, t, gameState.game.currentTurn, result);
 
             // Set winner for game.
             game.setWinner(result.player);

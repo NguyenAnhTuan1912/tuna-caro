@@ -21,6 +21,7 @@ export default function SideMenu(props: CustomizedModalItemProps) {
         maxWidth: "475px",
         minWidth: "300px",
         padding: ".75rem",
+        background: "var(--clr-background)",
         borderLeft: "2px solid var(--clr-onBackground)"
       })}
     >

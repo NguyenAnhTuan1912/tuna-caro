@@ -1,5 +1,8 @@
 import { useSelector, useDispatch } from 'react-redux';
 
+// Import from classes
+import { SFXSettingKeysType } from 'src/classes/Settings';
+
 // Import from state
 import { AppDispatch } from 'src/state';
 
@@ -21,9 +24,14 @@ export const {
         dispatch(toggleDarkModeAction());
       },
 
-      // setSFXStatusAction: function(id: string) {
-      //   dispatch(setSFXStatusAction(id));
-      // }
+      /**
+       * 
+       * @param soundName 
+       * @param status 
+       */
+      setSFXStatusAction: function(soundName: SFXSettingKeysType, status?: boolean) {
+        dispatch(setSFXStatusAction({ sound: soundName, status }));
+      }
     }
   }
 

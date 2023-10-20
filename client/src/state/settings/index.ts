@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // Import classes
-import { st, SoundSettingsType, SFXSettingsType, Settings } from 'src/classes/Settings';
+import { st, SFXSettingKeysType, SFXSettingsType, Settings } from 'src/classes/Settings';
 
 // Import objects
 // import { MyMap } from 'src/objects/MyMap';
@@ -39,19 +39,8 @@ export const SettingsSlice = createSlice({
      * @param state 
      * @param action 
      */
-    setSFXStatusAction: function(state, action: ReduxAction<{ sound: SoundSettingsType, status?: boolean }>) {
-      let status = Boolean(action.payload.status);
-      switch(action.payload.sound) {
-        case "table_click": {
-          state.self.sfx.hasSoundWhenClickTable = status;
-          break;
-        }
-
-        case "button_click": {
-          state.self.sfx.hasSoundWhenClickButton = status;
-          break;
-        }
-      }
+    setSFXStatusAction: function(state, action: ReduxAction<{ sound: SFXSettingKeysType, status?: boolean }>) {
+      state.self.setSFX(action.payload.sound, action.payload.status ? action.payload.status : false);
     },
 
     /**

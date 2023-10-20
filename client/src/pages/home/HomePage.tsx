@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { openTMI } from 'tunangn-react-modal';
 
 // Import classes
 import { GameType } from 'src/classes/Game';
@@ -12,7 +11,10 @@ import { mySocket, Message, MySocket } from 'src/apis/socket';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 import { usePlayer } from 'src/hooks/usePlayer';
 
-// Import component
+// Import from components
+import { openGameFindingDialog, openGameCreatingDialog } from 'src/components/dialog/GameDialog';
+import { openNotificatedSnackBar } from 'src/components/snack_bar/SnackBar';
+import Button from 'src/components/button/Button';
 
 // Import types
 import { HomePageProps } from './HomePage.props';
@@ -21,8 +23,9 @@ import { HomePageProps } from './HomePage.props';
 import "./HomePage.styles.css";
 
 export default function HomePage(props: HomePageProps) {
-  const navigate = useNavigate();
   const { player } = usePlayer();
+  
+  const navigate = useNavigate();
   const { changeData } = useGlobalData();
 
   React.useEffect(() => {
@@ -69,6 +72,11 @@ export default function HomePage(props: HomePageProps) {
       }
     );
 
+    openNotificatedSnackBar("Chào mừng bạn tới Caro game")
+    .then(result => {
+      console.log("Snackbar result: ", result);
+    })
+
     return function() {
       mySocket.removeEventListener(MySocket.EventNames.emitGame, emitGameListener);
       mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
@@ -79,13 +87,14 @@ export default function HomePage(props: HomePageProps) {
     <div className="home-page p-2">
       <h1 className="txt-center">Trang chủ</h1>
       <div className="home-page-menu w-100 pt-4">
-        <Link to={"/game/offline"}><button className="btn spe-outline w-100">Chơi 2 người</button></Link>
+        <Button to={"/game/offline"} extendClassName="w-100">Chơi 2 người</Button>
 
         <hr className="my-4"></hr>
-
-        <button
+        
+        <Button
+          extendClassName="w-100 mb-1"
           onClick={() => {
-            openTMI("myGameCreatingDialog").then(result => {
+            openGameCreatingDialog().then(result => {
               if(!result.isAgree) return;
               mySocket.emit(
                 MySocket.EventNames.emitGame,
@@ -95,7 +104,7 @@ export default function HomePage(props: HomePageProps) {
                   {
                     player: player,
                     game: {
-                      name: result.data.name,
+                      name: result.data.game_name,
                       password: result.data.password
                     }
                   }
@@ -103,14 +112,14 @@ export default function HomePage(props: HomePageProps) {
               );
             })
           }}
-          className="btn spe-outline w-100 mb-1"
-        ><strong className="txt-clr-primary">Tạo phòng chơi trực tuyến</strong></button>
+        >
+          <strong className="txt-clr-primary">Tạo phòng chơi trực tuyến</strong>
+        </Button>
 
-        <button
+        <Button
           onClick={() => {
-            openTMI("myGameFindingDialog").then(result => {
+            openGameFindingDialog().then(result => {
               if(!result.isAgree) return;
-              console.log("GameFinding result: ", result);
               mySocket.emit(
                 MySocket.EventNames.joinGame,
                 MySocket.createMessage(
@@ -119,7 +128,7 @@ export default function HomePage(props: HomePageProps) {
                   {
                     player: player,
                     game: {
-                      id: result.data.id,
+                      id: result.data.game_id,
                       password: result.data.password
                     }
                   }
@@ -127,14 +136,16 @@ export default function HomePage(props: HomePageProps) {
               );
             })
           }}
-          className="btn spe-outline w-100 mb-1"
-        >Tìm phòng</button>
+          extendClassName="w-100 mb-1"
+        >
+          Tìm phòng
+        </Button>
 
-        <Link to={"/rooms"}><button className="btn spe-outline w-100">Khám phá</button></Link>
+        <Button to={"/rooms"} extendClassName="w-100">Khám phá</Button>
 
         <hr className="my-4"></hr>
 
-        <Link to={"/settings"}><button className="btn spe-outline w-100">Cài đặt</button></Link>
+        <Button to={"/settings"} extendClassName="w-100">Cài đặt</Button>
       </div>
     </div>
   )

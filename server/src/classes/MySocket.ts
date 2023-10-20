@@ -84,7 +84,12 @@ export class MySocket {
      * This event is all about the game move to new round. When the round has winner, host will be click the start new round
      * in the right bottom corner. This event will send the message to another player to tell them start new round.
      */
-    startNewRound: "start_new_round"
+    startNewRound: "start_new_round",
+    /**
+     * This event is all about player get games in server. When a player create a game, its data will store (fast solution) in
+     * server. So if another player go to Game Rooms Page, they will see multiple Game Rooms.
+     */
+    getGames: "get_games"
   };
 
   private _listeners: Array<ListenerInfo> | null;
@@ -94,9 +99,11 @@ export class MySocket {
   private __o__!: SEListenerObjectsType;
 
   constructor(options: MySocketOptions) {
+    console.log("ORIGIN: ", [ env.REQUEST_ORIGIN!, env.REQUEST_ORIGIN_MOBILE! ]);
     this._io = new SocketServer(options.httpServer, {
       cors: {
-        origin: env.REQUEST_ORIGIN,
+        // For development
+        origin: [ env.REQUEST_ORIGIN!, env.REQUEST_ORIGIN_MOBILE! ],
         credentials: true
       }
     });

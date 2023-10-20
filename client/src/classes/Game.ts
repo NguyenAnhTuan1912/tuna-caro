@@ -53,6 +53,14 @@ export interface GameType {
   _players: { [key: string]: PlayerType } | null;
 };
 
+export interface GameRoomType {
+  id: string;
+  playerName: string;
+  name: string;
+  status: GameStatus;
+  hasPassword: boolean;
+}
+
 /**
  * Create a direction checker. Each case has 2 directions to check.
  */

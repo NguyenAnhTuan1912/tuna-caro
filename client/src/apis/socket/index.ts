@@ -53,7 +53,12 @@ export class MySocket {
      * This event is all about the game move to new round. When the round has winner, host will be click the start new round
      * in the right bottom corner. This event will send the message to another player to tell them start new round.
      */
-    startNewRound: "start_new_round"
+    startNewRound: "start_new_round",
+    /**
+     * This event is all about player get games in server. When a player create a game, its data will store (fast solution) in
+     * server. So if another player go to Game Rooms Page, they will see multiple Game Rooms.
+     */
+    getGames: "get_games"
   };
 
   constructor() {

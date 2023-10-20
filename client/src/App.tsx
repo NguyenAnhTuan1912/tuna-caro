@@ -17,8 +17,8 @@ import GamePage from './pages/game/GamePage';
 
 // Import components
 import SideMenu from './components/side_menu/SideMenu';
-import GameCreatingDialog from './components/dialog/GameCreatingDialog';
-import GameFindingDialog from './components/dialog/GameFindingDialog';
+import GameDialog from './components/dialog/GameDialog';
+import SnackBar from './components/snack_bar/SnackBar';
 
 /**
  * This component in the center of the app. Contain many component that contains many components and so on...
@@ -47,9 +47,6 @@ function App() {
 
     // Init socket.
     init();
-
-    // Init theme.
-    document.documentElement.setAttribute("data-theme", "default");
 
     return function() {
       console.log("Disconnect socket");
@@ -109,13 +106,14 @@ function App() {
             placeOn: "right",
             element: SideMenu
           },
-          myGameFindingDialog: {
+          myGameDialog: {
             type: "dialog",
-            element: GameFindingDialog
+            element: GameDialog
           },
-          myGameCreatingDialog: {
-            type: "dialog",
-            element: GameCreatingDialog
+          mySnackBar: {
+            type: "snack-bar",
+            position: "top-right",
+            element: SnackBar
           }
         }}
       />

@@ -1,6 +1,9 @@
 const StoreKeys = {
   "playerId": "_plyid",
-  "playerName": "_plyn"
+  "playerName": "_plyn",
+  "isDarkMode": "_idrkmde",
+  "hasSoundWhenClickButton": "_hsndwcbtn",
+  "hasSoundWhenClickTable": "_hsndwctb"
 };
 
 type Keys = keyof typeof StoreKeys;

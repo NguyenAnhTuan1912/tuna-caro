@@ -27,6 +27,12 @@
   display: flex;
 }
 
+.center-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* FLEX DIRECTION */
 .flex-rw {
   flex-direction: row;

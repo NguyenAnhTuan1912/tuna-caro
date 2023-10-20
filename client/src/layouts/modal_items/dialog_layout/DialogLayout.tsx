@@ -1,8 +1,14 @@
 import React from 'react';
 
+// Import from layouts
+import CloseButton from '../CloseButton';
+
 // Import types
 import { DialogLayoutProps } from './DialogLayout.props';
 
+/**
+ * A layout for dialog, use for customized dialog.
+ */
 const DialogLayout = React.forwardRef<HTMLDivElement, DialogLayoutProps>(function(props, ref) {
   return (
     <div
@@ -12,12 +18,11 @@ const DialogLayout = React.forwardRef<HTMLDivElement, DialogLayoutProps>(functio
     >
       <div className="flex-box ait-center jc-space-between">
         {props.title}
-        <span
-          className="material-symbols-outlined btn-transparent p-1 rounded-4"
-          onClick={() => props.close({ isAgree: false })}
-        >
-          close
-        </span>
+        <CloseButton
+          icon='close'
+          isAgree={false}
+          close={props.close}
+        />
       </div>
       {props.children}
     </div>

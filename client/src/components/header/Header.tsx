@@ -1,6 +1,9 @@
 import React from 'react';
 import { openTMI } from "tunangn-react-modal";
 
+// Import from components
+import Button from '../button/Button';
+
 // Import types
 import { HeaderProps } from './Header.props';
 
@@ -15,12 +18,13 @@ export default function Header(props: HeaderProps) {
             : props.title
       }
       <div className="flex-box ait-center">
-        <button
+        <Button
+          isTransparent
           onClick={() => { openTMI("mySideMenu") }}
-          className="btn-transparent no-outline rounded-8 p-1"
+          extendClassName="rounded-8 p-1"
         >
           <span className="material-symbols-outlined">menu</span>
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -33,6 +33,9 @@ export const LeaveGameSELWrapperInfo = {
       // Remove player from game.
       game.leaveGame(player.id);
 
+      // Change status of game.
+      game.status = "Waiting";
+
       // Disconnect from room
       socket.leave(game.id);
 

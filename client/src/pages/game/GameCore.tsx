@@ -128,7 +128,12 @@ export default function GameCore(props: GameCoreProps) {
           } else {
             game.setPlayer(key, new Player(player));
           }
-          console.log(`Get player ${key}: `, game.getPlayer(key));
+          
+          // If game has 2 players, then change the status.
+          if(game.getPlayer("first") && game.getPlayer("second")) {
+            game.status = "Playing";
+          }
+
           return game;
         });
       },
@@ -152,7 +157,13 @@ export default function GameCore(props: GameCoreProps) {
         changeState("game", function(game) {
           // If a player leave the game or is kicked by host. The game will be reset.
           game.removePlayer(g);
+
+          // Reset state.
           game.reset();
+
+          // Because of leaving of a player, so game's status must be change
+          game.status = "Waiting";
+
           return game;
         });
       }
@@ -218,6 +229,9 @@ export default function GameCore(props: GameCoreProps) {
       <Grid
         height={"100%"}
         emitCoordinate={(x, y, t) => {
+          // Check if game status is `Waiting`, then don't let player hit table.
+          if(gameState.game.status === "Waiting") return;
+
           // Check if main player can mark, else terminate.
           if(
             props.mainPlayer

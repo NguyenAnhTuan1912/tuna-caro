@@ -30,6 +30,19 @@ export default function Switch(props: SwitchProps) {
   }, []);
 
   React.useEffect(() => {
+    // For old device, if element doesn't have animate() method, don't call it.
+    if(!switchRef.current?.animate) {
+      if(status) {
+        // When true
+        switchRef.current!.style.transform = animationData.keyframes.whenTrue[0].transform;
+      } else {
+        // When false
+        switchRef.current!.style.transform = animationData.keyframes.whenFalse[0].transform;
+      }
+      return;
+    }
+      
+
     if(status) {
       // When true
       switchRef.current?.animate(animationData.keyframes.whenTrue, animationData.options);

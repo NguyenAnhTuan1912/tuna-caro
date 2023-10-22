@@ -6,7 +6,6 @@
  */
 
 import React from 'react';
-import { snackbar } from 'tunangn-react-modal';
 
 // Import from classes
 import { Game } from 'src/classes/Game';
@@ -21,6 +20,7 @@ import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import components
 import GameCore from './GameCore';
+import { openNotificatedSnackBar } from 'src/components/snack_bar/SnackBar';
 
 // Import types
 import { EmitMarkMessageDataType, EmitWinnerMessageDataType } from './Game.props';
@@ -66,13 +66,12 @@ export default function GameOnline() {
           MySocket.EventNames.joinGame,
           (m: Message<PlayerType>) => {
             let player = m.data!;
+
+            // Announce to player.
+            openNotificatedSnackBar(m.text!);
+
             // Add player to game.
             // Because first player always "X", so the second will be "O".
-            snackbar({
-              color: "#2798BC",
-              title: "Join",
-              content: m.text
-            })
             args.appendPlayer("second", player);
           }
         );
@@ -81,11 +80,10 @@ export default function GameOnline() {
         let leaveGameListener = mySocket.addEventListener(
           MySocket.EventNames.leaveGame,
           (m: Message<{ playerId: string }>) => {
-            snackbar({
-              color: "#2798BC",
-              title: "Leave",
-              content: m.text
-            })
+            // Announce to player.
+            openNotificatedSnackBar(m.text!);
+
+            // When receive a message that player is leave the game, remove them from game.
             args.removePlayer(m.data?.playerId!);
           }
         );

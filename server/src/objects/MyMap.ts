@@ -1,9 +1,3 @@
-type ValueType<Name, T> = {
-  "value": T;
-  "key": string;
-  "both": [string, T]
-};
-
 /**
  * This my is same as Map of Javascript, but has more convenient methods
  */
@@ -69,7 +63,7 @@ export class MyMap<K, V> extends Map<K, V> {
     let entries = this.entries();
 
     if(!from) from = 0;
-    if(!to) to = this.size;
+    if(!to) to = to! > this.size ? this.size : to!;
 
     for(let entry of entries) {
       if(pointer >= from! && pointer <= to!) {

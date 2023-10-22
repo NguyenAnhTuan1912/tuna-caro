@@ -3,7 +3,7 @@ import { Socket } from 'socket.io';
 import { Game, GameType } from './Game';
 
 // Import modified objects
-import { MyMap } from "objects/MyList";
+import { MyMap } from "objects/MyMap";
 
 /**
  * Create a game list to manage games.
@@ -13,6 +13,15 @@ export class GameList {
 
   constructor() {
     this._games = new MyMap();
+  }
+
+  /**
+   * Use this method to get customized data of games.
+   * @param fn 
+   * @returns 
+   */
+  map<R>(fn: (value: Game | undefined, key: string, index: number) => R) {
+    return this._games.map(fn);
   }
 
   /**
@@ -39,5 +48,14 @@ export class GameList {
    */
   removeGame(id: string) {
     this._games.delete(id);
+  }
+
+  /**
+   * Use this method to get game from the range `[skip, limit + skip]`.
+   * @param limit 
+   * @param skip 
+   */
+  getGames(limit: number, skip: number) {
+    return this._games.inRange<Array<Game>>(limit, skip + limit);
   }
 }

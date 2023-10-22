@@ -15,9 +15,8 @@ import { SettingsPageProps } from './SettingsPage.props';
 import './SettingsPage.styles.css';
 
 export default function SettingsPage(props: SettingsPageProps) {
+  console.log("Render SettingsPage");
   const { settings, settingsDispatcher } = useSettings();
-
-  console.log("Settings: ", settings);
 
   return (
     <div className="settings-page p-2">
@@ -27,8 +26,19 @@ export default function SettingsPage(props: SettingsPageProps) {
         <div className="ps-1 pt-1">
           {/* Sound Effect Setting */}
           <div className="setting mb-1">
-            <p>Hiệu ứng âm thanh</p>
-            <Switch initialStatus onChange={status => console.log(status)} />
+            <p>Âm thanh khi ấn nút</p>
+            <Switch
+              initialStatus={settings.sfx.hasSoundWhenClickButton}
+              onChange={status => settingsDispatcher.setSFXStatusAction("hasSoundWhenClickButton", status)}
+            />
+          </div>
+
+          <div className="setting mb-1">
+            <p>Âm thanh khi ấn vào bàn cờ</p>
+            <Switch
+              initialStatus={settings.sfx.hasSoundWhenClickTable}
+              onChange={status => settingsDispatcher.setSFXStatusAction("hasSoundWhenClickTable", status)}
+            />
           </div>
 
           {/* Theme Setting */}

@@ -237,10 +237,9 @@ export class ColorTheme {
    */
   setTheme(values: string[] | [string, string][]) {
     try {
-      console.log("Values: ", values);
       for(let value of values) {
         let [colorName, colorValue, colorType] = ColorTheme.generateKeyAndColor(value);
-        console.log(colorName, colorValue, colorType);
+
         if(colorType === "RGB")
           this._rgbTheme.set(colorName as keyof ThemeType, [colorValue, colorType]);
         else

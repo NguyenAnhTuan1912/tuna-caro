@@ -35,6 +35,17 @@ export interface ResultType {
 };
 
 /**
+ * GameRoomType is a type definition of brief data object of Game.
+ */
+export interface GameRoomType {
+  id: string;
+  playerName: string;
+  name: string;
+  status: GameStatus;
+  hasPassword: boolean;
+}
+
+/**
  * There are some rule in game:
  * - The first turn always "X".
  * - The first player in room is "X".

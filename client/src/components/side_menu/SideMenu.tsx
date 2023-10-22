@@ -1,6 +1,9 @@
 import React from 'react';
 import { CustomizedModalItemProps } from 'tunangn-react-modal';
 
+// Import from layouts
+import CloseButton from 'src/layouts/modal_items/CloseButton';
+
 // Import components
 import ProfileCard from '../profile_card/ProfileCard';
 import KeyGuide from '../key_guide/KeyGuide';
@@ -27,12 +30,11 @@ export default function SideMenu(props: CustomizedModalItemProps) {
     >
         {/* Header */}
         <div className="flex-box ait-center jc-space-between mb-3">
-          <span
-            className="material-symbols-outlined btn-transparent p-1 rounded-4"
-            onClick={() => props.close({ isAgree: false, message: "Fuck you" })}
-          >
-            close
-          </span>
+          <CloseButton
+            isAgree={false}
+            icon="close"
+            close={props.close}
+          />
           <div className="flex-box ait-center jc-space-between">
             {/* <strong className="me-1">ID: </strong>
             <p className="flex-box ait-center">

@@ -25,27 +25,29 @@
 }
 
 .game-page.O {
-  border: 5px solid rgba(0, 0, 255, .5);
+  border: 5px solid rgba(var(--clr-rgb-o), .5);
 }
 
 .game-page.X {
-  border: 5px solid rgba(255, 0, 0, .5);
+  border: 5px solid rgba(var(--clr-rgb-x), .5);
 }
 
 .game-page.O .end-line {
-  stroke: blue;
+  stroke: var(--clr-o);
 }
 
 .game-page.X .end-line {
-  stroke: red;
+  stroke: var(--clr-x);
 }
 
 .x-mark {
-  color: red;
+  color: var(--clr-x);
+  stroke: var(--clr-x);
 }
 
 .o-mark {
-  color: blue;
+  color: var(--clr-o);
+  stroke: var(--clr-o);
 }
 
 .mark {

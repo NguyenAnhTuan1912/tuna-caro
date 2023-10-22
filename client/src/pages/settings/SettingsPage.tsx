@@ -29,7 +29,7 @@ export default function SettingsPage(props: SettingsPageProps) {
             <p>Âm thanh khi ấn nút</p>
             <Switch
               initialStatus={settings.sfx.hasSoundWhenClickButton}
-              onChange={status => settingsDispatcher.setSFXStatusAction("hasSoundWhenClickButton", status)}
+              onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickButton", status)}
             />
           </div>
 
@@ -37,7 +37,7 @@ export default function SettingsPage(props: SettingsPageProps) {
             <p>Âm thanh khi ấn vào bàn cờ</p>
             <Switch
               initialStatus={settings.sfx.hasSoundWhenClickTable}
-              onChange={status => settingsDispatcher.setSFXStatusAction("hasSoundWhenClickTable", status)}
+              onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickTable", status)}
             />
           </div>
 
@@ -47,7 +47,7 @@ export default function SettingsPage(props: SettingsPageProps) {
             <Switch
               initialStatus={settings.isDarkMode}
               onChange={status => {
-                settingsDispatcher.toggleDarkModeAction()
+                settingsDispatcher.toggleDarkMode()
               }}
             />
           </div>

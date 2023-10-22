@@ -22,19 +22,19 @@ export const {
 } = (function() {
   const createPlayerActionFns = function(dispatch: AppDispatch) {
     return {
-      getPlayerIDAsyncThunk: function() {
+      getPlayerIDAsync: function() {
         dispatch(getPlayerIDAsyncThunk());
       },
 
-      setPlayerIdAction: function(id: string) {
+      setPlayerId: function(id: string) {
         dispatch(setPlayerIDAction(id));
       },
 
-      setPlayerNameAction: function(name: string) {
+      setPlayerName: function(name: string) {
         dispatch(setPlayerNameAction(name));
       },
 
-      setPlayerAction: function(player: Partial<PlayerType>) {
+      setPlayer: function(player: Partial<PlayerType>) {
         dispatch(setPlayerAction(player));
       }
     }

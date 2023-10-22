@@ -20,10 +20,10 @@ export default function Mark(props: MarkProps) {
   if(props.mark === "O") {
     let cx = props.x * props.t + (props.t / 2);
     let cy = props.y * props.t + (props.t / 2);
-    return <circle className="o-mark mark" cx={cx} cy={cy} r={props.t / 2 - Game.less} fill="none" stroke="blue" strokeWidth="2"></circle>;
+    return <circle className="o-mark mark" cx={cx} cy={cy} r={props.t / 2 - Game.less} fill="none" strokeWidth="2"></circle>;
   }
 
   return (
-    <path className="x-mark mark" d={Game.createPathDForX(props.x, props.y, props.t, Game.less)} fill="none" stroke="red" strokeWidth="2" />
+    <path className="x-mark mark" d={Game.createPathDForX(props.x, props.y, props.t, Game.less)} fill="none" strokeWidth="2" />
   )
 }

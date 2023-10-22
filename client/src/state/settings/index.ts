@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // Import classes
-import { st, SFXSettingKeysType, SFXSettingsType, Settings } from 'src/classes/Settings';
+import { SFXSettingKeysType, SFXSettingsType, Settings, SettingsType } from 'src/classes/Settings';
+import { ColorTheme, defaultDarkTheme } from 'src/classes/ColorTheme';
 
 // Import objects
 // import { MyMap } from 'src/objects/MyMap';
@@ -16,22 +17,7 @@ import { ReduxAction } from '../state.types';
 export const SettingsSlice = createSlice({
   name: "settings",
   initialState: {
-    // /**
-    //  * Is app in dark mode or not?
-    //  */
-    // isDarkMode: false,
-    // /**
-    //  * Sound effect settings.
-    //  */
-    // sfx: {
-    //   hasSoundWhenClickTable: true,
-    //   hasSoundWhenClickButton: true
-    // } as SFXSettingsType,
-    // /**
-    //  * Language of app.
-    //  */
-    // lang: languageMap.get("vie")
-    self: st
+    self: Settings.createSettings()
   },
   reducers: {
     /**
@@ -40,7 +26,10 @@ export const SettingsSlice = createSlice({
      * @param action 
      */
     setSFXStatusAction: function(state, action: ReduxAction<{ sound: SFXSettingKeysType, status?: boolean }>) {
-      state.self.setSFX(action.payload.sound, action.payload.status ? action.payload.status : false);
+      Settings.setSFX(
+        state.self,
+        action.payload.sound, action.payload.status ? action.payload.status : false
+      );
     },
 
     /**
@@ -49,14 +38,39 @@ export const SettingsSlice = createSlice({
      * @param action 
      */
     toggleDarkModeAction: function(state, action: ReduxAction<undefined>) {
-      state.self.toggleTheme();
+      Settings.toggleTheme(state.self);
+    },
+
+    /**
+     * __Note__: This action is not affect the state.
+     * 
+     * Use this action to perform tasks requiring settings.
+     * @param state 
+     * @param action 
+     */
+    performTasksRequireSettingsAction: function(state, action: ReduxAction<undefined>) {
+      /*
+        There are 2 tasks:
+        - Theme
+        - Language
+
+        Because they are affect to UI, so we need to perform their task depend on settings.
+      */
+
+      // Theme
+      if(state.self.isDarkMode) {
+        ColorTheme.enableTheme(defaultDarkTheme);
+      } else {
+        ColorTheme.unableTheme();
+      }
     }
   }
 });
 
 export const {
   setSFXStatusAction,
-  toggleDarkModeAction
+  toggleDarkModeAction,
+  performTasksRequireSettingsAction
 } = SettingsSlice.actions;
 
 /**
@@ -82,6 +96,6 @@ export function darkModeSettingsSelector(state: any): boolean {
  * @param state 
  * @returns 
  */
-export function settingsSelector(state: any): Settings {
+export function settingsSelector(state: any): SettingsType {
   return state.settings.self;
 }

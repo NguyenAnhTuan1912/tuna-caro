@@ -19,7 +19,7 @@ import { ReduxAction } from "../state.types";
 export const PlayerSlice = createSlice({
   name: "player",
   initialState: {
-    self: new Player(
+    self: Player.createPlayer(
       LocalStorageUtils.getItem("playerId") ?? "",
       LocalStorageUtils.getItem("playerName") ?? ""
     )
@@ -51,7 +51,7 @@ export const PlayerSlice = createSlice({
      */
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
       if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
-      state.self.setPlayer(action.payload);
+      Player.setPlayer(state.self, action.payload);
     }
   },
   
@@ -67,7 +67,7 @@ export const PlayerSlice = createSlice({
  * @param state 
  * @returns 
  */
-export function playerSelector(state: any): Player {
+export function playerSelector(state: any): PlayerType {
   return state.player.self;
 }
 

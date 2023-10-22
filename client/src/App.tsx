@@ -2,10 +2,13 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 
+// Import from classes
+
 // Import from apis
 import { mySocket } from 'src/apis/socket';
 
 // Import from hooks
+import { useSettingsActions } from './hooks/useSettings';
 import { usePlayerActions } from './hooks/usePlayer';
 
 // Import layout and pages
@@ -26,17 +29,18 @@ import SnackBar from './components/snack_bar/SnackBar';
  */
 function App() {
   const playerDispatcher = usePlayerActions();
+  const settingsDispatcher = useSettingsActions();
 
   // Handle some global Socket Exception
   React.useEffect(() => {
     async function init() {
       // Call API to get ID.
-      playerDispatcher.getPlayerIDAsyncThunk();
+      playerDispatcher.getPlayerIDAsync();
 
       // Init
       mySocket.init((message) => {
         let data = message.data!;
-        playerDispatcher.setPlayerAction({
+        playerDispatcher.setPlayer({
           socketId: data.socketId
         });
       });
@@ -47,6 +51,9 @@ function App() {
 
     // Init socket.
     init();
+
+    // Theme.
+    settingsDispatcher.performTasksRequireSettings();
 
     return function() {
       console.log("Disconnect socket");

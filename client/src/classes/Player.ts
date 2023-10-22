@@ -11,74 +11,84 @@ export interface PlayerType {
  * Use this class to create an object that can manage Player in game.
  */
 export class Player {
-  id!: string;
-  socketId!: string;
-  name!: string;
-  mark?: string;
-  isWinner!: boolean;
-  score!: number;
-
-  private static __hasArgsDefaultConstruct__(o: Player, id: string, name?: string, mark?: string, isWinner?: boolean, score?: number) {
-    o.id = id;
+  private static __hasArgsDefaultConstruct__(o: PlayerType, id?: string, name?: string, mark?: string, isWinner?: boolean, score?: number) {
+    o.id = id ? id : "";
     o.name = name ? name : `Player[${id}]`;
     if(mark) o.mark = mark;
     if(isWinner) o.isWinner = isWinner;
     if(score) o.score = score;
-  }
-
-  constructor();
-  constructor(player: PlayerType);
-  constructor(id: string);
-  constructor(id: string, name: string);
-  constructor(id: string, name: string, mark: string, isWinner: boolean, score: number);
-  constructor(_?: string | PlayerType, name?: string, mark?: string, isWinner?: boolean, score?: number) {
-    if(typeof _ === "string") {
-      Player.__hasArgsDefaultConstruct__(this, _, name, mark, isWinner, score);
-    }
-    
-    if(_ && typeof _ !== "string") {
-      Player.__hasArgsDefaultConstruct__(this, _.id, _.name, _.mark, _.isWinner, _.score);
-    }
+    return o;
   }
 
   /**
-   * Use this method to init state of player when enter game, including `score` and `isWinner`.
+   * 
    */
-  initForGame() {
-    this.score = 0;
-    this.isWinner = false;
-  }
-
+  static createPlayer(): PlayerType;
   /**
-   * Use this method to reset state of user in game, including `score` and `isWinner`.
+   * Use this static method to create a player with only `id`.
+   * @param id 
    */
-  reset() {
-    this.initForGame();
+  static createPlayer(id: string): PlayerType;
+  /**
+   * Use this static method to create a player with `id` and `name`.
+   * @param id 
+   * @param name 
+   */
+  static createPlayer(id: string, name: string): PlayerType;
+  /**
+   * Use this static method to create a player object with complete information.
+   * @param id 
+   * @param name 
+   * @param mark 
+   * @param isWinner 
+   * @param score 
+   */
+  static createPlayer(id: string, name: string, mark: string, isWinner: boolean, score: number): PlayerType;
+  static createPlayer(id?: string, name?: string, mark?: string, isWinner?: boolean, score?: number): PlayerType {
+    return Player.__hasArgsDefaultConstruct__({} as PlayerType, id, name, mark, isWinner, score);
   }
 
   /**
-   * Use this method to set information for player.
+   * Use this static method to create default player.
+   */
+  static createDefault(): PlayerType {
+    return {
+      id: "",
+      socketId: "",
+      name: "",
+      mark: "",
+      isWinner: false,
+      score: 0
+    }
+  }
+
+  /**
+   * Use this static method to init state of player when enter game, including `score` and `isWinner`.
+   * @param o 
+   */
+  static initForGame(o: PlayerType) {
+    o.score = 0;
+    o.isWinner = false;
+  }
+
+  /**
+   * Use this static method to reset state of user in game, including `score` and `isWinner`.
+   * @param o 
+   */
+  static reset(o: PlayerType) {
+    Player.initForGame(o);
+  }
+
+  /**
+   * Use this static method to set information for player.
    * @param player 
    */
-  setPlayer(player: Partial<PlayerType>) {
+  static setPlayer(o: PlayerType, player: Partial<PlayerType>) {
     for(let prop in player) {
       let key = prop as keyof PlayerType;
       if(prop !== "id" && player[key]) {
-        (this as any)[key] = player[key];
+        (o as any)[key] = player[key];
       }
     }
-  }
-
-  /**
-   * Use this method to get data of player (not include method).
-   */
-  getInformation(): PlayerType {
-    let result = {};
-    let keys = Object.keys(this);
-    for(let key of keys) {
-      (result as any)[key] = (this as any)[key];
-    }
-
-    return result as PlayerType;
   }
 }

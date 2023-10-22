@@ -1,5 +1,5 @@
 // Import classes
-import { defaultDarkTheme } from "./ColorTheme";
+import { defaultDarkTheme, ColorTheme } from "./ColorTheme";
 
 // Import from classes
 
@@ -8,8 +8,6 @@ import { defaultDarkTheme } from "./ColorTheme";
 // Import utils
 import { LocalStorageUtils } from "src/utils/localstorage";
 import { OtherUtils } from "src/utils/other";
-
-let __privateInstance__: Settings | null = null;
 
 export type LanguagesType = "vie" | "us";
 
@@ -27,56 +25,54 @@ export interface SettingsType {
 export type SFXSettingKeysType = keyof SFXSettingsType;
 
 /**
- * __Singleton class__
- * 
- * Get singleton instance from this class and use to manage the
- * settings in app.
- * 
- * Because the settings need to be synced along the app. So this class
- * need to be used as singleton.
+ * Use this class to create an settings object and manipulate the settings object's data.
+ * Because of design of React and Redux, this class will has special design.
  */
 export class Settings {
-  isDarkMode!: boolean;
-  sfx!: SFXSettingsType;
-  lang!: LanguagesType;
-
-  constructor() {
-    if(__privateInstance__) return __privateInstance__;
-
-    // Init some state of settings.
-    this.init();
-  }
+  // Lock constructor.
+  private constructor() {}
 
   /**
-   * Use this method to init some settings.
+   * Use this static method to create a settings object. Its content depend on
+   * the data in localStorage.
    */
-  init() {
+  static createSettings(): SettingsType {
     let hasSoundWhenClickButton = LocalStorageUtils.getItem<boolean | undefined>("hasSoundWhenClickButton");
     let hasSoundWhenClickTable = LocalStorageUtils.getItem<boolean | undefined>("hasSoundWhenClickTable");
 
-    // Init state
-    this.isDarkMode = Boolean(LocalStorageUtils.getItem("isDarkMode"));
-    this.sfx = {
-      hasSoundWhenClickButton:
-        hasSoundWhenClickButton === undefined ||  hasSoundWhenClickButton === null ? true : hasSoundWhenClickButton,
-      hasSoundWhenClickTable:
-        hasSoundWhenClickTable === undefined ||  hasSoundWhenClickTable === null ? true : hasSoundWhenClickTable
-    };
+    return {
+      isDarkMode: Boolean(LocalStorageUtils.getItem("isDarkMode")),
+      sfx: {
+        hasSoundWhenClickButton:
+          hasSoundWhenClickButton === undefined ||  hasSoundWhenClickButton === null ? true : hasSoundWhenClickButton,
+        hasSoundWhenClickTable:
+          hasSoundWhenClickTable === undefined ||  hasSoundWhenClickTable === null ? true : hasSoundWhenClickTable
+      },
+      lang: "vie"
+    }
+  }
 
-    // Install theme to style#theme.
-    defaultDarkTheme.install();
-
-    // Theme
-    this.setTheme(this.isDarkMode);
+  /**
+   * Use this static method to create a default settings object.
+   */
+  static createDefault(): SettingsType {
+    return {
+      isDarkMode: false,
+      sfx: {
+        hasSoundWhenClickButton: true,
+        hasSoundWhenClickTable: true
+      },
+      lang: "vie"
+    }
   }
 
   /**
    * Use this method to set status for `isDarkMode`.
    * @param isDark 
    */
-  setTheme(isDark: boolean) {
-    if(isDark) defaultDarkTheme.useTheme();
-    else document.documentElement.setAttribute("data-theme", "default");
+  static setTheme(isDark: boolean) {
+    if(isDark) ColorTheme.enableTheme(defaultDarkTheme);
+    else ColorTheme.unableTheme();
     LocalStorageUtils.setItem("isDarkMode", isDark);
   }
 
@@ -85,37 +81,39 @@ export class Settings {
    * @param soundSettingKey 
    * @param status 
    */
-  setSFX(soundSettingKey: SFXSettingKeysType, status: boolean) {
-    this.sfx[soundSettingKey] = status;
-    LocalStorageUtils.setItem(soundSettingKey, this.sfx[soundSettingKey]);
+  static setSFX(st: SettingsType, soundSettingKey: SFXSettingKeysType, status: boolean) {
+    st.sfx[soundSettingKey] = status;
+    LocalStorageUtils.setItem(soundSettingKey, st.sfx[soundSettingKey]);
   }
 
   /**
-   * Use this method to switch between dark and light theme.
+   * Use this static method to switch between dark and light theme.
+   * @param st 
    */
-  toggleTheme() {
+  static toggleTheme(st: SettingsType) {
     // Use togglePropertyState function in `OtherUtils` to toggle status.
     OtherUtils.togglePropertyState(
-      this, "isDarkMode",
+      st, "isDarkMode",
       function(status) {
         // Save to localstorage.
         LocalStorageUtils.setItem("isDarkMode", status);
         if(status) {
-          defaultDarkTheme.useTheme()
+          ColorTheme.enableTheme(defaultDarkTheme);
         } else {
-          document.documentElement.setAttribute("data-theme", "default")
+          ColorTheme.unableTheme();
         }
       }
     );
   }
 
   /**
-   * Use this method to toggle button click sound settings.
+   * Use this static method to toggle button click sound settings.
+   * @param st 
    */
-  toggleButtonClickSound() {
+  static toggleButtonClickSound(st: SettingsType) {
     // Use togglePropertyState function in `OtherUtils` to toggle status.
     OtherUtils.togglePropertyState(
-      this.sfx, "hasSoundWhenClickButton",
+      st.sfx, "hasSoundWhenClickButton",
       function(status) {
         // Save to localstorage.
         LocalStorageUtils.setItem("hasSoundWhenClickButton", status);
@@ -125,11 +123,12 @@ export class Settings {
 
   /**
    * Use this method to toggle table click sound settings.
+   * @param st 
    */
-  toggleTableClickSound() {
+  static toggleTableClickSound(st: SettingsType) {
     // Use togglePropertyState function in `OtherUtils` to toggle status.
     OtherUtils.togglePropertyState(
-      this.sfx, "hasSoundWhenClickTable",
+      st.sfx, "hasSoundWhenClickTable",
       function(status) {
         // Save to localstorage.
         LocalStorageUtils.setItem("hasSoundWhenClickTable", status);
@@ -137,7 +136,3 @@ export class Settings {
     );
   }
 }
-
-if(!__privateInstance__) __privateInstance__ = new Settings();
-
-export const st = new Settings();

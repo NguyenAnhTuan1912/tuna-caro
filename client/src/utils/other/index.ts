@@ -33,7 +33,7 @@ function togglePropertyState<T>(o: T, propName: keyof T, fn?: (status: boolean) 
   (o[propName] as boolean) = !o[propName];
 
   // Call
-  if(o[propName] && fn) fn(o[propName] as boolean);
+  if(fn) fn(o[propName] as boolean);
 }
 
 export const OtherUtils = {

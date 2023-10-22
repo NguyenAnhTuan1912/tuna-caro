@@ -13,6 +13,8 @@
   box-sizing: border-box;
   font-family: "Roboto Mono";
   color: var(--clr-onBackground);
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 body,

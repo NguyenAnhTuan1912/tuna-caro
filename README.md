@@ -6,6 +6,7 @@ Let me talk something about this project.
 
 ### The idea
 Follow [https://learnplaywin.net/caro/](https://learnplaywin.net/caro/):
+
 *Caro (the Vietnamese name) is a a board game based on the popular Japanese strategy board game called Gomoku. It is also known in other versions as Five in a Row or Gobang. The game is played on a 15 x 15 grid or sometimes on a 19 x 19 grid, depending on the version. Caro is somewhat similar to Tic Tac Toe except that the former requires the player to be able to create an unbroken row of five symbols whereas Tic Tac Toe is played on a 3 x 3 grid and only requires the player to create an unbroken row of three symbols to win.*
 
 So I want to make my own caro game with React, Express and SocketIO and learn from it as the same time!

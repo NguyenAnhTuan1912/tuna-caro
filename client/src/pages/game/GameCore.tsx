@@ -31,7 +31,7 @@ interface GamePageElements {
  */
 export default function GameCore(props: GameCoreProps) {
   const [gameState, gameStateFns] = useStateWESSFns({
-    game: new Game(props.game.id!, props.game.name!)
+    game: Game.createGame(props.game.id!, props.game.name!)
   }, function(changeState) {
     return {
       /**
@@ -57,14 +57,15 @@ export default function GameCore(props: GameCoreProps) {
           }
 
           // Add mark
-          game.addMarkInfo(
+          Game.addMarkInfo(
+            game,
             key,
             game.currentTurn,
             element
           );
 
           // Find winner
-          if(!result) result = game.findWinner(x, y);
+          if(!result) result = Game.findWinner(game, x, y);
 
           if(result) {
             // Run onAddMark if game has winner.
@@ -72,10 +73,11 @@ export default function GameCore(props: GameCoreProps) {
               props.onAddMark(x, y, t, gameState.game.currentTurn, result);
 
             // Set winner for game.
-            game.setWinner(result.player);
+            Game.setWinner(game, result.player);
 
             // Add mark.
-            game.addMarkInfo(
+            Game.addMarkInfo(
+              game,
               result.from + result.to,
               game.currentTurn,
               <EndLine key={result.from + result.to} from={result.endline.from} to={result.endline.to} />
@@ -85,8 +87,8 @@ export default function GameCore(props: GameCoreProps) {
           }
 
           // Swith turn
-          if(game.currentTurn === "X") game.setTurn("O")
-          else game.setTurn("X");
+          if(game.currentTurn === "X") Game.setTurn(game, "O")
+          else Game.setTurn(game, "X");
           
           // Subscribe an event here to support outside.
           if(props.onAddMark && canCallOnAddMark) props.onAddMark(x, y, t, gameState.game.currentTurn);
@@ -101,7 +103,8 @@ export default function GameCore(props: GameCoreProps) {
       resetGame: function() {
         changeState("game", function(game) {
           // Reset game.
-          game.reset();
+          Game.reset(game);
+
           return game;
         });
       },
@@ -112,7 +115,8 @@ export default function GameCore(props: GameCoreProps) {
       startNewRound: function() {
         changeState("game", function(game) {
           // Start new round.
-          game.startNewRound();
+          Game.startNewRound(game);
+
           return game;
         });
       },
@@ -124,10 +128,10 @@ export default function GameCore(props: GameCoreProps) {
       appendPlayer: function(key: PlayersKeyType, player: PlayerType) {
         changeState("game", function(game) {
           // Set new player.
-          game.setPlayer(key, player);
+          Game.setPlayer(game, key, player);
           
           // If game has 2 players, then change the status.
-          if(game.getPlayer("first") && game.getPlayer("second")) {
+          if(Game.getPlayer(game, "first") && Game.getPlayer(game, "second")) {
             game.status = "Playing";
           }
 
@@ -138,10 +142,10 @@ export default function GameCore(props: GameCoreProps) {
       /**
        * Use this function to set host.
        */
-      setHost: function(player: Player) {
+      setHost: function(player: PlayerType) {
         changeState("game", function(game) {
           // Set host
-          game.setHost(player);
+          Game.setHost(game, player);
           return game;
         });
       },
@@ -153,10 +157,10 @@ export default function GameCore(props: GameCoreProps) {
       removePlayer: function(g: PlayersKeyType | string) {
         changeState("game", function(game) {
           // If a player leave the game or is kicked by host. The game will be reset.
-          game.removePlayer(g);
+          Game.removePlayer(game, g);
 
           // Reset state.
-          game.reset();
+          Game.reset(game);
 
           // Because of leaving of a player, so game's status must be change
           game.status = "Waiting";
@@ -173,7 +177,7 @@ export default function GameCore(props: GameCoreProps) {
   });
 
   // Some logic
-  const hasWinner = gameState.game.hasWinner();
+  const hasWinner = Game.hasWinner(gameState.game);
   const canResetBtnShown = hasWinner && (!props.host
     ? true
     : props.host.id === props.mainPlayer!.id
@@ -240,7 +244,7 @@ export default function GameCore(props: GameCoreProps) {
           if(hasWinner) return;
 
           // Check if this square has mark, else terminate.
-          if(gameState.game.hasMarkIn(x, y)) return;
+          if(Game.hasMarkIn(gameState.game, x, y)) return;
 
           // Play sfx
           sfx.play("hitTableSound");
@@ -250,7 +254,7 @@ export default function GameCore(props: GameCoreProps) {
         }}
 
         renderSVGElements={() => {
-          return gameState.game.renderMarks(function(value) {
+          return Game.renderMarks(gameState.game, function(value) {
             return value?.element!;
           });
         }}

@@ -182,10 +182,10 @@ export default function GameOnline() {
       */
       mainPlayer={(function() {
         let game = data.game!;
-        let mainPlayer = player.getInformation();
+        let mainPlayer = { ...player };
 
         for(let key in game._players) {
-          if(mainPlayer.id === game._players[key].id) {
+          if(mainPlayer.id === game._players[key]!.id) {
             mainPlayer = Object.assign(mainPlayer, game._players[key]);
             break;
           }
@@ -193,7 +193,7 @@ export default function GameOnline() {
 
         return mainPlayer;
       })()}
-      host={data.game && data.game.host ? data.game.host : player.getInformation()}
+      host={data.game && data.game.host ? data.game.host : player}
     />
   )
 }

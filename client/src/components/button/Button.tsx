@@ -8,12 +8,14 @@ import { SFXPathsType } from 'src/classes/SoundEffects';
 import { useSFX } from 'src/hooks/useSFX';
 
 // Import from utils
+import { OtherUtils } from 'src/utils/other';
 import { StringUtils } from 'src/utils/string';
 
 interface ButtonPropsType extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   to?: string;
   soundName?: SFXPathsType;
   isTransparent?: boolean;
+  hasPadding?: boolean;
   extendClassName?: string;
 }
 
@@ -23,6 +25,7 @@ interface ButtonPropsType extends React.ButtonHTMLAttributes<HTMLButtonElement> 
  */
 export default function Button({
   to,
+  hasPadding = true,
   isTransparent = false,
   soundName = "buttonClickSound",
   extendClassName,
@@ -30,9 +33,21 @@ export default function Button({
   ...props
 }: ButtonPropsType) {
   // Concatenate the root class name with the extend class name.
-  const className = StringUtils.concate(
-    isTransparent ? "btn-transparent no-outline center-box p-1" : "btn spe-outline center-box", extendClassName
-  );
+  const className = OtherUtils.fromCase([
+    {
+      case: isTransparent,
+      returnValue: "btn-transparent no-outline center-box"
+    },
+    {
+      case: !hasPadding,
+      returnValue: "btn-no-padd no-outline center-box"
+    },
+    {
+      case: true,
+      returnValue: "btn spe-outline center-box"
+    }
+  ]) + " " + extendClassName;
+
   const sfx = useSFX();
 
   if(to) {

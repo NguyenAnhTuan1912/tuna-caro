@@ -48,9 +48,11 @@ export interface GameType {
   name: string;
   status: GameStatus;
   currentTurn: MarkType;
-  host?: Player;
-  _password: string;
-  _players: { [key: string]: PlayerType } | null;
+  host: PlayerType | null;
+  _markInfoMap: MarkInfoMapType | null;
+  _winnerFinder: WinnerFinderType | null;
+  _password: string | null;
+  _players: { [key: string]: PlayerType | null } | null;
 };
 
 export interface GameRoomType {
@@ -61,90 +63,104 @@ export interface GameRoomType {
   hasPassword: boolean;
 }
 
-/**
- * Create a direction checker. Each case has 2 directions to check.
- */
-class DirectionChecker {
-  private A!: {
+interface DirectionCheckerType {
+  A: {
     isDirecA: boolean;
     isDirecB: boolean;
   };
-  private B!: {
+  B: {
     isDirecA: boolean;
     isDirecB: boolean;
   };
-  private C!: {
+  C: {
     isDirecA: boolean;
     isDirecB: boolean;
   };
-  private D!: {
+  D: {
     isDirecA: boolean;
     isDirecB: boolean;
   }
+}
 
-  constructor() {
-    this.A = {
-      isDirecA: true,
-      isDirecB: true
-    };
-    this.B = {
-      isDirecA: true,
-      isDirecB: true
-    };
-    this.C = {
-      isDirecA: true,
-      isDirecB: true
-    };
-    this.D = {
-      isDirecA: true,
-      isDirecB: true
-    };
+interface WinnerFinderType {
+  markInfoMap: MarkInfoMapType;
+  directionChecker: DirectionCheckerType;
+}
+
+/**
+ * Use this class to create DirectionChecker and manipulate its data.
+ */
+class DirectionChecker {
+  // Lock constructor
+  private constructor() {}
+
+  /**
+   * Use this method to create a DirectionChecker object.
+   */
+  static createDirectionChecker(): DirectionCheckerType {
+    return {
+      A: {
+        isDirecA: true,
+        isDirecB: true
+      },
+      B: {
+        isDirecA: true,
+        isDirecB: true
+      },
+      C: {
+        isDirecA: true,
+        isDirecB: true
+      },
+      D: {
+        isDirecA: true,
+        isDirecB: true
+      }
+    }
   }
 
   /**
-   * Use this method to get a direction checker. Each case has 2 direction to check.
+   * Use this static method to get a direction checker. Each case has 2 direction to check.
    * If one of these direction is not satisfy the condition, checker will stop check this direction.
    * @param table 
    * @returns 
    */
-  getDirectionCheck(table: MarkInfoMapType) {
-    let that = this;
+  static getDirectionCheck(dchker: DirectionCheckerType, table: MarkInfoMapType) {
     return function(value: MarkInfoType, _: CheckCaseLabels, rowA: number, rowB: number, colA: number, colB: number) {
       let coorA = Game.createKey(rowA, colA);
       let coorB = Game.createKey(rowB, colB);
       
-      if(table.get(coorA)?.value !== value.value && that[_].isDirecA) {
-        that[_].isDirecA = false;
+      if(table.get(coorA)?.value !== value.value && dchker[_].isDirecA) {
+        dchker[_].isDirecA = false;
       }
   
-      if(table.get(coorB)?.value !== value.value && that[_].isDirecB) {
-        that[_].isDirecB = false;
+      if(table.get(coorB)?.value !== value.value && dchker[_].isDirecB) {
+        dchker[_].isDirecB = false;
       }
       
       return WinnerFinder.createDirectionCheckResult(
-        rowA, colA, coorA, that[_].isDirecA,
-        rowB, colB, coorB, that[_].isDirecB
+        rowA, colA, coorA, dchker[_].isDirecA,
+        rowB, colB, coorB, dchker[_].isDirecB
       );
     }
   }
 
   /**
-   * Use this method to reset all cases for other uses.
+   * Use this static method to reset all cases for other uses.
    */
-  reset() {
-    this.A = {
+  static reset(dchker: DirectionCheckerType) {
+    dchker.A = {
       isDirecA: true,
       isDirecB: true
     };
-    this.B = {
+    dchker.B = {
       isDirecA: true,
       isDirecB: true
     };
-    this.C = {
+    dchker.C = {
       isDirecA: true,
       isDirecB: true
     };
-    this.D = {
+    dchker.D = {
       isDirecA: true,
       isDirecB: true
     };
@@ -155,12 +171,19 @@ class DirectionChecker {
  * Create a winner finder. Each time mark is fill in the MarkInfoMap, checker will check to find winner.
  */
 class WinnerFinder {
-  markInfoMap!: WeakRef<MarkInfoMapType>;
-  directionChecker!: DirectionChecker;
+  // Lock constructor
+  private constructor() {}
 
-  constructor(markInfoMap: MarkInfoMapType) {
-    this.markInfoMap = new WeakRef(markInfoMap);
-    this.directionChecker = new DirectionChecker();
+  /**
+   * Use this static method to create WinnerFinder object.
+   * @param markInfoMap 
+   * @returns 
+   */
+  static createWinnerFinder(markInfoMap: MarkInfoMapType): WinnerFinderType {
+    return {
+      markInfoMap: markInfoMap,
+      directionChecker: DirectionChecker.createDirectionChecker()
+    }
   }
 
   /**
@@ -206,7 +229,7 @@ class WinnerFinder {
    * @param _ 
    * @param result 
    */
-  private updateCase($: CheckWinnerCaseType, _: CheckCaseLabels, result: DirectionCheckResultType) {
+  private static updateCase($: CheckWinnerCaseType, _: CheckCaseLabels, result: DirectionCheckResultType) {
     if(result[0] && result[0].isSatisfactory) {
       $[_]["satisfactionTimes"] += 1;
       $[_]["from"] = result[0].coor;
@@ -229,7 +252,7 @@ class WinnerFinder {
    * @param from 
    * @param to 
    */
-  private boundaryCheck(table: MarkInfoMapType, mark: MarkType, prevFrom: Coordinate, nextTo: Coordinate) {
+  private static boundaryCheck(table: MarkInfoMapType, mark: MarkType, prevFrom: Coordinate, nextTo: Coordinate) {
     let markAtFrom = table.get(Game.createKey(prevFrom.x, prevFrom.y));
     let markAtTo = table.get(Game.createKey(nextTo.x, nextTo.y));
 
@@ -258,7 +281,7 @@ class WinnerFinder {
    * @param callWhenTrue 
    * @returns 
    */
-  check<T extends Function>(
+  static check<T extends Function>(
     value: MarkInfoType,
     cases: CheckWinnerCaseType,
     directionCheck: T,
@@ -270,7 +293,7 @@ class WinnerFinder {
     let caseACheck: DirectionCheckResultType = directionCheck(value, c, rowA, rowB, colA, colB);
       
     // Update case `c`
-    this.updateCase(cases, c, caseACheck);
+    WinnerFinder.updateCase(cases, c, caseACheck);
 
     if(times === cases[c].satisfactionTimes) {
       // Set boundary when case `c`
@@ -287,9 +310,9 @@ class WinnerFinder {
    * @param col 
    * @returns 
    */
-  checkWinner(row: number, col: number): ResultType | undefined {
+  static checkWinner(wnfder: WinnerFinderType, row: number, col: number): ResultType | undefined {
     let rCoor = Game.createKey(row, col);
-    let table = this.markInfoMap.deref()!
+    let table = wnfder.markInfoMap;
     let value = table.get(rCoor);
 
     if(!value) return undefined;
@@ -327,7 +350,7 @@ class WinnerFinder {
 
     let times = 5;
     let result;
-    let directionCheck = this.directionChecker.getDirectionCheck(table);
+    let directionCheck = DirectionChecker.getDirectionCheck(wnfder.directionChecker, table);
     let boundaryCoors = {
       from: { x: 0, y: 0 },
       to: { x: 0, y: 0 }
@@ -429,7 +452,7 @@ class WinnerFinder {
     }
 
     // Reset
-    this.directionChecker.reset();
+    DirectionChecker.reset(wnfder.directionChecker);
     
     if(result && !this.boundaryCheck(table, value.value, boundaryCoors.from, boundaryCoors.to)) {
       return undefined;
@@ -447,17 +470,6 @@ class WinnerFinder {
  * Use this game to create an object that can manage Game in app.
  */
 export class Game {
-  id!: string;
-  name!: string;
-  status!: GameStatus;
-  currentTurn!: MarkType;
-  host!: Player;
-  
-  private _password?: string;
-  private _players!: { [key: string]: PlayerType | null } | null;
-  private _markInfoMap!: MarkInfoMapType | null;
-  private _winnerFinder!: WinnerFinder | null;
-
   static MarkInfoKeyPattern = /\((\d+),(\d+)\)/;
   /**
    * `less` define size of "square" around Circle (O) and Path (X).
@@ -468,17 +480,30 @@ export class Game {
    */
   static t = 30;
 
-  constructor(id: string, name: string) {
-    this.id = id;
-    this.name = name;
-    this.status = "Waiting";
-    this._players = {
+  // Lock constructor
+  private constructor() {}
+
+  /**
+   * Use this static method to create a Game object.
+   * @param id 
+   * @param name 
+   * @returns 
+   */
+  static createGame(id: string, name: string): GameType {
+    // Init game.
+    let newGame = Game.init({} as GameType);
+
+    newGame.id = id;
+    newGame.name = name;
+    newGame.status = "Waiting";
+    newGame.host = null;
+    newGame._players = {
       "first": null,
       "second": null
     };
+    newGame._password = null;
 
-    // Init something
-    this.init();
+    return newGame;
   }
 
   /**
@@ -538,8 +563,8 @@ export class Game {
    * @param o 
    * @param cb 
    */
-  static iteratePlayers(o: Game, cb: (player: PlayerType, index: number) => void) {
-    let players = o.getPlayers(true) as (Array<PlayerType>);
+  static iteratePlayers(game: GameType, cb: (player: PlayerType, index: number) => void) {
+    let players = Game.getPlayers(game, true) as (Array<PlayerType>);
     let index = 0;
     for(let player of players) {
       cb(player, index);
@@ -548,58 +573,74 @@ export class Game {
   }
 
   /**
-   * Use this method to init game's state.
+   * Use this static method to init a game.
+   * @param game 
    */
-  init() {
-    this.currentTurn = "X";
-    this._markInfoMap = new MyMap();
-    this._winnerFinder = new WinnerFinder(this._markInfoMap);
+  static init(game: GameType) {
+    game.currentTurn = "X";
+    game._markInfoMap = new MyMap() as MarkInfoMapType;
+    game._winnerFinder = WinnerFinder.createWinnerFinder(game._markInfoMap);
+
+    return game;
   }
 
-  // Use to clear some properties.
-  clear() {
-    this._players = null;
-    this._markInfoMap = null;
-    this._winnerFinder = null;
+  /**
+   * Use this static method to clear some properties.
+   * @param game 
+   */
+  static clear(game: GameType) {
+    game._players = null;
+    game._markInfoMap = null;
+    game._winnerFinder = null;
   }
 
   /*
     SETTERS
   */
-  setPassword(password: string) {
-    this._password = password;
+ /**
+  * Use this static method to set password for game.
+  * @param game 
+  * @param password 
+  */
+  static setPassword(game: GameType, password: string) {
+    game._password = password;
   }
 
   /**
-   * Use this method to set player.
-   * @param turn 
+   * Use this static method to set player.
+   * @param game 
+   * @param key 
    * @param player 
+   * @returns 
    */
-  setPlayer(key: PlayersKeyType, player: PlayerType) {
-    if(!this._players) return;
+  static setPlayer(game: GameType, key: PlayersKeyType, player: PlayerType) {
+    if(!game._players) return;
 
     // Always init for game.
     Player.initForGame(player);
 
-    this._players[key] = player;
+    game._players[key] = player;
   }
 
   /**
-   * Use this method to set turn.
+   * Use this static method to set turn.
+   * @param game 
    * @param turn 
    */
-  setTurn(turn: MarkType) {
-    this.currentTurn = turn;
+  static setTurn(game: GameType, turn: MarkType) {
+    game.currentTurn = turn;
   }
 
   /**
-   * Use this method to set winner.
-   * @param mark 
+   * Use this static method to set winner.
+   * @param game 
+   * @param key 
+   * @returns 
    */
-  setWinner(key: string) {
-    if(!this._players) return;
+  static setWinner(game: GameType, key: string) {
+    if(!game._players) return;
 
-    Game.iteratePlayers(this, player => {
+    Game.iteratePlayers(game, player => {
       if(player.mark === key) {
         player.score += 1;
         player.isWinner = true;
@@ -608,49 +649,54 @@ export class Game {
   }
 
   /**
-   * Use this method to set host for game.
-   * @param player
+   * Use this static method to set host for game.
+   * @param game 
+   * @param player 
    */
-  setHost(player: Player): any;
-  setHost(key: string): any;
-  setHost(g: Player | string) {
-    if(!this._players) return;
+  static setHost(game: GameType, player: PlayerType): any;
+  static setHost(game: GameType, key: string): any;
+  static setHost(game: GameType, g: PlayerType | string) {
+    if(!game._players) return;
 
     if(typeof g === "string") {
-      this.host = this._players[g]!;
+      game.host = game._players[g]!;
       return;
     }
 
-    this.host = g;
+    game.host = g;
   }
 
   /*
     GETTERS
   */
- /**
-  * Use this method to get password.
-  * @returns 
-  */
-  getPassword() {
-    return this._password;
-  }
-
   /**
-   * Use this method to get player.
-   * @param turn 
+   * Use this static method to get password.
+   * @param game 
    * @returns 
    */
-  getPlayer(key: PlayersKeyType) {
-    if(!this._players) return;
-    return this._players[key];
+  static getPassword(game: GameType) {
+    return game._password;
   }
 
   /**
-   * Use this method to get player by id;
-   * @param playerId 
+   * Use this static method to get player.
+   * @param game 
+   * @param key 
+   * @returns 
    */
-  getPlayerById(playerId: string) {
-    let players = this.getPlayers(true) as Array<PlayerType>;
+  static getPlayer(game: GameType, key: PlayersKeyType) {
+    if(!game._players) return;
+    return game._players[key];
+  }
+
+  /**
+   * Use this static method to get player by id.
+   * @param game 
+   * @param playerId 
+   * @returns 
+   */
+  static getPlayerById(game: GameType, playerId: string) {
+    let players = Game.getPlayers(game, true) as Array<PlayerType>;
 
     return players.find(player => {
       if(player) return player.id === playerId;
@@ -659,11 +705,13 @@ export class Game {
   }
 
   /**
-   * Use this method to get the player whose `id` does not match with `playerId`.
+   * Use this static method to get the player whose `id` does not match with `playerId`.
+   * @param game 
    * @param playerId 
+   * @returns 
    */
-  getPlayerByExceptedId(playerId: string) {
-    let players = this.getPlayers(true) as Array<PlayerType>;
+  static getPlayerByExceptedId(game: GameType, playerId: string) {
+    let players = Game.getPlayers(game, true) as Array<PlayerType>;
 
     return players.find(player => {
       if(player) return player.id !== playerId;
@@ -672,14 +720,15 @@ export class Game {
   }
 
   /**
-   * Use this method to get information of player by `name`.
+   * Use this static method to get information of player by `name`.
+   * @param game 
    * @param name 
    * @returns 
    */
-  getPlayerByName(name: string) {
-    if(!this._players) return undefined;
+  static getPlayerByName(game: GameType, name: string) {
+    if(!game._players) return undefined;
 
-    let players = this.getPlayers(true) as Array<PlayerType>;
+    let players = Game.getPlayers(game, true) as Array<PlayerType>;
 
     return players.find(player => {
       if(player) return player.name === name;
@@ -688,14 +737,16 @@ export class Game {
   }
 
   /**
-   * Use this method to get ordinal number of player in `_players`.
+   * Use this static method to get ordinal number of player in `_players`.
+   * @param game 
    * @param playerId 
+   * @returns 
    */
-  getPlayerONumById(playerId: string) {
+  static getPlayerONumById(game: GameType, playerId: string) {
     let target = "second";
 
     // Find
-    Game.iteratePlayers(this, (player, index) => {
+    Game.iteratePlayers(game, (player, index) => {
       if(player && player.id === playerId) target = index === 0 ? "first" : "second"
     });
 
@@ -703,109 +754,120 @@ export class Game {
   }
 
   /**
-   * Use this method to get non-host player.
+   * Use this static method to get non-host player.
+   * @param game 
+   * @returns 
    */
-  getNonHostPlayer() {
-    if(!this._players) return;
-    let players = this.getPlayers(true) as Array<PlayerType>;
+  static getNonHostPlayer(game: GameType) {
+    if(!game._players) return;
+    let players = Game.getPlayers(game, true) as Array<PlayerType>;
     return players.find(player => {
-      if(player) return player === this.host;
+      if(player) return player === game.host;
       else return false;
     });
   }
 
   /**
-   * Use this method to get all players.
-   * @param isArray
+   * Use this static method to get all players.
+   * @param game 
+   * @param isArray 
+   * @returns 
    */
-  getPlayers(isArray: boolean = false) {
+  static getPlayers(game: GameType, isArray: boolean = false) {
     if(isArray) {
       let result: Array<any> = [];
-      if(!this._players) return result;
+      if(!game._players) return result;
 
       // Check if `first` player is exist.
-      if(this._players["first"]) {
-        result.push(this._players["first"]);
+      if(game._players["first"]) {
+        result.push(game._players["first"]);
       }
 
       // Check if `second` player is exist.
-      if(this._players["second"]) {
-        result.push(this._players["second"]);
+      if(game._players["second"]) {
+        result.push(game._players["second"]);
       }
       return result;
 
     }
 
-    if(!this._players) return {};
+    if(!game._players) return {};
 
-    return this._players!;
+    return game._players!;
   }
 
   /*
     OTHER METHODS
   */
- /**
-  * Use this method to remove a player by `id` or `mark`.
-  * @param playerId 
-  */
-  removePlayer(playerId: string): any;
-  removePlayer(key: PlayersKeyType): any;
-  removePlayer(g: PlayersKeyType | string) {
-    if(!this._players) return;
-    if(this._players[g]) { delete this._players[g]; return; };
+  /**
+   * Use this static method to remove a player by `id` or `mark`.
+   * @param game 
+   * @param playerId 
+   */
+  static removePlayer(game: GameType, playerId: string): any;
+  static removePlayer(game: GameType, key: PlayersKeyType): any;
+  static removePlayer(game: GameType, g: PlayersKeyType | string) {
+    if(!game._players) return;
+    if(game._players[g]) { delete game._players[g]; return; };
 
-    if(this._players["first"] && this._players["first"].id === g) {
-      delete this._players["first"];
-    } else if(this._players["second"] && this._players["second"].id === g) {
-      delete this._players["second"];
+    if(game._players["first"] && game._players["first"].id === g) {
+      delete game._players["first"];
+    } else if(game._players["second"] && game._players["second"].id === g) {
+      delete game._players["second"];
     }
   }
 
   /**
-   * Use a callback with this function to render marks to JSX.Element.
+   * Use this static method with a callback with this function to render marks to JSX.Element.
+   * @param game 
    * @param fn 
    * @returns 
    */
-  renderMarks(fn: (value: MarkInfoType | undefined, key?: string) => JSX.Element) {
-    return this._markInfoMap!.map(fn);
+  static renderMarks(game: GameType, fn: (value: MarkInfoType | undefined, key?: string) => JSX.Element) {
+    return game._markInfoMap!.map(fn);
   }
 
   /**
-   * Use this method to add an information of mark to map.
+   * Use this static method to add an information of mark to map.
+   * @param game 
    * @param coordinate 
    * @param mark 
    * @param element 
    */
-  addMarkInfo(coordinate: string, mark: MarkType, element: JSX.Element) {
-    if(!this._markInfoMap!.get(coordinate))
-      this._markInfoMap!.set(coordinate, { value: mark, element });
+  static addMarkInfo(game: GameType, coordinate: string, mark: MarkType, element: JSX.Element) {
+    if(!game._markInfoMap!.get(coordinate))
+      game._markInfoMap!.set(coordinate, { value: mark, element });
   }
 
   /**
-   * Use this method to compare password.
+   * Use this static method to compare password.
+   * @param game 
    * @param password 
    * @returns 
    */
-  comparePassword(password: string) {
-    return this._password === password;
+  static comparePassword(game: GameType, password: string) {
+    return game._password === password;
   }
 
   /**
-   * Use to check if this unit coordinate has any mark. Return boolean.
+   * Use this static method to check if this unit coordinate has any mark. Return boolean.
+   * @param game 
    * @param unitCoorX 
    * @param unitCoorY 
    * @returns 
    */
-  hasMarkIn(unitCoorX: number, unitCoorY: number) {
-    return Boolean(this._markInfoMap!.get(Game.createKey(unitCoorX, unitCoorY)));
+  static hasMarkIn(game: GameType, unitCoorX: number, unitCoorY: number) {
+    return Boolean(game._markInfoMap!.get(Game.createKey(unitCoorX, unitCoorY)));
   }
 
   /**
-   * Use to check "Is game complete?" or "Has winner?"
+   * Use this static method to check "Is game complete?" or "Has winner?"
+   * @param game 
+   * @returns 
    */
-  hasWinner() {
-    if(!this._players) return false;
-    let result = (this.getPlayers(true) as Array<PlayerType>).some(player => {
+  static hasWinner(game: GameType) {
+    if(!game._players) return false;
+    let result = (Game.getPlayers(game, true) as Array<PlayerType>).some(player => {
       if(player) return player.isWinner;
       return false;
     });
@@ -814,46 +876,54 @@ export class Game {
   }
 
   /**
-   * Use this method to reset entire the state of game.
+   * Use this static method to reset entire the state of game.
+   * @param game 
+   * @returns 
    */
-  reset() {
-    if(!this._players) return;
+  static reset(game: GameType) {
+    if(!game._players) return;
 
-    if(this._players["first"]) Player.reset(this._players["first"]);
-    if(this._players["second"]) Player.reset(this._players["second"]);
+    if(game._players["first"]) Player.reset(game._players["first"]);
+    if(game._players["second"]) Player.reset(game._players["second"]);
 
-    this.startNewRound();
+    Game.startNewRound(game);
   }
 
   /**
-   * Use this method to start new game.
+   * Use this static method to start new game.
+   * @param game 
+   * @returns 
    */
-  startNewRound() {
-    if(!this._players) return;
+  static startNewRound(game: GameType) {
+    if(!game._players) return;
 
-    if(this._players["first"]) this._players["first"].isWinner = false;
-    if(this._players["second"]) this._players["second"].isWinner = false;
+    if(game._players["first"]) game._players["first"].isWinner = false;
+    if(game._players["second"]) game._players["second"].isWinner = false;
 
-    this.init();
+    return Game.init(game);
   }
 
   /**
-   * Use this method to get user's information.
+   * Use this static method to get user's information.
+   * @param game 
    * @param key 
    * @returns 
    */
-  getPlayerInformation(key: PlayersKeyType) {
-    if(!this._players) return;
-    return this._players![key];
+  static getPlayerInformation(game: GameType, key: PlayersKeyType) {
+    if(!game._players) return;
+    return game._players![key];
   }
 
   // FIND WINNER
   /**
-   * Use to find winner. If game has winner, this will return `ResultType` else return `undefined`.
+   * Use this static method to find winner. If game has winner,
+   * this will return `ResultType` else return `undefined`.
+   * @param game 
    * @param row 
    * @param col 
+   * @returns 
    */
-  findWinner(row: number, col: number) {
-    return this._winnerFinder?.checkWinner(row, col);
+  static findWinner(game: GameType, row: number, col: number) {
+    return WinnerFinder.checkWinner(game._winnerFinder!, row, col);
   }
 }

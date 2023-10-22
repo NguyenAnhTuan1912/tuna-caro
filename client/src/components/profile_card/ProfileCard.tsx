@@ -6,12 +6,14 @@ import { usePlayer } from 'src/hooks/usePlayer';
 
 // Import components
 import MyInput from '../my_input/MyInput';
+import Button from '../button/Button';
 
-// Import types
-import { ProfileCardProps } from './ProfileCard.props';
 
 // Import styles
 import './ProfileCard.stlyes.css';
+
+// Import types
+import { ProfileCardProps } from './ProfileCard.props';
 
 interface ProfileCardElementsType {
   playerName: HTMLInputElement | null;
@@ -41,7 +43,7 @@ export default function ProfileCard(props: ProfileCardProps) {
          */
         changeName: function() {
           let newName = elementRefs.current.playerName!.value;
-          playerDispatcher.setPlayerNameAction(newName);
+          playerDispatcher.setPlayerName(newName);
         }
       }
     }
@@ -64,9 +66,9 @@ export default function ProfileCard(props: ProfileCardProps) {
       <div className="user-img outline">
         {
           props.canEdit && (
-            <button className="btn-no-padd spe-outline circle">
+            <Button className="circle">
               <span className="material-symbols-outlined" style={{ padding: "5px" }}>change_circle</span>
-            </button>
+            </Button>
           )
         }
       </div>
@@ -88,7 +90,7 @@ export default function ProfileCard(props: ProfileCardProps) {
         }
         {
           profileState.canChangeName && (
-            <button
+            <Button
               onClick={() => {
                 profileStateFns.changeName()
                 profileStateFns.toggleChangeName(false)
@@ -96,12 +98,12 @@ export default function ProfileCard(props: ProfileCardProps) {
               className="btn-transparent no-outline py-1 rounded-4"
             >
               <span className="txt-clr-primary fs-4">Đồng ý</span>
-            </button>
+            </Button>
           )
         }
         {
           props.canEdit && (
-            <button
+            <Button
               onClick={() => { profileStateFns.toggleChangeName() }}
               className="btn-transparent no-outline py-1 rounded-4"
             >
@@ -114,7 +116,7 @@ export default function ProfileCard(props: ProfileCardProps) {
                     <span className="txt-clr-primary fs-4">Đổi tên</span>
                   )
               }
-            </button>
+            </Button>
           )
         }
       </div>

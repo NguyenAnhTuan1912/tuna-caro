@@ -1,10 +1,10 @@
 import React from 'react'
 
 // Import classes
-import { Game } from 'src/classes/Game'
+import { Game, GameType } from 'src/classes/Game'
 
 interface ScoreBoardProps {
-  game: Game;
+  game: GameType;
   extendClassName?: string;
 }
 
@@ -14,8 +14,8 @@ interface ScoreBoardProps {
  * @returns 
  */
 export default function ScoreBoard(props: ScoreBoardProps) {
-  let firstPlayer = props.game.getPlayerInformation("first");
-  let secondPlayer = props.game.getPlayerInformation("second");
+  let firstPlayer = Game.getPlayerInformation(props.game, "first");
+  let secondPlayer = Game.getPlayerInformation(props.game, "second");
 
   let fpName = firstPlayer ? firstPlayer.name : "Unknow01";
   let spName = secondPlayer ? secondPlayer.name : "Unknow02";

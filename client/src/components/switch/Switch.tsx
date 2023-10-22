@@ -14,6 +14,9 @@ import { SwitchProps } from './Switch.props';
 export default function Switch(props: SwitchProps) {
   const [status, setStatus] = React.useState(Boolean(props.initialStatus));
   const switchRef = React.useRef<HTMLDivElement>(null);
+  const switchData = React.useRef({
+    prevStatus: !Boolean(props.initialStatus)
+  });
   
   const animationData = React.useMemo(() => {
     return {
@@ -55,11 +58,12 @@ export default function Switch(props: SwitchProps) {
   return (
     <div className="switch-container outline">
       <div
-        onClick={() => {setStatus(prevState => {
-          let newStatus = !prevState;
-          props.onChange(newStatus);
-          return newStatus;
-        })}}
+        onClick={() => {
+          props.onChange(!status);
+          setStatus(prevState => {
+            return !prevState;
+          })
+        }}
         className="switch outline-x"
         ref={switchRef}
       ></div>

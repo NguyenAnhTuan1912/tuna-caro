@@ -2,7 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 // Import from classes
-import { sfx, SFXPathsType } from 'src/classes/SoundEffects';
+import { SFXPathsType } from 'src/classes/SoundEffects';
+
+// Import from hooks
+import { useSFX } from 'src/hooks/useSFX';
 
 // Import from utils
 import { StringUtils } from 'src/utils/string';
@@ -30,6 +33,7 @@ export default function Button({
   const className = StringUtils.concate(
     isTransparent ? "btn-transparent no-outline center-box p-1" : "btn spe-outline center-box", extendClassName
   );
+  const sfx = useSFX();
 
   if(to) {
     return (

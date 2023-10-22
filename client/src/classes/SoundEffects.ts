@@ -1,14 +1,20 @@
 // Import from classes
-import { Settings } from "./Settings";
+import { SettingsType } from "./Settings";
+
+// Import from objects
+import { MyMap } from "src/objects/MyMap";
 
 export type SFXPathsType = keyof typeof SoundEffects.SFXPaths;
 
-let __privateInstance__: SoundEffects | null = null;
+export interface SoundEffectsType {
+  audios: MyMap<SFXPathsType, HTMLAudioElement>;
+  settings: SettingsType;
+}
+
+let __AudioList__: MyMap<SFXPathsType, HTMLAudioElement> | null = null;
 
 /**
- * Get singleton instance from this class to manage sound effects in app.
- * 
- * Use with `Settings` to get permission to perform some tasks.
+ * Use this static class to create SoundEffects object.
  */
 export class SoundEffects {
   static SoundsRoot = "/sounds";
@@ -19,60 +25,90 @@ export class SoundEffects {
     notiSound: "/noti_sound.wav",
   };
 
-  private _audio!: HTMLAudioElement;
-  private _settings!: Settings;
+  // Lock constructor.
+  private constructor() {}
 
-  constructor() {
-    if(__privateInstance__) return __privateInstance__;
+  /**
+   * Use this static method to create SoundEffects.
+   * @param st 
+   * @returns 
+   */
+  static createSoundEffects(st: SettingsType): SoundEffectsType {
+    let audios: MyMap<SFXPathsType, HTMLAudioElement>;
+    if(__AudioList__) audios = __AudioList__;
+    else {
+      let keys = Object.keys(SoundEffects.SFXPaths);
+      __AudioList__ = new MyMap();
 
-    this._audio = new Audio();
-    this._settings = new Settings();
+      for(let key of keys) {
+        let src = SoundEffects.SoundsRoot + SoundEffects.SFXPaths[key as SFXPathsType];
+        let audio = new Audio(src);
 
-    // Set default volume.
-    this._audio.volume = .4;
+        // Set volume
+        audio.volume = .4;
+
+        __AudioList__.set(key as SFXPathsType, audio);
+      }
+
+      audios = __AudioList__;
+    }
+
+
+
+    return {
+      audios,
+      settings: st
+    }
   }
+
+  /**
+   * Use this private static method to reset audio.
+   * @param audio 
+   */
+  private static _resetAudio(audio: HTMLAudioElement) {
+    // Pause
+    audio.pause();
+
+    // Set to 0
+    audio.currentTime = 0;
+  } 
   
   /**
-   * Use to play sound effect.
+   * Use this static async method to play sound effect.
    * @param soundName 
   */
- async play(soundName: SFXPathsType) {
-    let src = SoundEffects.SoundsRoot;
-
-    // Reload
-    this._audio.load();
+ static async play(sfx: SoundEffectsType, soundName: SFXPathsType) {
+    let audio: HTMLAudioElement;
 
     switch(soundName) {
       case "buttonClickSound": {
         // If this sfx is turn off, then return to prevent play this sound.
-        if(!this._settings.sfx.hasSoundWhenClickButton) return;
-        src += SoundEffects.SFXPaths.buttonClickSound;
+        if(!sfx.settings.sfx.hasSoundWhenClickButton) return;
+
+        audio = sfx.audios.get("buttonClickSound")!;
         break;
       }
 
       case "hitTableSound": {
         // If this sfx is turn off, then return to prevent play this sound.
-        if(!this._settings.sfx.hasSoundWhenClickTable) return;
-        src += SoundEffects.SFXPaths.hitTableSound;
+        if(!sfx.settings.sfx.hasSoundWhenClickTable) return;
+
+        audio = sfx.audios.get("hitTableSound")!;
         break;
       }
 
       case "notiSound": {
-        src += SoundEffects.SFXPaths.notiSound;
+        audio = sfx.audios.get("notiSound")!;
         break;
       }
 
       default: return;
     }
 
-    // Load src.
-    this._audio.src = src;
+    // Reset audio
+    SoundEffects._resetAudio(audio);
 
-    // Play sound.
-    await this._audio.play();
+    // Play
+    await audio.play();
   }
 }
-
-if(!__privateInstance__) __privateInstance__ = new SoundEffects();
-
-export const sfx = new SoundEffects();

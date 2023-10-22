@@ -58,14 +58,14 @@ export interface ThemeType {
 
 export interface ColorThemeType {
   name: string;
-  _theme: MyMap<keyof ThemeType, [string, string]>;
-  _isInstalled: boolean;
+  rgbTheme: MyMap<keyof Partial<ThemeType>, [string, string]>;
+  hexTheme: MyMap<keyof Partial<ThemeType>, [string, string]>;
+  isInstalled: boolean;
 }
 
 /**
- * Create an instance from this class to manage the color theme in app.
+ * Use this static class to create a ColorTheme.
  * 
- * This instance need to use the HTML Element to perform the task.
  * Default theme is installed in `variables.css` file.
  * 
  * First, you need to use `setTheme` method to add theme to css. The value
@@ -73,7 +73,7 @@ export interface ColorThemeType {
  * - An array of tuple, first element of tuple is the name of color and
  * the second is the value of it. For example:
  * ```
- * setTheme([
+ * ColorTheme.setTheme([
  *   ["primary", "242,12,92"],
  *   ["onPrimary", "123, 123, 123"]
  *   ["background", "FFF"],
@@ -82,7 +82,7 @@ export interface ColorThemeType {
  * ```
  * - An array of string that are in format `key:value`. For example:
  * ```
- * setTheme([
+ * ColorTheme.setTheme([
  *   "primary: 242,12,92",
  *   "onPrimary: 123, 123, 123",
  *   "background:FFF",
@@ -93,14 +93,6 @@ export interface ColorThemeType {
  * Note: HEX Theme is required. RGB is optional.
  */
 export class ColorTheme {
-  name!: string;
-
-  private _rgbTheme!: MyMap<keyof Partial<ThemeType>, [string, string]>;
-  private _hexTheme!: MyMap<keyof Partial<ThemeType>, [string, string]>;
-  private _documentElement: HTMLElement;
-  private _styleThemeElement!: HTMLElement;
-  private _isInstalled = false;
-
   /**
    * Use to get `key` and `value` of color.
    */
@@ -118,18 +110,23 @@ export class ColorTheme {
     // "primary", "onPrimary",
     "background", "onBackground"
   ];
+  static styleThemeElement = document.getElementById("theme")!;
 
-  constructor(name: string) {
-    this.name = name;
+  // Lock constructor
+  private constructor() {}
 
-    // Init hex theme.
-    this._hexTheme = new MyMap();
-
-    // Init
-    this._rgbTheme = new MyMap();
-
-    this._documentElement = document.documentElement;
-    this._styleThemeElement = document.getElementById("theme")!;
+  /**
+   * Use this static method to create a ColorTheme object.
+   * @param name 
+   * @returns 
+   */
+  static createColorTheme(name: string): ColorThemeType {
+    return {
+      name,
+      hexTheme: new MyMap(),
+      rgbTheme: new MyMap(),
+      isInstalled: false
+    }
   }
 
   /**
@@ -220,38 +217,41 @@ export class ColorTheme {
   }
 
   /**
-   * Use this method to check if theme is completely install.
+   * Use this static method to check if theme is completely install.
+   * @param theme 
+   * @returns 
    */
-  check() {
+  static check(theme: ColorThemeType) {
     for(let requiredColor of ColorTheme.RequiredColors) {
-      return Boolean(this._hexTheme.get(requiredColor))
+      return Boolean(theme.hexTheme.get(requiredColor))
     }
   }
 
   /**
    * __Important__
    * 
-   * Use this method to set theme. Receive a value of string or tuple.
+   * Use this static method to set theme. Receive a value of string or tuple.
+   * @param theme 
    * @param values 
    * @returns 
    */
-  setTheme(values: string[] | [string, string][]) {
+  static setTheme(theme: ColorThemeType, values: string[] | [string, string][]) {
     try {
       for(let value of values) {
         let [colorName, colorValue, colorType] = ColorTheme.generateKeyAndColor(value);
 
         if(colorType === "RGB")
-          this._rgbTheme.set(colorName as keyof ThemeType, [colorValue, colorType]);
+          theme.rgbTheme.set(colorName as keyof ThemeType, [colorValue, colorType]);
         else
-          this._hexTheme.set(colorName as keyof ThemeType, [colorValue, colorType]);
+          theme.hexTheme.set(colorName as keyof ThemeType, [colorValue, colorType]);
       }
 
-      if(!this.check()) throw new Error("The values is not enough color to set theme. Double check and try again.");
+      if(!ColorTheme.check(theme)) throw new Error("The values is not enough color to set theme. Double check and try again.");
 
       return true;
     } catch (error: any) {
       // If has error, clear all values.
-      this._hexTheme.clear();
+      theme.hexTheme.clear();
       console.error("ColorTheme Error: ", error.message);
 
       return false;
@@ -259,44 +259,52 @@ export class ColorTheme {
   }
 
   /**
-   * Use this method to add theme to css
+   * Use this static method to add theme to css
+   * @param theme 
+   * @returns 
    */
-  install() {
-    if(this._isInstalled) return true;
-    let cssTheme = `[data-theme="${this.name}"] { \n`;
+  static install(theme: ColorThemeType) {
+    if(theme.isInstalled) return true;
+    let cssTheme = `[data-theme="${theme.name}"] { \n`;
 
     // Add value (HEX).
-    this._hexTheme.forEach(function(value, colorName) {
+    theme.hexTheme.forEach(function(value, colorName) {
       cssTheme += ColorTheme.toCSSVariable(colorName, value[0], value[1]) + ";\n";
     });
 
     // Add value (RGB)
-    this._rgbTheme.forEach(function(value, colorName) {
+    theme.rgbTheme.forEach(function(value, colorName) {
       cssTheme += ColorTheme.toCSSVariable(colorName, value[0], value[1]) + ";\n";
     });
 
     cssTheme += "}";
 
     // Add cssTheme to style#theme
-    this._styleThemeElement!.innerHTML += cssTheme;
+    ColorTheme.styleThemeElement!.innerHTML += cssTheme;
 
     return true;
   }
 
   /**
-   * Use this method to tell HTML use this theme by set the `data-theme` to theme's `name`.
+   * Use this static method to tell HTML use this theme by set the `data-theme` to theme's `name`.
    * The default value of `data-theme` is `default`.
+   * @param theme 
    */
-  useTheme() {
-    this._documentElement.setAttribute("data-theme", this.name);
+  static enableTheme(theme: ColorThemeType) {
+    document.documentElement.setAttribute("data-theme", theme.name);
   }
 
-  
+  /**
+   * Use this static method to enable default theme.
+   */
+  static unableTheme() {
+    document.documentElement.setAttribute("data-theme", "default");
+  }
 }
 
 // Create dark theme for `default` here or some supported themes.
 // DEFAULT DARK
-const defaultDarkTheme = new ColorTheme("default-dark");
+const defaultDarkTheme = ColorTheme.createColorTheme("default-dark");
 
 /*
   --clr-outline: #C5C5C5;
@@ -306,18 +314,24 @@ const defaultDarkTheme = new ColorTheme("default-dark");
 */
 
 // setTheme
-defaultDarkTheme.setTheme([
-  "primary:5DC2E1",
-  "primary:93, 194, 225",
-  "background:262626",
-  "background:38, 38, 38",
-  "onBackground:FFFFFF",
-  "onBackground:255, 255, 255",
-  "outline:595959",
-  "outline:89, 89, 89",
-  "subOutline:6B6B6B",
-  "subOutline:107, 107, 107"
-]);
+ColorTheme.setTheme(
+  defaultDarkTheme,
+  [
+    "primary:5DC2E1",
+    "primary:93, 194, 225",
+    "background:262626",
+    "background:38, 38, 38",
+    "onBackground:FFFFFF",
+    "onBackground:255, 255, 255",
+    "outline:595959",
+    "outline:89, 89, 89",
+    "subOutline:6B6B6B",
+    "subOutline:107, 107, 107"
+  ]
+);
+
+// Install theme
+ColorTheme.install(defaultDarkTheme);
 
 export {
   defaultDarkTheme

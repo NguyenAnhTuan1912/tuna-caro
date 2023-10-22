@@ -10,6 +10,7 @@ import { AppDispatch } from 'src/state';
 import {
   toggleDarkModeAction,
   setSFXStatusAction,
+  performTasksRequireSettingsAction,
   settingsSelector
 } from 'src/state/settings';
 
@@ -18,19 +19,26 @@ export const {
   useSettingsState,
   useSettingsActions
 } = (function() {
-  const createSettingsActionFns = function(dispatch: AppDispatch) {
+  const createActions = function(dispatch: AppDispatch) {
     return {
-      toggleDarkModeAction: function() {
+      /**
+       * Use this action to change dark mode status.
+       */
+      toggleDarkMode: function() {
         dispatch(toggleDarkModeAction());
       },
 
       /**
-       * 
+       * Use this action to change SFX Settings status.
        * @param soundName 
        * @param status 
        */
-      setSFXStatusAction: function(soundName: SFXSettingKeysType, status?: boolean) {
+      setSFXStatus: function(soundName: SFXSettingKeysType, status?: boolean) {
         dispatch(setSFXStatusAction({ sound: soundName, status }));
+      },
+
+      performTasksRequireSettings: function() {
+        dispatch(performTasksRequireSettingsAction());
       }
     }
   }
@@ -44,7 +52,7 @@ export const {
       const settings = useSelector(settingsSelector);
       const dispatch = useDispatch();
 
-      return { settings, settingsDispatcher: createSettingsActionFns(dispatch) }
+      return { settings, settingsDispatcher: createActions(dispatch) }
     },
 
     /**
@@ -61,7 +69,7 @@ export const {
      */
     useSettingsActions: function() {
       const dispatch = useDispatch();
-      return createSettingsActionFns(dispatch);
+      return createActions(dispatch);
     }
   }
 })();

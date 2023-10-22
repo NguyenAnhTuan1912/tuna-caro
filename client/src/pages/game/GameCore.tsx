@@ -6,6 +6,7 @@ import { Player, PlayerType } from 'src/classes/Player';
 
 // Import hooks
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
+import { useSFX } from 'src/hooks/useSFX';
 
 // Import components
 import Grid from 'src/components/grid/Grid';
@@ -120,14 +121,10 @@ export default function GameCore(props: GameCoreProps) {
        * Use this function to add player to game.
        * @param player 
        */
-      appendPlayer: function(key: PlayersKeyType, player: PlayerType | Player) {
+      appendPlayer: function(key: PlayersKeyType, player: PlayerType) {
         changeState("game", function(game) {
           // Set new player.
-          if(player instanceof Player) {
-            game.setPlayer(key, player);
-          } else {
-            game.setPlayer(key, new Player(player));
-          }
+          game.setPlayer(key, player);
           
           // If game has 2 players, then change the status.
           if(game.getPlayer("first") && game.getPlayer("second")) {
@@ -169,6 +166,7 @@ export default function GameCore(props: GameCoreProps) {
       }
     }
   });
+  const sfx = useSFX();
 
   const elementRefs = React.useRef<GamePageElements>({
     page: null
@@ -189,8 +187,8 @@ export default function GameCore(props: GameCoreProps) {
     */
     if(!props.host) {
       // Create 2 new players
-      let firstPlayer = new Player("01");
-      let secondPlayer = new Player("02");
+      let firstPlayer = Player.createPlayer("01");
+      let secondPlayer = Player.createPlayer("02");
 
       // Set mark (default)
       firstPlayer.mark = "X";
@@ -205,11 +203,11 @@ export default function GameCore(props: GameCoreProps) {
       */
       // Create player. The second player may not in the game (can join later).
       // That mean the player has just created the game.
-      let firstPlayer = new Player(props.host);
+      let firstPlayer = props.host;
       let secondPlayer;
 
       // If the game has second player, that mean the player has just joined the game.
-      if(props.game._players && props.game._players["second"]) secondPlayer = new Player(props.game._players["second"]);
+      if(props.game._players && props.game._players["second"]) secondPlayer = props.game._players["second"];
 
       // Add player to the game and prepare to update state.
       gameStateFns.appendPlayer("first", firstPlayer);
@@ -243,6 +241,9 @@ export default function GameCore(props: GameCoreProps) {
 
           // Check if this square has mark, else terminate.
           if(gameState.game.hasMarkIn(x, y)) return;
+
+          // Play sfx
+          sfx.play("hitTableSound");
 
           // If pass all the condition (except check square), add new mark.
           gameStateFns.addMark(x, y, t, undefined, true);

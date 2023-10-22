@@ -454,7 +454,7 @@ export class Game {
   host!: Player;
   
   private _password?: string;
-  private _players!: { [key: string]: Player | null } | null;
+  private _players!: { [key: string]: PlayerType | null } | null;
   private _markInfoMap!: MarkInfoMapType | null;
   private _winnerFinder!: WinnerFinder | null;
 
@@ -538,8 +538,8 @@ export class Game {
    * @param o 
    * @param cb 
    */
-  static iteratePlayers(o: Game, cb: (player: Player, index: number) => void) {
-    let players = o.getPlayers(true) as (Array<Player>);
+  static iteratePlayers(o: Game, cb: (player: PlayerType, index: number) => void) {
+    let players = o.getPlayers(true) as (Array<PlayerType>);
     let index = 0;
     for(let player of players) {
       cb(player, index);
@@ -575,11 +575,11 @@ export class Game {
    * @param turn 
    * @param player 
    */
-  setPlayer(key: PlayersKeyType, player: Player) {
+  setPlayer(key: PlayersKeyType, player: PlayerType) {
     if(!this._players) return;
 
     // Always init for game.
-    player.initForGame();
+    Player.initForGame(player);
 
     this._players[key] = player;
   }
@@ -650,9 +650,12 @@ export class Game {
    * @param playerId 
    */
   getPlayerById(playerId: string) {
-    let players = this.getPlayers(true) as Array<Player>;
+    let players = this.getPlayers(true) as Array<PlayerType>;
 
-    return players.find(player => { if(player) return player.id === playerId });
+    return players.find(player => {
+      if(player) return player.id === playerId;
+      else return false;
+    });
   }
 
   /**
@@ -660,9 +663,12 @@ export class Game {
    * @param playerId 
    */
   getPlayerByExceptedId(playerId: string) {
-    let players = this.getPlayers(true) as Array<Player>;
+    let players = this.getPlayers(true) as Array<PlayerType>;
 
-    return players.find(player => { if(player) return player.id !== playerId });
+    return players.find(player => {
+      if(player) return player.id !== playerId;
+      else return false;
+    });
   }
 
   /**
@@ -673,9 +679,12 @@ export class Game {
   getPlayerByName(name: string) {
     if(!this._players) return undefined;
 
-    let players = this.getPlayers(true) as Array<Player>;
+    let players = this.getPlayers(true) as Array<PlayerType>;
 
-    return players.find(player => { if(player) return player.name === name });
+    return players.find(player => {
+      if(player) return player.name === name;
+      else return false;
+    });
   }
 
   /**
@@ -698,8 +707,11 @@ export class Game {
    */
   getNonHostPlayer() {
     if(!this._players) return;
-    let players = this.getPlayers(true) as Array<Player>;
-    return players.find(player => { if(player) return player === this.host });
+    let players = this.getPlayers(true) as Array<PlayerType>;
+    return players.find(player => {
+      if(player) return player === this.host;
+      else return false;
+    });
   }
 
   /**
@@ -793,7 +805,7 @@ export class Game {
    */
   hasWinner() {
     if(!this._players) return false;
-    let result = (this.getPlayers(true) as Array<Player>).some(player => {
+    let result = (this.getPlayers(true) as Array<PlayerType>).some(player => {
       if(player) return player.isWinner;
       return false;
     });
@@ -807,8 +819,8 @@ export class Game {
   reset() {
     if(!this._players) return;
 
-    if(this._players["first"]) this._players["first"].reset();
-    if(this._players["second"]) this._players["second"].reset();
+    if(this._players["first"]) Player.reset(this._players["first"]);
+    if(this._players["second"]) Player.reset(this._players["second"]);
 
     this.startNewRound();
   }

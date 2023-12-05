@@ -9,6 +9,11 @@ import { DataTableProps } from './DataTable.props';
 // Import styles
 import './DataTable.styles.css';
 
+/**
+ * Component will render a data table depend on `data`.
+ * @param param0 
+ * @returns 
+ */
 export default function DataTable<T>({
   maxRows = 5,
   ...props

@@ -4,7 +4,8 @@ import { CustomizedModalItemProps } from 'tunangn-react-modal';
 // Import from layouts
 import CloseButton from 'src/layouts/modal_items/CloseButton';
 
-// Import components
+// Import from components
+import Article from '../article/Article';
 import ProfileCard from '../profile_card/ProfileCard';
 import KeyGuide from '../key_guide/KeyGuide';
 
@@ -18,14 +19,14 @@ export default function SideMenu(props: CustomizedModalItemProps) {
   return (
     <div
       ref={sideMenuRef}
-      className="side-menu-container"
+      className="side-menu-container p-3"
       style={props.utils.getContainerStyle({
         width: "100%",
         maxWidth: "475px",
         minWidth: "300px",
-        padding: ".75rem",
         background: "var(--clr-background)",
-        borderLeft: "2px solid var(--clr-onBackground)"
+        borderLeft: "2px solid var(--clr-onBackground)",
+        overflow: "auto"
       })}
     >
         {/* Header */}
@@ -52,10 +53,10 @@ export default function SideMenu(props: CustomizedModalItemProps) {
         <div>
           <ProfileCard isVertical canEdit />
         </div>
-
-        <div className="p-1">
-          <h2>Hướng dẫn</h2>
-          <hr className="my-1"></hr>
+        <Article
+          title="Hướng dẫn"
+          hasHorizontalLine
+        >
           <div className="mb-4">
             <h3>Chung</h3>
             <p className="mb-1">Nếu như bạn muốn thay đổi ngôn ngữ, màu chủ đề và các cài đặt khác thì vào phần "Cài đặt".</p>
@@ -88,7 +89,7 @@ export default function SideMenu(props: CustomizedModalItemProps) {
               keys={<span className="material-symbols-outlined">restart_alt</span>}
             />
           </div>
-        </div>
+        </Article>
     </div>
   )
 }

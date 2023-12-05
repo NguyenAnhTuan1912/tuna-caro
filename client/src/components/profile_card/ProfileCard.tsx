@@ -40,6 +40,7 @@ export default function ProfileCard(props: ProfileCardProps) {
 
         /**
          * Use this function to change name for player.
+         * It change the state in redux (Global state).
          */
         changeName: function() {
           let newName = elementRefs.current.playerName!.value;
@@ -66,7 +67,7 @@ export default function ProfileCard(props: ProfileCardProps) {
       <div className="user-img outline">
         {
           props.canEdit && (
-            <Button className="circle">
+            <Button extendClassName="circle" hasPadding={false}>
               <span className="material-symbols-outlined" style={{ padding: "5px" }}>change_circle</span>
             </Button>
           )

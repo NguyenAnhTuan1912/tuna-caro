@@ -36,11 +36,12 @@ export default function Button({
   let className = "spe-outline center-box";
 
   // Transparent
-  if(!isTransparent) className += " btn-transparent";
-  else className += " btn"
+  if(isTransparent) className += " btn-transparent";
 
   // Padding
-  if(hasPadding) className += " px-6 py-3";
+  if(!hasPadding) className += " btn-no-padd";
+  else className += " btn";
+  
 
   // Extend class name
   if(extendClassName) className += " " + extendClassName;

@@ -1,6 +1,6 @@
 .home-page {
   max-width: 100%;
-  height: calc(100vh - (86px + 55px));
+  height: calc(100vh - (89px + 55px));
   background-color: var(--clr-background);
   overflow: auto;
 }

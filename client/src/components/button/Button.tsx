@@ -33,20 +33,17 @@ export default function Button({
   ...props
 }: ButtonPropsType) {
   // Concatenate the root class name with the extend class name.
-  const className = OtherUtils.fromCase([
-    {
-      case: isTransparent,
-      returnValue: "btn-transparent no-outline center-box"
-    },
-    {
-      case: !hasPadding,
-      returnValue: "btn-no-padd no-outline center-box"
-    },
-    {
-      case: true,
-      returnValue: "btn spe-outline center-box"
-    }
-  ]) + " " + extendClassName;
+  let className = "spe-outline center-box";
+
+  // Transparent
+  if(!isTransparent) className += " btn-transparent";
+  else className += " btn"
+
+  // Padding
+  if(hasPadding) className += " px-6 py-3";
+
+  // Extend class name
+  if(extendClassName) className += " " + extendClassName;
 
   const sfx = useSFX();
 

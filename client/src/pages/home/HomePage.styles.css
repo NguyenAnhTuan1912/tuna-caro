@@ -1,10 +1,11 @@
-.home-page-menu {
-  max-width: 370px;
-  margin: 0 auto;
-}
-
 .home-page {
   max-width: 100%;
   height: calc(100vh - (86px + 55px));
   background-color: var(--clr-background);
+  overflow: auto;
+}
+
+.home-page-menu {
+  max-width: 370px;
+  margin: 0 auto;
 }

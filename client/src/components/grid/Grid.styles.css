@@ -11,8 +11,8 @@
 }
 
 .grid-wrapper {
-  width: 300%;
-  height: 300vh;
+  width: 3000px;
+  height: 3000px;
   transform: scale(1);
   transform-origin: 0 0;
 }

@@ -20,6 +20,7 @@ export default function Header(props: HeaderProps) {
       <div className="flex-box ait-center">
         <Button
           isTransparent
+          hasPadding={false}
           onClick={() => { openTMI("mySideMenu") }}
           extendClassName="rounded-8 p-1"
         >

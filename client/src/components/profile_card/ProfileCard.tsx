@@ -67,7 +67,10 @@ export default function ProfileCard(props: ProfileCardProps) {
       <div className="user-img outline">
         {
           props.canEdit && (
-            <Button extendClassName="circle" hasPadding={false}>
+            <Button
+              extendClassName="circle"
+              hasPadding={false}
+            >
               <span className="material-symbols-outlined" style={{ padding: "5px" }}>change_circle</span>
             </Button>
           )

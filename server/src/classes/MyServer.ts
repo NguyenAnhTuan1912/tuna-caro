@@ -56,7 +56,7 @@ export default class MyServer {
             200,
             Utils.RM.getResponseMessage(false, {
               id: Utils.Security.getRandomID("", 2, 8)
-            }, "Welcome to Tunanguyen Server. You can have perfect experience in here.")
+            }, "This is the server of caro-game. An application in Nguyen Anh Tuan's Project.")
           );
         } catch (error: any) {
           return Utils.RM.responseJSON(

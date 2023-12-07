@@ -99,11 +99,10 @@ export class MySocket {
   private __o__!: SEListenerObjectsType;
 
   constructor(options: MySocketOptions) {
-    console.log("ORIGIN: ", [ env.REQUEST_ORIGIN!, env.REQUEST_ORIGIN_MOBILE! ]);
     this._io = new SocketServer(options.httpServer, {
       cors: {
-        // For development
-        origin: [ env.REQUEST_ORIGIN!, env.REQUEST_ORIGIN_MOBILE! ],
+        // For safe
+        origin: env.AUTHORIZED_DOMAINS,
         credentials: true
       }
     });
@@ -144,10 +143,12 @@ export class MySocket {
       console.log("SocketID: ", socket.id);
       console.log("Rooms: ", socket.rooms);
 
+      // Set up `disconnect` event for socket to handle some tasks for individual socket.
       socket.on("disconnect", () => {
         socket.removeAllListeners();
       });
 
+      // Set up `initial` event for socket.
       socket.on(MySocket.EventNames.initial, (message) => {
         socket.emit(
           MySocket.EventNames.initial,
@@ -161,6 +162,7 @@ export class MySocket {
         );
       });
 
+      // Set up listeners (including listener wrappers)
       this._listeners?.forEach((data) => {
         socket.on(data.name, (...args) => {
           data.fn(socket, args);

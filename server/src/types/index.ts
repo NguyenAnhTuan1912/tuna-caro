@@ -1,3 +1,4 @@
+import { Db, ObjectId } from "mongodb";
 import { Request, Response, NextFunction } from "express";
 import MyServer from "classes/MyServer";
 
@@ -14,7 +15,7 @@ export interface ServerBuilderOptions {
 }
 
 export interface IMongoModel {
-  validate: (data: any) => Promise<any>
+  validate(data: any): Promise<any>;
 }
 
 export interface APIHandler {
@@ -24,4 +25,13 @@ export interface APIHandler {
 
 export interface EncodeOptions {
   expireTime?: number | string
+}
+
+export type MongoModelOptions = {
+  dbInstance: Db
+}
+
+export type SchemaTimeType = {
+  createdAt?: number;
+  updatedAt?: number;
 }

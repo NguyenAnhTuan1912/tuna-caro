@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Temp_ADB from "db/temp_a";
+import CaroGameDB from "db/carogame";
 
 import utils from "utils";
 import { APIHandler } from "types";
@@ -8,7 +8,7 @@ import { APIHandler } from "types";
 type A = typeof utils;
 interface Utils extends A {}
 interface DBs {
-  Temp_ADB: Temp_ADB
+  CaroGameDB: CaroGameDB
 }
 
 interface HandlerCBProps {
@@ -65,7 +65,7 @@ export function createHandler(
 ): APIHandler {
   // Declare Database Objects for call back.
   const DBs = {
-    Temp_ADB: new Temp_ADB()
+    CaroGameDB: new CaroGameDB()
   };
 
   // Declare props for call back.
@@ -131,7 +131,7 @@ export function createExtraArgsHandler<T>(
 ) {
   // Declare Database Objects for call back.
   const DBs = {
-    Temp_ADB: new Temp_ADB()
+    CaroGameDB: new CaroGameDB()
   };
 
   // Declare props for call back.

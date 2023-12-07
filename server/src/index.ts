@@ -19,7 +19,10 @@ import ServerBuilder from "classes/ServerBuilder";
 import { env } from 'env';
 
 // DBs
-import Temp_ADB from "db/temp_a";
+import CaroGameDB from "db/carogame";
+
+// Import routers
+import CharacterRouter from "modules/characters";
 
 // Import socket event listener wrappers
 import { EmitGameSELWrapperInfo } from "socket_events/game/emitGame";
@@ -32,6 +35,7 @@ import { GetGamesSELWrapperInfo } from "socket_events/game/getGame";
 
 const ExpressServer = new MyServer({ port: process.env.PORT || "5000" });
 const builder = new ServerBuilder({ server: ExpressServer });
+const base = "/api";
 
 /**
  * The order of build actions is not important.
@@ -39,13 +43,22 @@ const builder = new ServerBuilder({ server: ExpressServer });
 
 // Build something before start
 // Build middle-wares
-builder.buildMiddleWare(cors({ origin: env.REQUEST_ORIGIN, credentials: true }));
+builder.buildMiddleWare(cors({
+  // Custom cors.
+  origin: function(origin, cb) {
+    if(env.NODE_ENV === "development") return cb(null, true);
+    if(env.AUTHORIZED_DOMAINS?.indexOf(origin!) !== -1) return cb(null, true);
+    return cb(new Error(`${origin} is not allowed by CORS.`));
+  },
+  credentials: true
+}));
 builder.buildMiddleWare(bodyParser.json());
 builder.buildMiddleWare(bodyParser.urlencoded({ extended: true }));
 
 // Build API
 // http://localhost:3000/api/post?id=post_01
 // http://localhost:3000/api/posts
+builder.buildAPI(base, CharacterRouter);
 
 // Build Socket
 builder.buildSocketEventWrapper(EmitGameSELWrapperInfo.name, EmitGameSELWrapperInfo.wrapper);
@@ -57,7 +70,7 @@ builder.buildSocketEventWrapper(StartNewRoundSELWrapperInfo.name, StartNewRoundS
 builder.buildSocketEventWrapper(GetGamesSELWrapperInfo.name, GetGamesSELWrapperInfo.wrapper);
 
 // Connect to DB
-builder.buildDBConnection(Temp_ADB.connect());
+builder.buildDBConnection(CaroGameDB.connect());
 
 // Start new server.
 ExpressServer.start();

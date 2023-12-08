@@ -9,15 +9,20 @@ import {
 } from "mongodb";
 import Joi from "joi";
 
+// Import from utils
+import Utils from "utils";
+
 // Import from utils of mongo
 import { MongoUtils } from "db/utils";
 
-// Import from types
+// Import types
 import {
   SchemaTimeType,
   MongoModelOptions,
   IMongoModel
 } from "types";
+
+import { ErrorReportType } from "utils/response_message";
 
 export type CharacterType = {
   img: string;
@@ -57,8 +62,8 @@ export interface ICharacter extends IMongoModel {
    * - `img`, `name`: maybe this method receives only img and name.
    * @param data 
    */
-  createCharacter(data: CharacterType): Promise<InsertOneResult<CharacterDocType> | null>;
-  createCharacter(img: string, name: string): Promise<InsertOneResult<CharacterDocType> | null>;
+  createCharacter(data: CharacterType): Promise<InsertOneResult<CharacterDocType> | ErrorReportType>;
+  createCharacter(img: string, name: string): Promise<InsertOneResult<CharacterDocType> | ErrorReportType>;
   /**
    * Use this method to create a character, then add it to `characters` collection.
    * Has validation.
@@ -67,14 +72,32 @@ export interface ICharacter extends IMongoModel {
    * - `data`: an array of object of character information.
    * @param data 
    */
-  createCharacters(data: Array<CharacterType>): Promise<InsertManyResult<CharacterDocType> | null>;
+  createCharacters(data: Array<CharacterType>): Promise<InsertManyResult<CharacterDocType> | ErrorReportType>;
 
   // UPDATE
+  /**
+   * Use this method to update a character, then use `q` to find and modify multiple character with `data`.
+   * @param q 
+   * @param data 
+   */
   updateCharacter(q: CharacterQuery, data: CharacterType): Promise<UpdateResult<CharacterDocType> | null>;
+  /**
+   * Use this method to update a character, then use `q` to find and modify multiple characters with `data`.
+   * @param q 
+   * @param data 
+   */
   updateCharacters(q: CharacterQuery, data: CharacterType): Promise<UpdateResult<CharacterDocType> | null>;
 
   // DELETE
+  /**
+   * Use this method to delete a character with `q` object.
+   * @param q 
+   */
   deleteCharacter(q: CharacterQuery): Promise<any>;
+  /**
+   * Use this method to delete characters with `q` object.
+   * @param q 
+   */
   deleteCharacters(q: CharacterQuery): Promise<any>;
 }
 
@@ -85,6 +108,10 @@ export class CharacterModel implements ICharacter {
     createdAt: Joi.date().timestamp("javascript").default(Date.now()),
     updatedAt: Joi.date().timestamp("javascript").default(Date.now())
   });
+  static PartialSchema = Joi.object<CharacterDocType>({
+    img: Joi.string(),
+    name: Joi.string()
+  });
   static Name = "characters";
 
   private _instance: Collection<CharacterDocType>;
@@ -93,8 +120,12 @@ export class CharacterModel implements ICharacter {
     this._instance = options.dbInstance.collection(CharacterModel.Name);
   }
 
-  async validate(data: CharacterType): Promise<CharacterDocType> {
+  async validateAsync(data: CharacterType): Promise<CharacterDocType> {
     return CharacterModel.Schema.validateAsync(data);
+  }
+
+  async partiallyValidateAsync(data: Partial<CharacterType>): Promise<Partial<CharacterType>> {
+    return CharacterModel.PartialSchema.validateAsync(data);
   }
   
   async getCharacter(q: CharacterQuery): Promise<WithId<CharacterDocType> | null> {
@@ -110,18 +141,26 @@ export class CharacterModel implements ICharacter {
     try {
       if(!opt) {
         opt = { limit: 10, skip: 0 };
-      }
+      };
 
-      let cursor = this._instance.find(MongoUtils.getQuery(q), opt);
+      // If `limit` or `skip` is NaN or both, then set default value.
+      opt.limit = opt.limit ? opt.limit : 10;
+      opt.skip = opt.skip ? opt.skip : 0;
+      
+      let query = MongoUtils.getQuery(q, function(key, value) {
+        if(key === "reg" && value) return { [key]: { $regex: value } };
+      });
+
+      let cursor = this._instance.find(query, opt);
       return await cursor.toArray();
     } catch (error) {
       return null;
     }
   }
 
-  createCharacter(data: CharacterType): Promise<InsertOneResult<CharacterDocType> | null>;
-  createCharacter(img: string, name: string): Promise<InsertOneResult<CharacterDocType> | null>;
-  async createCharacter(g: any, name?: string): Promise<InsertOneResult<CharacterDocType> | null> {
+  createCharacter(data: CharacterType): Promise<InsertOneResult<CharacterDocType> | ErrorReportType>;
+  createCharacter(img: string, name: string): Promise<InsertOneResult<CharacterDocType> | ErrorReportType>;
+  async createCharacter(g: any, name?: string): Promise<InsertOneResult<CharacterDocType> | ErrorReportType> {
     try {
       let doc = g;
       // There are 2 cases.
@@ -139,29 +178,30 @@ export class CharacterModel implements ICharacter {
       }
 
       // Validate data
-      let validated = await this.validate(doc);
+      let validated = await this.validateAsync(doc);
       let result = await this._instance.insertOne(validated);
       return result;
-    } catch (error) {
-      return null;
+    } catch (error: any) {
+      return Utils.RM.reportError(error.message, "createCharacter() method");
     }
   }
 
-  async createCharacters(data: CharacterType[]): Promise<InsertManyResult<CharacterDocType> | null> {
+  async createCharacters(data: CharacterType[]): Promise<InsertManyResult<CharacterDocType> | ErrorReportType> {
     try {
       let validated = await Promise.all(data.map(char => CharacterModel.Schema.validateAsync(char)));
       let result = await this._instance.insertMany(validated);
       return result;
-    } catch (error) {
-      return null;
+    } catch (error: any) {
+      return Utils.RM.reportError(error.message, "createCharacters() method");
     }
   }
 
   async updateCharacter(q: CharacterQuery, data: CharacterType): Promise<any> {
     try {
+      let validated = await this.partiallyValidateAsync(data);
       let result = await this._instance.updateOne(MongoUtils.getQuery(q), {
         $set: {
-          ...data,
+          ...validated,
           updatedAt: Date.now()
         }
       });

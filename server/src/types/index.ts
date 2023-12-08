@@ -15,7 +15,8 @@ export interface ServerBuilderOptions {
 }
 
 export interface IMongoModel {
-  validate(data: any): Promise<any>;
+  validateAsync(data: any): Promise<any>;
+  partiallyValidateAsync(data: any): Promise<any>;
 }
 
 export interface APIHandler {

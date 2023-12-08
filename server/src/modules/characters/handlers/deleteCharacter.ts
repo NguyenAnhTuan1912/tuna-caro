@@ -1,23 +1,29 @@
 import { createHandler } from "templates/handler";
 
-const GetCharacterHandler = createHandler(
+const DeleteCharacterHandler = createHandler(
   "/",
   function({ DBs, Utils }) {
     return async function(req, res) {
       let statusCode = 500;
       try {
-        let { id } = req.query;
-        let characters = await DBs.CaroGameDB.Character.getCharacters({ id: id as string });
+        let { id } = req.body;
         
-        if(!characters) {
-          statusCode = 404;
-          throw new Error("Characters not found.");
-        };
+        if(!id) {
+          statusCode = 400;
+          throw new Error("Id must be knew.");
+        }
+
+        let result = await DBs.CaroGameDB.Character.deleteCharacter({ id });
+        
+        if((result as any).$$error) {
+          statusCode = 400;
+          throw new Error((result as any).$$error);
+        }
 
         return Utils.RM.responseJSON(
           res,
           200,
-          Utils.RM.getResponseMessage(false, characters, "Characters found.")
+          Utils.RM.getResponseMessage(false, result, "Character is deleted successfully.")
         );
       } catch (error: any) {
         return Utils.RM.responseJSON(
@@ -30,4 +36,4 @@ const GetCharacterHandler = createHandler(
   }
 );
 
-export default GetCharacterHandler;
+export default DeleteCharacterHandler;

@@ -1,4 +1,4 @@
-import { RM, ResponseMessage } from "./response_message";
+import { RM } from "./response_message";
 import { Other } from "./other";
 import { Security } from "./security";
 import { HTTPCodes } from "./http_codes";

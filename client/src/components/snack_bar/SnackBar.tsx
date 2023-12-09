@@ -29,7 +29,7 @@ interface SnackBarTransferedDataType {
  * @param data 
  * @returns 
  */
-export function openNotificatedSnackBar(message: string) {
+export function openNotifiableSnackBar(message: string) {
   return openTMI(name, {
     body: message,
     closeButtons: [

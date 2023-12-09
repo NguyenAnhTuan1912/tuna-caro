@@ -22,7 +22,7 @@ export default function Header(props: HeaderProps) {
           isTransparent
           hasPadding={false}
           onClick={() => { openTMI("mySideMenu") }}
-          extendClassName="rounded-8 p-1"
+          extendClassName="rounded-4 p-1"
         >
           <span className="material-symbols-outlined">menu</span>
         </Button>

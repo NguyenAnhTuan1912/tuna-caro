@@ -20,7 +20,7 @@ import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import components
 import GameCore from './GameCore';
-import { openNotificatedSnackBar } from 'src/components/snack_bar/SnackBar';
+import { openNotifiableSnackBar } from 'src/components/snack_bar/SnackBar';
 
 // Import types
 import { EmitMarkMessageDataType, EmitWinnerMessageDataType } from './Game.props';
@@ -68,7 +68,7 @@ export default function GameOnline() {
             let player = m.data!;
 
             // Announce to player.
-            openNotificatedSnackBar(m.text!);
+            openNotifiableSnackBar(m.text!);
 
             // Add player to game.
             // Because first player always "X", so the second will be "O".
@@ -81,7 +81,7 @@ export default function GameOnline() {
           MySocket.EventNames.leaveGame,
           (m: Message<{ playerId: string }>) => {
             // Announce to player.
-            openNotificatedSnackBar(m.text!);
+            openNotifiableSnackBar(m.text!);
 
             // When receive a message that player is leave the game, remove them from game.
             args.removePlayer(m.data?.playerId!);

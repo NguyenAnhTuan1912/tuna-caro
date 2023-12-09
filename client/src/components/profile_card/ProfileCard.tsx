@@ -4,10 +4,10 @@ import React from 'react'
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { usePlayer } from 'src/hooks/usePlayer';
 
-// Import components
+// Import from components
 import MyInput from '../my_input/MyInput';
 import Button from '../button/Button';
-
+import { openCPDialog } from '../dialog/CharacterPickerDialog';
 
 // Import styles
 import './ProfileCard.stlyes.css';
@@ -66,10 +66,14 @@ export default function ProfileCard(props: ProfileCardProps) {
       {/* Representation Image */}
       <div className="user-img outline">
         {
+          Boolean(player.img) && <img className="" src={player.img} alt={"Avatar of " + player.name} />
+        }
+        {
           props.canEdit && (
             <Button
               extendClassName="circle"
               hasPadding={false}
+              onClick={() => openCPDialog()}
             >
               <span className="material-symbols-outlined" style={{ padding: "5px" }}>change_circle</span>
             </Button>

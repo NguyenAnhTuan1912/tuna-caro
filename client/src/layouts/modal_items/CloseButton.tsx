@@ -17,6 +17,7 @@ export default function CloseButton(props: CloseButtonPropsType) {
     <Button
       isTransparent
       hasPadding={false}
+      hasBorder={false}
       extendClassName="p-1 rounded-4"
       onClick={() => props.close({ isAgree: props.isAgree ? true : false })}
     >

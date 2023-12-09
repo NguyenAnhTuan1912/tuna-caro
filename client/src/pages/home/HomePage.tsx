@@ -13,7 +13,7 @@ import { usePlayer } from 'src/hooks/usePlayer';
 
 // Import from components
 import { openGameFindingDialog, openGameCreatingDialog } from 'src/components/dialog/GameDialog';
-import { openNotificatedSnackBar } from 'src/components/snack_bar/SnackBar';
+import { openNotifiableSnackBar } from 'src/components/snack_bar/SnackBar';
 import Button from 'src/components/button/Button';
 
 // Import types
@@ -72,7 +72,7 @@ export default function HomePage(props: HomePageProps) {
       }
     );
 
-    openNotificatedSnackBar("Chào mừng bạn tới Caro game")
+    openNotifiableSnackBar("Chào mừng bạn tới Caro game")
     .then(result => {
       console.log("Snackbar result: ", result);
     })

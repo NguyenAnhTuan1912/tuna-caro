@@ -8,7 +8,7 @@ import Button from '../button/Button';
 // Import layout
 import DialogLayout from 'src/layouts/modal_items/dialog_layout/DialogLayout'
 
-const name = "myGameDialog";
+export const name = "myGameDialog";
 
 interface GameDialogInputPropsType {
   name: string;

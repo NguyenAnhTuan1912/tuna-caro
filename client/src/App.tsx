@@ -20,7 +20,8 @@ import GamePage from './pages/game/GamePage';
 
 // Import components
 import SideMenu from './components/side_menu/SideMenu';
-import GameDialog from './components/dialog/GameDialog';
+import GameDialog, { name as GDName } from './components/dialog/GameDialog';
+import CharacterPickerDialog, { name as CPDName } from './components/dialog/CharacterPickerDialog';
 import SnackBar from './components/snack_bar/SnackBar';
 
 /**
@@ -113,7 +114,7 @@ function App() {
             placeOn: "right",
             element: SideMenu
           },
-          myGameDialog: {
+          [GDName]: {
             type: "dialog",
             element: GameDialog
           },
@@ -121,6 +122,10 @@ function App() {
             type: "snack-bar",
             position: "top-right",
             element: SnackBar
+          },
+          [CPDName]: {
+            type: "dialog",
+            element: CharacterPickerDialog
           }
         }}
       />

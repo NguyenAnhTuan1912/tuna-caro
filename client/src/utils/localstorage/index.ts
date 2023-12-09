@@ -1,6 +1,7 @@
 const StoreKeys = {
   "playerId": "_plyid",
   "playerName": "_plyn",
+  "playerImg": "_plig",
   "isDarkMode": "_idrkmde",
   "hasSoundWhenClickButton": "_hsndwcbtn",
   "hasSoundWhenClickTable": "_hsndwctb"

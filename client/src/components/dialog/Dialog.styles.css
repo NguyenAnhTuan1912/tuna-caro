@@ -1,0 +1,25 @@
+.character-dialog-body {
+  min-height: 320px;
+}
+
+.character-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.character-img {
+  width: 15%;
+  height: 15%;
+  margin: 2.5%;
+  min-width: 92px;
+}
+
+.character-img.choice {
+  border: 5px solid var(--clr-primary);
+}
+
+.character-img > img {
+  display: block;
+  width: 100%;
+}

@@ -1,5 +1,6 @@
 export interface PlayerType {
   id: string;
+  img: string;
   socketId?: string;
   name: string;
   mark?: string;
@@ -11,17 +12,20 @@ export interface PlayerType {
  * Use this class to create an object that can manage Player in game.
  */
 export class Player {
-  private static __hasArgsDefaultConstruct__(o: PlayerType, id?: string, name?: string, mark?: string, isWinner?: boolean, score?: number) {
-    o.id = id ? id : "";
-    o.name = name ? name : `Player[${id}]`;
-    if(mark) o.mark = mark;
-    if(isWinner) o.isWinner = isWinner;
-    if(score) o.score = score;
+  private static __hasArgsDefaultConstruct__(
+    o: PlayerType,
+    _: Partial<PlayerType>
+  ) {
+    o.id = _.id ? _.id : "";
+    o.name = _.name ? _.name : `Player[${_.id}]`;
+    for(let key in _) {
+      if((_ as any)[key]) (o as any)[key] = (_ as any)[key];
+    }
     return o;
   }
 
   /**
-   * 
+   * Use this static method to create a player.
    */
   static createPlayer(): PlayerType;
   /**
@@ -35,6 +39,7 @@ export class Player {
    * @param name 
    */
   static createPlayer(id: string, name: string): PlayerType;
+  static createPlayer(o: Partial<PlayerType>): PlayerType;
   /**
    * Use this static method to create a player object with complete information.
    * @param id 
@@ -43,9 +48,24 @@ export class Player {
    * @param isWinner 
    * @param score 
    */
-  static createPlayer(id: string, name: string, mark: string, isWinner: boolean, score: number): PlayerType;
-  static createPlayer(id?: string, name?: string, mark?: string, isWinner?: boolean, score?: number): PlayerType {
-    return Player.__hasArgsDefaultConstruct__({} as PlayerType, id, name, mark, isWinner, score);
+  static createPlayer(
+    id: string,
+    name: string,
+    mark: string,
+    isWinner: boolean,
+    score: number
+  ): PlayerType;
+  static createPlayer(
+    generic?: string | Partial<PlayerType>,
+    name?: string,
+    mark?: string,
+    isWinner?: boolean,
+    score?: number
+  ): PlayerType {
+    if(typeof generic === "object")
+      return Player.__hasArgsDefaultConstruct__({} as PlayerType, generic);
+
+    return Player.__hasArgsDefaultConstruct__({} as PlayerType, { id: generic, name, mark, isWinner, score });
   }
 
   /**
@@ -55,6 +75,7 @@ export class Player {
     return {
       id: "",
       socketId: "",
+      img: "",
       name: "",
       mark: "",
       isWinner: false,

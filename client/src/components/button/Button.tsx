@@ -16,6 +16,7 @@ interface ButtonPropsType extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   soundName?: SFXPathsType;
   isTransparent?: boolean;
   hasPadding?: boolean;
+  hasBorder?: boolean;
   extendClassName?: string;
 }
 
@@ -26,6 +27,7 @@ interface ButtonPropsType extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 export default function Button({
   to,
   hasPadding = true,
+  hasBorder = true,
   isTransparent = false,
   soundName = "buttonClickSound",
   extendClassName,
@@ -33,7 +35,11 @@ export default function Button({
   ...props
 }: ButtonPropsType) {
   // Concatenate the root class name with the extend class name.
-  let className = "spe-outline center-box";
+  let className = "center-box";
+
+  // Border
+  if(hasBorder) className += " spe-outline";
+  else className += " no-outline";
 
   // Transparent
   if(isTransparent) className += " btn-transparent";

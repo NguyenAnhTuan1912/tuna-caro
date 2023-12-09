@@ -20,8 +20,11 @@ export const PlayerSlice = createSlice({
   name: "player",
   initialState: {
     self: Player.createPlayer(
-      LocalStorageUtils.getItem("playerId") ?? "",
-      LocalStorageUtils.getItem("playerName") ?? ""
+      {
+        id: (LocalStorageUtils.getItem("playerId") ?? "") as string,
+        name: (LocalStorageUtils.getItem("playerName") ?? "") as string,
+        img: (LocalStorageUtils.getItem("playerImg") ?? "") as string
+      }
     )
   },
   reducers: {
@@ -51,6 +54,7 @@ export const PlayerSlice = createSlice({
      */
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
       if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
+      if(action.payload.img) LocalStorageUtils.setItem("playerImg", action.payload.img);
       Player.setPlayer(state.self, action.payload);
     }
   },

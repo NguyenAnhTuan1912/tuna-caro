@@ -16,6 +16,10 @@ import { useGlobalData } from 'src/hooks/useGlobalData';
 import DataTable from 'src/components/data_table/DataTable';
 import { openGameJoiningDialog } from 'src/components/dialog/GameDialog';
 
+// Locally Import
+import { GameRoomsStateConfigs } from './state/game_rooms';
+import { GameRoomsSocketEventListeners } from './socket_events/game_rooms';
+
 // Import types
 import { GameRoomPageProps } from './GameRoomPage.props';
 
@@ -27,34 +31,8 @@ export default function GameRoomPage(props: GameRoomPageProps) {
 
   const { player } = usePlayer();
   const [ gameRoomsState, gameRoomsStateFns ] = useStateWESSFns(
-    {
-      skip: 0,
-      data: [] as Array<GameRoomType>
-    },
-    function(changeState) {
-      return {
-        /**
-         * Use this function to add games to `data`.
-         * @param games 
-         */
-        setGames: function(games: Array<GameRoomType>) {
-          changeState("data", function(data) {
-            data = games;
-            return data;
-          })
-        },
-
-        /**
-         * Use this function to update skip to get next `skip` games.
-         */
-        nextGames: function() {
-          changeState("skip", function(data) {
-            
-            return data;
-          })
-        }
-      }
-    }
+    GameRoomsStateConfigs.getInitialState(),
+    GameRoomsStateConfigs.getStateFns
   );
 
   const navigate = useNavigate();
@@ -77,10 +55,9 @@ export default function GameRoomPage(props: GameRoomPageProps) {
     // Set up listener.
     let getGamesListener = mySocket.addEventListener(
       MySocket.EventNames.getGames,
-      (m: Message<Array<GameRoomType>>) => {
-        console.log("Message from `getGames`: ", m);
-        gameRoomsStateFns.setGames(m.data!);
-      }
+      GameRoomsSocketEventListeners.getGetGamesListener({
+        stateFns: gameRoomsStateFns
+      })
     );
 
     /*
@@ -88,20 +65,13 @@ export default function GameRoomPage(props: GameRoomPageProps) {
       Receive a message from server contains data of player.
       Complete data of player.
     */
-      let joinGameListener = mySocket.addEventListener(
-        MySocket.EventNames.joinGame,
-        (m: Message<GameType>) => {
-          let game = m.data!;
-          
-          // Set new game.
-          changeData("game", function() {
-            return game;
-          });
-  
-          // After set new game, navigato /game/online
-          navigate("/game/online");
-        }
-      );
+    let joinGameListener = mySocket.addEventListener(
+      MySocket.EventNames.joinGame,
+      GameRoomsSocketEventListeners.getJoinGameListener({
+        changeData,
+        navigate
+      })
+    );
 
     // Unsubscribe events
     return function() {

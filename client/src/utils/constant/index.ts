@@ -8,3 +8,11 @@
  * The base endpoint of primary API.
  */
 export const API_ROOT = import.meta.env.VITE_API_ROOT;
+export const ROUTES = {
+  Home: "/",
+  Game: "/game",
+  GameOnline: "/game/online",
+  GameOffline: "/game/offline",
+  GameRooms: "/rooms",
+  Settings: "/settings"
+};

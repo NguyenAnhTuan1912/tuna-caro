@@ -4,6 +4,7 @@ import { GameType } from "src/classes/Game";
 export interface GlobalDataType {
   game: GameType | null
 };
+export type ChangeDataFnType = <N extends keyof GlobalDataType>(name: N, fn: (data: GlobalDataType[N]) => GlobalDataType[N]) => void
 
 const __privateData__: GlobalDataType = {
   game: null

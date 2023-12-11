@@ -1,12 +1,12 @@
 import { GameType, Coordinate, MarkType, PlayersKeyType, ResultType } from "src/classes/Game";
-import { Player, PlayerType } from "src/classes/Player";
+import { PlayerType } from "src/classes/Player";
 
 export type TypeOfGame = "offline" | "online";
 
 /**
  * This use to set up some outside works for GameCore about socket.
  */
-interface UserEffectCBArgsType {
+export interface UseEffectCBArgsType {
   /**
    * Use this to add new mark to table. Can receive a information about winner (result)
    * and onAddMark can be called inside.
@@ -81,7 +81,7 @@ export interface GameCoreProps {
    * @param args 
    * @returns 
    */
-  useEffectCB?: (args: UserEffectCBArgsType) => () => void;
+  useEffectCB?: (args: UseEffectCBArgsType) => () => void;
   /**
    * This function use to fire works outside GameCore or given works.
    * When the host click "start new round" (reset icon).

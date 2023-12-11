@@ -17,8 +17,9 @@ import Button from '../button/Button';
 // Import from utils
 import { ObjectUtils } from 'src/utils/object';
 
-// Import types
-import { CharacterType } from 'src/types/character.types';
+// Locally Import
+// Import functions
+import { CharacterPickerDialogStateConfigs } from './state/character_picker_dialog';
 
 // Import styles
 import "./Dialog.styles.css";
@@ -39,68 +40,21 @@ export function openCPDialog() {
  */
 export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
   const [data, setDataFns] = useStateWESSFns(
-    {
-      skip: "0",
-      characters: [] as Array<CharacterType>,
-      choice: {
-        _id: "",
-        name: "",
-        img: ""
-      },
-    },
-    function(changeState) {
-      return {
-        /**
-         * Use this function to add new list of character to main data.
-         * @param characters 
-         */
-        addCharacters: function(characters: Array<CharacterType>) {
-          let N = characters.length;
-
-          if(N > 0) {
-            changeState("characters", function(data) {
-              data = data.concat(characters);
-              return [...data];
-            });
-  
-            changeState("skip", function(data) {
-              return (data + N).toString();
-            });
-          }
-        },
-
-        /**
-         * Use this function to clear data of character.
-         */
-        clearCharacter: function() {
-          changeState("characters", function() {
-            return [];
-          });
-        },
-
-        /**
-         * Use this function to set the character who is chose.
-         * @param character 
-         */
-        setChoice: function(character: CharacterType) {
-          changeState("choice", function() {
-            return { img: character.img, name: character.name, _id: character._id }
-          })
-        }
-      }
-    }
+    CharacterPickerDialogStateConfigs.getInitialState(),
+    CharacterPickerDialogStateConfigs.getStateFns
   );
   const { setPlayer } = usePlayerActions();
 
   const fetchCharacters = function(query?: { limit?: string, skip?: string }) {
     query = ObjectUtils.setDefaultValues(query, { limit: "5", skip: "0" });
+
+    // Call API to get characters from server.
     OtherAPIs
-      .getCharactersAsync({ query: query! })
-      .then(payload => {
-        let data = payload.data;
-        console.log("Data: ", data);
-        setDataFns.addCharacters(data);
-      })
+    .getCharactersAsync({ query: query! })
+    .then(payload => {
+      let data = payload.data;
+      setDataFns.addCharacters(data);
+    })
   }
 
   React.useEffect(() => {

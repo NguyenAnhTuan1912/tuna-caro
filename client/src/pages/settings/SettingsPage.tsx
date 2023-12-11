@@ -16,7 +16,6 @@ import { SettingsPageProps } from './SettingsPage.props';
 import './SettingsPage.styles.css';
 
 export default function SettingsPage(props: SettingsPageProps) {
-  console.log("Render SettingsPage");
   const { settings, settingsDispatcher } = useSettings();
 
   return (

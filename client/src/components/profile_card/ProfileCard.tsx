@@ -9,6 +9,10 @@ import MyInput from '../my_input/MyInput';
 import Button from '../button/Button';
 import { openCPDialog } from '../dialog/CharacterPickerDialog';
 
+// Locally Import
+// Import functions.
+import { ProfileCardStateConfigs } from './state/profile_card';
+
 // Import styles
 import './ProfileCard.stlyes.css';
 
@@ -22,37 +26,22 @@ interface ProfileCardElementsType {
 export default function ProfileCard(props: ProfileCardProps) {
   const { player, playerDispatcher } = usePlayer();
   const [ profileState, profileStateFns ] = useStateWESSFns(
-    {
-      canChangeName: false
-    },
-    function(changeState) {
-      return {
-        /**
-         * Use this function to enable of disable player name text box.
-         * @param s
-         */
-        toggleChangeName: function(s?: boolean) {
-          changeState("canChangeName", function(status) {
-            if(s) return s;
-            return !status;
-          });
-        },
-
-        /**
-         * Use this function to change name for player.
-         * It change the state in redux (Global state).
-         */
-        changeName: function() {
-          let newName = elementRefs.current.playerName!.value;
-          playerDispatcher.setPlayerName(newName);
-        }
-      }
-    }
+    ProfileCardStateConfigs.getInitialState(),
+    ProfileCardStateConfigs.getStateFns
   );
 
   const elementRefs = React.useRef<ProfileCardElementsType>({
     playerName: null
   });
+
+  /**
+   * Use this function to change name for player.
+   * It change the state in redux (Global state).
+   */
+  const changeName = function() {
+    let newName = elementRefs.current.playerName!.value;
+    playerDispatcher.setPlayerName(newName);
+  }
 
   // Handle when click to change name button
   React.useEffect(() => {
@@ -100,7 +89,7 @@ export default function ProfileCard(props: ProfileCardProps) {
           profileState.canChangeName && (
             <Button
               onClick={() => {
-                profileStateFns.changeName()
+                changeName()
                 profileStateFns.toggleChangeName(false)
               }}
               className="btn-transparent no-outline py-1 rounded-4"

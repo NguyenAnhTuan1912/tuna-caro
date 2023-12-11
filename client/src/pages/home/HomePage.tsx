@@ -1,20 +1,25 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // Import classes
-import { GameType } from 'src/classes/Game';
 
 // Import from api/soket
-import { mySocket, Message, MySocket } from 'src/apis/socket';
+import { mySocket, MySocket } from 'src/apis/socket';
 
-// Import hooks
+// Import from hooks
 import { useGlobalData } from 'src/hooks/useGlobalData';
 import { usePlayer } from 'src/hooks/usePlayer';
+
+// Import from utils
+import { ROUTES } from 'src/utils/constant';
 
 // Import from components
 import { openGameFindingDialog, openGameCreatingDialog } from 'src/components/dialog/GameDialog';
 import { openNotifiableSnackBar } from 'src/components/snack_bar/SnackBar';
 import Button from 'src/components/button/Button';
+
+// Locally Import
+import { HomePageSocketEvents } from './socket_events/home_page';
 
 // Import types
 import { HomePageProps } from './HomePage.props';
@@ -38,18 +43,10 @@ export default function HomePage(props: HomePageProps) {
     */
     let emitGameListener = mySocket.addEventListener(
       MySocket.EventNames.emitGame,
-      (m: Message<GameType>) => {
-        if(m.isError) return;
-        let game = m.data!;
-
-        // Set new game.
-        changeData("game", function() {
-          return game;
-        });
-
-        // After change the data, navigate to /game/online
-        navigate("/game/online");
-      }
+      HomePageSocketEvents.getEmitGameListener({
+        changeData,
+        navigate
+      })
     );
 
     /*
@@ -59,17 +56,10 @@ export default function HomePage(props: HomePageProps) {
     */
     let joinGameListener = mySocket.addEventListener(
       MySocket.EventNames.joinGame,
-      (m: Message<GameType>) => {
-        let game = m.data!;
-        
-        // Set new game.
-        changeData("game", function() {
-          return game;
-        });
-
-        // After set new game, navigato /game/online
-        navigate("/game/online");
-      }
+      HomePageSocketEvents.getJoinGameListener({
+        changeData,
+        navigate
+      })
     );
 
     openNotifiableSnackBar("Chào mừng bạn tới Caro game")
@@ -87,7 +77,7 @@ export default function HomePage(props: HomePageProps) {
     <div className="home-page p-2">
       <h1 className="txt-center">Trang chủ</h1>
       <div className="home-page-menu w-100 pt-4">
-        <Button to={"/game/offline"} extendClassName="w-100">Chơi 2 người</Button>
+        <Button to={ROUTES.GameOffline} extendClassName="w-100">Chơi 2 người</Button>
 
         <hr className="my-4"></hr>
         
@@ -141,11 +131,11 @@ export default function HomePage(props: HomePageProps) {
           Tìm phòng
         </Button>
 
-        <Button to={"/rooms"} extendClassName="w-100">Khám phá</Button>
+        <Button to={ROUTES.GameRooms} extendClassName="w-100">Khám phá</Button>
 
         <hr className="my-4"></hr>
 
-        <Button to={"/settings"} extendClassName="w-100">Cài đặt</Button>
+        <Button to={ROUTES.Settings} extendClassName="w-100">Cài đặt</Button>
       </div>
     </div>
   )

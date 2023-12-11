@@ -5,14 +5,8 @@
  * - Handle socket events (send and receive message).
  */
 
-import React from 'react';
-
-// Import from classes
-import { Game } from 'src/classes/Game';
-import { PlayerType } from 'src/classes/Player';
-
 // Import from apis
-import { Message, MySocket, mySocket } from 'src/apis/socket';
+import { MySocket, mySocket } from 'src/apis/socket';
 
 // Import hooks
 import { usePlayer } from 'src/hooks/usePlayer';
@@ -20,7 +14,9 @@ import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import components
 import GameCore from './GameCore';
-import { openNotifiableSnackBar } from 'src/components/snack_bar/SnackBar';
+
+// Locally Import
+import { GameOnlineSocketEvents } from './socket_events/game_online';
 
 // Import types
 import { EmitMarkMessageDataType, EmitWinnerMessageDataType } from './Game.props';
@@ -54,57 +50,41 @@ export default function GameOnline() {
       useEffectCB={function(args) {
         let emitMarkListener = mySocket.addEventListener(
           MySocket.EventNames.emitMark,
-          (m: Message<EmitMarkMessageDataType>) => {
-            let data = m.data;
-            let { x, y } = data?.coor!;
-            args.addMark(x, y, Game.t);
-          }
+          GameOnlineSocketEvents.getEmitMarkListener({
+            useEffectArgs: args
+          })
         );
     
         // Set up `join_game` listener for host.
         let joinGameListener = mySocket.addEventListener(
           MySocket.EventNames.joinGame,
-          (m: Message<PlayerType>) => {
-            let player = m.data!;
-
-            // Announce to player.
-            openNotifiableSnackBar(m.text!);
-
-            // Add player to game.
-            // Because first player always "X", so the second will be "O".
-            args.appendPlayer("second", player);
-          }
+          GameOnlineSocketEvents.getJoinGameListener({
+            useEffectArgs: args
+          })
         );
     
         // Set up `leave_game` listener for all.
         let leaveGameListener = mySocket.addEventListener(
           MySocket.EventNames.leaveGame,
-          (m: Message<{ playerId: string }>) => {
-            // Announce to player.
-            openNotifiableSnackBar(m.text!);
-
-            // When receive a message that player is leave the game, remove them from game.
-            args.removePlayer(m.data?.playerId!);
-          }
+          GameOnlineSocketEvents.getLeaveGameListener({
+            useEffectArgs: args
+          })
         );
 
         // Set up `emit_winner` listener.
         let emitWinnerListener = mySocket.addEventListener(
           MySocket.EventNames.emitWinner,
-          (m: Message<EmitWinnerMessageDataType>) => {
-            let data = m.data!;
-            let { x, y } = data.coor!;
-            let winner = data.winner;
-            args.addMark(x, y, Game.t, winner, false);
-          }
+          GameOnlineSocketEvents.getEmitWinnerListener({
+            useEffectArgs: args
+          })
         )
 
         // Set up `start_new_round` for all.
         let startNewRoundListener = mySocket.addEventListener(
           MySocket.EventNames.startNewRound,
-          (m: Message<boolean>) => {
-            if(m.data) args.startNewRound();
-          }
+          GameOnlineSocketEvents.getStartNewRoundListener({
+            useEffectArgs: args
+          })
         )
     
         return function() {

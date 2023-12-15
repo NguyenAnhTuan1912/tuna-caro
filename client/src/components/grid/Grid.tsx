@@ -195,7 +195,15 @@ export default function Grid({
     /**
      * Height of header
      */
-    headerHeight: 0
+    headerHeight: 0,
+    /**
+     * The `x` value in coordinate of cursor on Grid.
+     */
+    rootX: 0,
+    /**
+     * The `y` value in coordinate of cursor on Grid.
+     */
+    rootY: 0
   });
 
   /**
@@ -229,22 +237,42 @@ export default function Grid({
    */
   const eventHandlers = React.useMemo(() => {
     return {
+      /**
+       * This function will process the `mouse down` event. When the LMB is down, operate something.
+       * @param e 
+       */
       handleMouseDownOnGridBase: function(e: MouseEvent) {
         gridData.current.isMouseDown = true;
       },
 
+      /**
+       * This function will process the `mouse up` event. When the LMB is up, operate something.
+       * @param e 
+       */
       handleMouseUpOnGridBase: function(e: MouseEvent) {
+        // Set the root X and Y to 0 respectively when LMB is up.
+        gridData.current.rootX = 0;
+        gridData.current.rootY = 0;
         gridData.current.isMouseDown = false;
       },
 
+      /**
+       * This function will process the `drag action` of user when they hold `space + LMB` and move the mouse.
+       * The core idea is change the scroll value of container that has `overflow attribute` and contains grid.
+       * @param e 
+       */
       handleMouseMoveOnGridBase: function(e: MouseEvent) {
         if(gridData.current.isMouseDown && gridData.current.isSpaceDown) {
-          let centerXOfGrid = (elementRefs.current.gridWrapper!.offsetWidth) / 2;
-          let centerYOfGrid = (elementRefs.current.gridWrapper!.offsetHeight) / 2;
+          if(gridData.current.rootX === 0)
+            gridData.current.rootX = e.clientX + elementRefs.current.gridBase?.scrollLeft!;
+          if(gridData.current.rootY === 0)
+            gridData.current.rootY = e.clientY + elementRefs.current.gridBase?.scrollTop!;
+
           let clientX = e.clientX;
           let clientY = e.clientY;
-          let dx = centerXOfGrid - clientX;
-          let dy = centerYOfGrid - clientY;
+
+          let dx = gridData.current.rootX - clientX;
+          let dy = gridData.current.rootY - clientY;
 
           elementRefs.current.gridBase?.scroll({ top: dy, left: dx });
         }

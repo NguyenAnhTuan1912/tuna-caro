@@ -1,3 +1,3 @@
-export interface GameRoomPageProps {
+export type GameRoomPageProps = {
   
 }

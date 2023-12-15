@@ -1,6 +1,4 @@
-import { PlayerType } from "src/classes/Player";
-
-export interface ProfileCardProps {
+export type ProfileCardProps = {
   canEdit?: boolean;
   isVertical?: boolean;
 }

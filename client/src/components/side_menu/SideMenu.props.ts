@@ -1,3 +1,3 @@
-export interface SideMenuProps {
+export type SideMenuProps = {
   
 }

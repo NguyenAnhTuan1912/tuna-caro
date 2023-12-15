@@ -1,0 +1,77 @@
+{
+  "text": "This data is for testing only. Not use in production.",
+  "data": [
+    {
+      "id": "gametest_01",
+      "playerName": "Player01",
+      "name": "Vao day choi",
+      "status": "Waiting",
+      "hasPassword": false
+    },
+    {
+      "id": "gametest_02",
+      "playerName": "Player02",
+      "name": "Phong nay de test",
+      "status": "Playing",
+      "hasPassword": true
+    },
+    {
+      "id": "gametest_03",
+      "playerName": "Player03",
+      "name": "Phong nay cung de test",
+      "status": "Playing",
+      "hasPassword": false
+    },
+    {
+      "id": "gametest_04",
+      "playerName": "Player04",
+      "name": "Phong cua nguoi choi 04",
+      "status": "Waiting",
+      "hasPassword": true
+    },
+    {
+      "id": "gametest_05",
+      "playerName": "Player05",
+      "name": "Phong cua nguoi choi 05",
+      "status": "Waiting",
+      "hasPassword": false
+    }
+  ],
+  "asyncData": [
+    {
+      "id": "gametest_06",
+      "playerName": "Player06",
+      "name": "Tiep tuc test",
+      "status": "Playing",
+      "hasPassword": true
+    },
+    {
+      "id": "gametest_07",
+      "playerName": "Player07",
+      "name": "Phong nay de choi",
+      "status": "Waiting",
+      "hasPassword": true
+    },
+    {
+      "id": "gametest_08",
+      "playerName": "Player08",
+      "name": "Phong nay cung de test",
+      "status": "Playing",
+      "hasPassword": false
+    },
+    {
+      "id": "gametest_09",
+      "playerName": "Player09",
+      "name": "Phong cua nguoi choi 09",
+      "status": "Waiting",
+      "hasPassword": true
+    },
+    {
+      "id": "gametest_10",
+      "playerName": "Player10",
+      "name": "Phong cua nguoi choi 10",
+      "status": "Waiting",
+      "hasPassword": false
+    }
+  ]
+}

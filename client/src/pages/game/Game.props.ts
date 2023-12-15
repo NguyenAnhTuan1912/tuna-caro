@@ -6,7 +6,7 @@ export type TypeOfGame = "offline" | "online";
 /**
  * This use to set up some outside works for GameCore about socket.
  */
-export interface UseEffectCBArgsType {
+export type UseEffectCBArgsType = {
   /**
    * Use this to add new mark to table. Can receive a information about winner (result)
    * and onAddMark can be called inside.
@@ -43,7 +43,7 @@ export interface UseEffectCBArgsType {
   startNewRound: () => void;
 }
 
-export interface GameCoreProps {
+export type GameCoreProps = {
   /**
    * __Online only__
    * 
@@ -90,12 +90,14 @@ export interface GameCoreProps {
   onResetClick?: () => void;
 }
 
-export interface EmitMarkMessageDataType {
+export type EmitMarkMessageDataType = {
   mark: MarkType;
   coor: Coordinate;
   gameId: string;
 }
 
-export interface EmitWinnerMessageDataType extends EmitMarkMessageDataType {
-  winner: ResultType;
-}
+export type EmitWinnerMessageDataType =
+  EmitMarkMessageDataType
+  & {
+    winner: ResultType;
+  }

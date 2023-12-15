@@ -2,23 +2,30 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 
 // Import from classes
-import { GameType, GameRoomType } from 'src/classes/Game';
+import { GameRoomType } from 'src/classes/Game';
 
 // Import from api/soket
-import { mySocket, Message, MySocket } from 'src/apis/socket';
+import { mySocket, MySocket } from 'src/apis/socket';
 
 // Import hooks
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
+// Import utils
+import { OtherUtils } from 'src/utils/other';
+
 // Import from components
 import DataTable from 'src/components/data_table/DataTable';
-import { openGameJoiningDialog } from 'src/components/dialog/GameDialog';
+
+// Import data for testing
+import gameRoomsTestData from 'src/assets/data/game_rooms.json';
 
 // Locally Import
 import { GameRoomsStateConfigs } from './state/game_rooms';
 import { GameRoomsSocketEventListeners } from './socket_events/game_rooms';
+
+import GameRow from './GameRow';
 
 // Import types
 import { GameRoomPageProps } from './GameRoomPage.props';
@@ -26,6 +33,16 @@ import { GameRoomPageProps } from './GameRoomPage.props';
 // Import styles
 import './GameRoom.styles.css';
 
+async function getDataAsync() {
+  await OtherUtils.wait(2000);
+  return gameRoomsTestData.asyncData as Array<GameRoomType>;
+}
+
+/**
+ * Component renders a page that contains a list of game rooms in server.
+ * @param props 
+ * @returns 
+ */
 export default function GameRoomPage(props: GameRoomPageProps) {
   const limit = 5;
 
@@ -59,6 +76,8 @@ export default function GameRoomPage(props: GameRoomPageProps) {
         stateFns: gameRoomsStateFns
       })
     );
+
+    gameRoomsStateFns.setGames(gameRoomsTestData.data as GameRoomType[]);
 
     /*
       Set up `join_game` listener for player who want to join.
@@ -94,46 +113,17 @@ export default function GameRoomPage(props: GameRoomPageProps) {
             <td><strong>Trạng thái</strong></td>
           </tr>
         )}
+        getDataAsync={async () => {
+          let data = await getDataAsync();
+          return data;
+        }}
         renderRowData={(piece, index) => (
-          <tr
+          <GameRow
             key={piece.id}
-            onClick={(e) => {
-              openGameJoiningDialog(
-                piece.name,
-                piece.playerName,
-                piece.hasPassword
-              )
-              .then(result => {
-                if(!result.isAgree) return;
-                mySocket.emit(
-                  MySocket.EventNames.joinGame,
-                  MySocket.createMessage(
-                    MySocket.EventNames.joinGame,
-                    undefined,
-                    {
-                      player: player,
-                      game: {
-                        id: piece.id,
-                        password: result.data.password
-                      }
-                    }
-                  )
-                );
-              })
-            }}
-          >
-            <td>{index + 1}</td>
-            <td><strong>{piece.name}</strong></td>
-            <td>{piece.playerName}</td>
-            <td>{piece.hasPassword ? "Có" : "Không"}</td>
-            <td>
-              {
-                piece.status === "Waiting"
-                  ? <strong className="txt-clr-success">Đang chờ</strong>
-                  : <strong className="txt-clr-error">Đang chơi</strong>
-              }
-            </td>
-          </tr>
+            data={piece}
+            index={index}
+            player={player}
+          />
         )}
       />
     </div>

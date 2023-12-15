@@ -36,7 +36,19 @@ function togglePropertyState<T>(o: T, propName: keyof T, fn?: (status: boolean) 
   if(fn) fn(o[propName] as boolean);
 }
 
+/**
+ * Use this function to perform "delay" in asynchronous task.
+ * @param time 
+ * @returns 
+ */
+function wait(time = 0) {
+  return new Promise(function(res) {
+    setTimeout(res, time, true);
+  })
+}
+
 export const OtherUtils = {
   fromCase,
-  togglePropertyState
+  togglePropertyState,
+  wait
 };

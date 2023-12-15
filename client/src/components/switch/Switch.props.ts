@@ -1,4 +1,4 @@
-export interface SwitchProps {
+export type SwitchProps = {
   initialStatus?: boolean,
   onChange: (status: boolean) => void
 }

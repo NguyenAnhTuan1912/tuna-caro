@@ -1,9 +1,9 @@
-export interface GridBehaviorFns {
+export type GridBehaviorFns = {
   zoomIn: () => void;
   zoomOut: () => void;
 }
 
-export interface GridProps {
+export type GridProps = {
   /**
    * Width of grid
    */

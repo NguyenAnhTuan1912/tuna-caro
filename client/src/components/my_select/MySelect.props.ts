@@ -1,13 +1,15 @@
-export interface MySelectOption {
+export type MySelectOption = {
   label?: string | JSX.Element,
   value: string
 }
 
-export interface MyOptionProps extends MySelectOption {
-  chooseOption: (value: string) => void
-}
+export type MyOptionProps =
+  MySelectOption
+  & {
+    chooseOption: (value: string) => void
+  }
 
-export interface MySelectProps {
+export type MySelectProps = {
   placeHolder?: string | JSX.Element | (() => string | JSX.Element),
   options: Array<MySelectOption>,
   defaultValue?: string,

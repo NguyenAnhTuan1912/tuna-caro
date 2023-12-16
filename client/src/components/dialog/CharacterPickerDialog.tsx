@@ -16,6 +16,12 @@ import Button from '../button/Button';
 
 // Import from utils
 import { ObjectUtils } from 'src/utils/object';
+import { OtherUtils } from 'src/utils/other';
+
+// Import from types
+import { CharacterType } from 'src/types/character.types';
+
+import charactersData from "src/assets/data/characters.json";
 
 // Locally Import
 // Import functions
@@ -31,6 +37,40 @@ export const name = "myCharacterPickerDialog";
  */
 export function openCPDialog() {
   return openTMI(name);
+}
+
+type CharacterPickerType = {
+  data: CharacterType;
+  choicedId: string;
+  setChoice: (character: CharacterType) => void;
+};
+
+function CharacterPicker(props: CharacterPickerType) {
+  let extendClassName = "character-img circle";
+  if(props.data._id === props.choicedId) extendClassName += " choice";
+
+  return (
+    <Button
+      isTransparent
+      hasPadding={false}
+      extendClassName={extendClassName}
+      onClick={() => props.setChoice(props.data)}
+    >
+      <img src={props.data.img} alt={props.data.name} />
+    </Button>
+  )
+}
+
+async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
+  await OtherUtils.wait(2000);
+  let N = charactersData.data.length < to ? charactersData.data.length : to;
+  let data = [];
+
+  for(let i = from; i < N; i++) {
+    data.push(charactersData.data[i]);
+  };
+
+  return data;
 }
 
 /**
@@ -49,13 +89,11 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
     query = ObjectUtils.setDefaultValues(query, { limit: "5", skip: "0" });
 
     // Call API to get characters from server.
-    OtherAPIs
-    .getCharactersAsync({ query: query! })
+    getCharactersAsync(0, 10)
     .then(payload => {
-      let data = payload.data;
-      setDataFns.addCharacters(data);
+      setDataFns.addCharacters(payload);
     })
-  }
+  };
 
   React.useEffect(() => {
     // Call API to get characters for the first time
@@ -88,22 +126,14 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
           </div>
           <div className="character-imgs mb-1">
             {
-              data.characters.map(character => {
-                let extendClassName = "character-img circle";
-                if(character._id === data.choice._id) extendClassName += " choice";
-
-                return (
-                  <Button
-                    isTransparent
-                    hasPadding={false}
-                    key={character._id}
-                    extendClassName={extendClassName}
-                    onClick={() => setDataFns.setChoice(character)}
-                  >
-                    <img src={character.img} alt={character.name} />
-                  </Button>
-                )
-              })
+              data.characters.map(character => (
+                <CharacterPicker
+                  key={character._id}
+                  data={character}
+                  setChoice={setDataFns.setChoice}
+                  choicedId={data.choice._id}
+                />
+              ))
             }
           </div>
           <div className="flex-box jc-center">

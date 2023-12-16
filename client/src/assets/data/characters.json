@@ -1,0 +1,110 @@
+{
+  "text": "This data is for testing only. Not use in production.",
+  "data": [
+    {
+      "_id": "657287add8b448676ea4a5fb",
+      "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785950/caro-game/characters/x9j61g29a16xxcxsjpfy.png",
+      "name": "boy",
+      "createdAt": 1702004482555,
+      "updatedAt": 1702004482556
+    },
+    {
+        "_id": "6572cd76a86a366b01f61b55",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785954/caro-game/characters/nwizz3cjf4wzkads6d0f.png",
+        "name": "girl",
+        "createdAt": 1702022292809,
+        "updatedAt": 1702022292809
+    },
+    {
+        "_id": "6572cfbe123ddfcb48e87649",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785951/caro-game/characters/uqvorfswuskoilvvafpf.png",
+        "name": "unknown",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702022975144
+    },
+    {
+        "_id": "6572cfcc123ddfcb48e8764a",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785949/caro-game/characters/nqyydyznkmawdyspayeq.png",
+        "name": "nerd",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702022975144
+    },
+    {
+        "_id": "6572cff8123ddfcb48e8764b",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785950/caro-game/characters/klcrehrsighg4jnxxj1q.png",
+        "name": "chef",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702025901448
+    },
+    {
+      "_id": "6572d008123ddfcb48e8764c",
+      "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785950/caro-game/characters/ezsfozuhgacv87xawwqb.png",
+      "name": "skull",
+      "createdAt": 1702022975144,
+      "updatedAt": 1702025979748
+    },
+    {
+        "_id": "6572d03a123ddfcb48e8764d",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785949/caro-game/characters/wp4zdfqnidcurp2vqdds.png",
+        "name": "hunter",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702022975144
+    },
+    {
+        "_id": "6572d04b123ddfcb48e8764e",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785949/caro-game/characters/urcqw6chqfaqfc56xaxf.png",
+        "name": "wizard",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026025884
+    },
+    {
+        "_id": "6572d068123ddfcb48e8764f",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785952/caro-game/characters/q5muvijnoohnfqtemi8z.png",
+        "name": "dj",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026045046
+    },
+    {
+        "_id": "6572d078123ddfcb48e87650",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785952/caro-game/characters/fnrzwoxmq9nxspvhsar5.png",
+        "name": "student",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026058103
+    },
+    {
+      "_id": "6572d008123ddfcb48e8064c",
+      "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785950/caro-game/characters/ezsfozuhgacv80xawwqb.png",
+      "name": "skull",
+      "createdAt": 1702022975144,
+      "updatedAt": 1702025979748
+    },
+    {
+        "_id": "6572d03a123ddfcb48e8064d",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785949/caro-game/characters/wp4zdfqnidcurp2vqdds.png",
+        "name": "hunter",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702022975144
+    },
+    {
+        "_id": "6572d04b123ddfcb48e8064e",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785949/caro-game/characters/urcqw6chqfaqfc56xaxf.png",
+        "name": "wizard",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026025884
+    },
+    {
+        "_id": "6572d068123ddfcb48e8064f",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785952/caro-game/characters/q5muvijnoohnfqtemi8z.png",
+        "name": "dj",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026045046
+    },
+    {
+        "_id": "6572d078123ddfcb48e80650",
+        "img": "https://res.cloudinary.com/dhqgfphiy/image/upload/v1701785952/caro-game/characters/fnrzwoxmq9nxspvhsar5.png",
+        "name": "student",
+        "createdAt": 1702022975144,
+        "updatedAt": 1702026058103
+    }
+  ]
+}

@@ -18,7 +18,15 @@
   margin: calc(var(--spacing-value) + calc(var(--spacing-value-step) * 4));
 }
 
+.m-auto {
+  margin: auto;
+}
+
 /* Margin x */
+
+.mx-auto {
+  margin: 0 auto;
+}
 
 .mx-0 {
   margin-left: 0;
@@ -46,6 +54,9 @@
 }
 
 /* Margin y */
+.my-auto {
+  margin: auto 0;
+}
 
 .my-0 {
   margin-top: 0;

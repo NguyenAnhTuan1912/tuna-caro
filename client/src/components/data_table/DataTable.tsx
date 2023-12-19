@@ -81,7 +81,7 @@ export default function DataTable<T>({
         </thead>
         <tbody>
           {
-            printableDataRows.map((c, index) => props.renderRowData(c, index))
+            printableDataRows.map(props.renderRowData)
           }
         </tbody>
       </table>

@@ -1,5 +1,4 @@
 type RenderItemFn<T> = (item: T, index: number) => JSX.Element;
-type ExtractKeyFn<T> = (item: T, index: number) => string;
 
 export type ListChildElementRefsType = {
   list: HTMLDivElement | null;
@@ -13,14 +12,15 @@ export type ListInternalDataType = {
 
 export type ListProps<T> = {
   data: Array<T>;
+  maxHeight: string | number;
   renderItem: RenderItemFn<T>;
-  extractKey: ExtractKeyFn<T>;
-  onReachBottom?: () => void;
+  onReachBottom?: (scrollTop: number) => void;
 };
 
 export type LazyListProps<T> = {
-  numberOfItems: number;
+  limit: number;
+  loadMoreBtnLabel: string;
+  maxHeight: string | number;
   getListDataAsync: (skip: number) => Promise<Array<T>>;
   renderItem: RenderItemFn<T>;
-  extractKey: ExtractKeyFn<T>;
 };

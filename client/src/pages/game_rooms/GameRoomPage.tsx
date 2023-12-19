@@ -117,10 +117,10 @@ export default function GameRoomPage(props: GameRoomPageProps) {
           let data = await getDataAsync();
           return data;
         }}
-        renderRowData={(piece, index) => (
+        renderRowData={(item, index) => (
           <GameRow
-            key={piece.id}
-            data={piece}
+            key={item.id}
+            data={item}
             index={index}
             player={player}
           />

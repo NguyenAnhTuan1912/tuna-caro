@@ -4,52 +4,59 @@ import React from 'react';
 // Import types
 import {
   ListProps,
-  ListChildElementRefsType,
-  ListInternalDataType
+  ListChildElementRefsType
 } from './List.props'
 
 // Import styles
 import "./List.styles.css";
 
-export default function List<T>(props: ListProps<T>) {
+/**
+ * This component renders a list of `data` that is passed to it.
+ * @param props 
+ * @returns 
+ */
+const List = React.forwardRef(function(props, ref) {
   const elementRefs = React.useRef<ListChildElementRefsType>({
     list: null,
     content: null
   });
 
-  /**
-   * This data is state, but it doesn't need to re-render the component.
-   */
-  const listData = React.useRef<ListInternalDataType>({
-    listHeight: 0,
-    contentHeight: 0
-  });
-
-  React.useEffect(() => {
-    // Set some values
-    listData.current.contentHeight = elementRefs.current.content?.offsetHeight!;
-    listData.current.listHeight = elementRefs.current.list?.offsetHeight!;
+  const handleScrollOnList = React.useCallback(function(e: React.UIEvent) {
+    let target = e.target as HTMLElement;
+    let threshold = elementRefs.current.content?.offsetHeight! - (elementRefs.current.list?.offsetHeight! + 0);
+    
+    // If element reaches the threshold, the trigger the if statement.
+    if(target.scrollTop >= threshold && props.onReachBottom) props.onReachBottom(target.scrollTop);
   }, []);
 
-  return (
+  // Sync the outer ref `ref` with inner ref `elementRefs.current.list`.
+  // React.useImperativeHandle(ref, () => elementRefs.current.list!, []);
+
+  return React.useMemo(() => (
     <div
       className="list"
-      ref={ref => elementRefs.current.list = ref}
-      onScroll={(e) => {
-        let target = e.target as HTMLElement;
-        let threshold = listData.current.contentHeight - (listData.current.listHeight + 24);
-        
-        // If element reaches the threshold, the trigger the if statement.
-        if(target.scrollTop >= threshold && props.onReachBottom) props.onReachBottom();
+      style={{
+        maxHeight: props.maxHeight
       }}
+      ref={_ref => {
+        // Sync the outer ref `ref` with inner ref `elementRefs.current.list`.
+        elementRefs.current.list = _ref;
+        if(typeof ref === "function") ref(_ref);
+        else if(ref !== null) ref.current = _ref;
+      }}
+      // ref={ref => elementRefs.current.list = ref}
+      onScroll={props.onReachBottom ? handleScrollOnList : undefined}
     >
       <div
+        className="content"
         ref={ref => elementRefs.current.content = ref}
       >
         {
-
+          props.data.map(props.renderItem)
         }
       </div>
     </div>
-  )
-}
+  ), [props.data]);
+}) as <T>(p: ListProps<T> & { ref?: React.ForwardedRef<HTMLDivElement> }) => React.ReactElement;
+
+export default List;

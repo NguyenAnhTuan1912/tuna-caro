@@ -13,6 +13,7 @@ import DialogLayout from 'src/layouts/modal_items/dialog_layout/DialogLayout';
 
 // Import from components
 import Button from '../button/Button';
+import LazyList from '../list/LazyList';
 
 // Import from utils
 import { ObjectUtils } from 'src/utils/object';
@@ -62,9 +63,11 @@ function CharacterPicker(props: CharacterPickerType) {
 }
 
 async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
-  await OtherUtils.wait(2000);
+  await OtherUtils.wait(1000);
   let N = charactersData.data.length < to ? charactersData.data.length : to;
   let data = [];
+
+  console.log("From, to: ", from, to);
 
   for(let i = from; i < N; i++) {
     data.push(charactersData.data[i]);
@@ -96,10 +99,6 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
   };
 
   React.useEffect(() => {
-    // Call API to get characters for the first time
-    // Because of testing purpose, so I will get 5 characters at first.
-    fetchCharacters();
-
     return function() {
       setDataFns.clearCharacter();
     }
@@ -114,39 +113,38 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
         width: "100%",
         maxWidth: "720px",
         minHeight: "360px",
+        maxHeight: "667px",
         borderRadius: "0",
         backgroundColor: "var(--clr-background)",
         border: "2px solid var(--clr-onBackground)"
       })}
     >
       <div className="flex-box flex-col jc-space-between px-4 mt-4 character-dialog-body">
-        <div>
+        <div
+          style={{
+            height: "100vh",
+            maxHeight: "400px"
+          }}
+        >
           <div>
             <p>Chọn nhân vật đại diện cho bạn</p>
           </div>
-          <div className="character-imgs mb-1">
-            {
-              data.characters.map(character => (
-                <CharacterPicker
-                  key={character._id}
-                  data={character}
-                  setChoice={setDataFns.setChoice}
-                  choicedId={data.choice._id}
-                />
-              ))
-            }
-          </div>
-          <div className="flex-box jc-center">
-            <Button
-              hasBorder={false}
-              extendClassName="txt-clr-primary"
-              onClick={() => {
-                fetchCharacters({ skip: data.skip });
-              }}
-            >
-              Xem thêm
-            </Button>
-          </div>
+          <LazyList
+            maxHeight="300px"
+            loadMoreBtnLabel='Xem thêm'
+            limit={5}
+            getListDataAsync={(skip) => {
+              return getCharactersAsync(skip, skip + 5);
+            }}
+            renderItem={(item) => (
+              <CharacterPicker
+                key={item._id}
+                data={item}
+                setChoice={setDataFns.setChoice}
+                choicedId={data.choice._id}
+              />
+            )}
+          />
         </div>
         <div className="flex-box jc-flex-end ait-center">
           <div className="me-2">

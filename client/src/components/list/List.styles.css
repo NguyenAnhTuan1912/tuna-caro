@@ -2,3 +2,9 @@
   width: 100%;
   overflow: auto;
 }
+
+.list .content {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}

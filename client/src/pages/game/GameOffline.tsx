@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Import components
 import GameCore from './GameCore';
 
@@ -12,7 +10,8 @@ export default function GameOffline() {
     <GameCore
       game={{
         id: "TWO_PLAYERS_GAME",
-        name: "2 players game"
+        name: "2 players game",
+        status: "Playing"
       }}
     />
   )

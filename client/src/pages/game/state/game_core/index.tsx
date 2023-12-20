@@ -16,9 +16,9 @@ import EndLine from "../../EndLine";
 // Import types.
 import { GameCoreProps } from "../../Game.props";
 
-function getInitialState(id: string, name: string) {
+function getInitialState(id: string, name: string, isPause: boolean = true) {
   return {
-    game: Game.createGame(id!, name!)
+    game: Game.createGame(id!, name!, isPause)
   }
 }
 
@@ -78,10 +78,6 @@ function getStateFns(
 
           return game;
         }
-
-        // Swith turn
-        if(game.currentTurn === "X") Game.setTurn(game, "O")
-        else Game.setTurn(game, "X");
         
         // Subscribe an event here to support outside.
         if(props.onAddMark && canCallOnAddMark) props.onAddMark(x, y, t, game.currentTurn);
@@ -160,6 +156,18 @@ function getStateFns(
 
         return game;
       });
+    },
+
+    /**
+     * Use this function to pause of resume game.
+     * @param status 
+     */
+    pause: function(status: boolean = true) {
+      changeState("game", function(game) {
+        if(status) Game.pause(game);
+        else Game.resume(game);
+        return game;
+      })
     }
   }
 }

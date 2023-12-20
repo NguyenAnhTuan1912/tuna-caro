@@ -104,6 +104,9 @@ export class MySocket {
         // For safe
         origin: env.AUTHORIZED_DOMAINS,
         credentials: true
+      },
+      connectionStateRecovery: {
+        maxDisconnectionDuration: 2 * 60 * 1000 // 2 minutes
       }
     });
     this.__o__ = {
@@ -140,11 +143,21 @@ export class MySocket {
     this._io.on("connection", (socket) => {
       console.log("Game in list: ", this.__o__.gameList);
       
-      console.log("SocketID: ", socket.id);
-      console.log("Rooms: ", socket.rooms);
+      if(socket.recovered) {
+        console.log("Old Connection");
+        console.log("SocketID: ", socket.id);
+        console.log("Rooms: ", socket.rooms);
+      } else {
+        console.log("New Connection");
+        console.log("SocketID: ", socket.id);
+        console.log("Rooms: ", socket.rooms);
+      }
 
       // Set up `disconnect` event for socket to handle some tasks for individual socket.
       socket.on("disconnect", () => {
+        console.log("Disconnect");
+        console.log("SocketID: ", socket.id);
+        console.log("Rooms: ", socket.rooms);
         socket.removeAllListeners();
       });
 

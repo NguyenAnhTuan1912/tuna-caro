@@ -6,14 +6,14 @@ import { ToStringOptions } from "./index.types";
  * @param o 
  * @param s 
  */
-function setDefaultValues(o: any, ext: any) {
-  if(!Boolean(o)) return ext;
+function setDefaultValues<T>(o: T, ext: T) {
+  if(!Boolean(o)) return ext!;
   for(let key in ext) {
     if(!o[key]) {
       o[key] = ext[key]!;
     }
   }
-  return o;
+  return o!;
 }
 
 /**
@@ -32,7 +32,7 @@ function setDefaultValues(o: any, ext: any) {
  * console.log(str);
  * ```
  */
-function toString(o: {[key: string]: any}, opt?: ToStringOptions) {
+function toString(o: {[key: string]: any}, opt?:ToStringOptions) {
   let str = "";
 
   opt = setDefaultValues(opt, { kvSeperator: "=", seperator: "&" });

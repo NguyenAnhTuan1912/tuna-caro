@@ -65,7 +65,7 @@ export default function HomePage(props: HomePageProps) {
     openNotifiableSnackBar("Chào mừng bạn tới Caro game")
     .then(result => {
       console.log("Snackbar result: ", result);
-    })
+    });
 
     return function() {
       mySocket.removeEventListener(MySocket.EventNames.emitGame, emitGameListener);

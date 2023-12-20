@@ -489,13 +489,13 @@ export class Game {
    * @param name 
    * @returns 
    */
-  static createGame(id: string, name: string): GameType {
+  static createGame(id: string, name: string, isPause: boolean): GameType {
     // Init game.
     let newGame = Game.init({} as GameType);
 
     newGame.id = id;
     newGame.name = name;
-    newGame.status = "Waiting";
+    newGame.status = isPause ? "Waiting" : "Playing";
     newGame.host = null;
     newGame._players = {
       "first": null,
@@ -799,6 +799,24 @@ export class Game {
   /*
     OTHER METHODS
   */
+ /**
+  * Use this static method to pause the game.
+  * @param game 
+  */
+  static pause(game: GameType) {
+    game.status = "Waiting";
+    return game;
+  }
+
+  /**
+   * Use this static method to resume the game.
+   * @param game 
+   */
+  static resume(game: GameType) {
+    game.status = "Playing";
+    return game;
+  }
+
   /**
    * Use this static method to remove a player by `id` or `mark`.
    * @param game 
@@ -837,6 +855,10 @@ export class Game {
   static addMarkInfo(game: GameType, coordinate: string, mark: MarkType, element: JSX.Element) {
     if(!game._markInfoMap!.get(coordinate))
       game._markInfoMap!.set(coordinate, { value: mark, element });
+
+    // Switch turn
+    if(game.currentTurn === "X") Game.setTurn(game, "O");
+    else Game.setTurn(game, "X");
   }
 
   /**

@@ -35,7 +35,7 @@ export function useStateWESSFns<T, O>(
     const changeStage = function<N extends keyof T>(name: N, fn: ChangeStateCallbackFnType<T, N>, preventUpdate?: PreventUpdateFnType<T, N>) {
       set$(
         function(prevState) {
-          if(preventUpdate && preventUpdate(fn(prevState[name], prevState), prevState)) return prevState;
+          if(preventUpdate && preventUpdate(prevState[name], prevState)) return prevState;
           return getState(prevState, name, fn);
         }
       );

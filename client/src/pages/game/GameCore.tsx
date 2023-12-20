@@ -12,9 +12,12 @@ import { useSFX } from 'src/hooks/useSFX';
 import Grid from 'src/components/grid/Grid';
 import ScoreBoard from './ScoreBoard';
 
-// IMPORTANT
+// Locally Import
 // Import functions.
 import { GameCoreStateConfigs } from './state/game_core';
+
+// Import components
+import PauseGameLayer from './PauseGameLayer';
 
 // Import types
 import { GameCoreProps } from './Game.props';
@@ -33,7 +36,7 @@ interface GamePageElements {
  */
 export default function GameCore(props: GameCoreProps) {
   const [gameState, gameStateFns] = useStateWESSFns(
-    GameCoreStateConfigs.getInitialState(props.game.id!, props.game.name!),
+    GameCoreStateConfigs.getInitialState(props.game.id!, props.game.name!, props.game.status === "Waiting"),
     function(changeState) {
       return GameCoreStateConfigs.getStateFns(changeState, props)
     }
@@ -69,6 +72,7 @@ export default function GameCore(props: GameCoreProps) {
       // Add to game and update state as the same time.
       gameStateFns.appendPlayer("first", firstPlayer);
       gameStateFns.appendPlayer("second", secondPlayer);
+      gameStateFns.pause(false);
     } else {
       /*
         That mean the game has host => is online game.
@@ -83,7 +87,12 @@ export default function GameCore(props: GameCoreProps) {
 
       // Add player to the game and prepare to update state.
       gameStateFns.appendPlayer("first", firstPlayer);
-      if(secondPlayer) gameStateFns.appendPlayer("second", secondPlayer);
+      if(secondPlayer) {
+        gameStateFns.appendPlayer("second", secondPlayer);
+
+        // Resume game
+        gameStateFns.pause(false);
+      };
 
       // Set host and update state.
       gameStateFns.setHost(firstPlayer);
@@ -95,237 +104,95 @@ export default function GameCore(props: GameCoreProps) {
   }, []);
 
   return (
-    <div ref={ref => elementRefs.current.page = ref} className={"game-page" + (gameState.game.currentTurn === "O" ? " O" : " X")}>
-      <Grid
-        height={"100%"}
-        emitCoordinate={(x, y, t) => {
-          // Check if game status is `Waiting`, then don't let player hit table.
-          if(gameState.game.status === "Waiting") return;
+    <>
+      { gameState.game.status === "Waiting" && <PauseGameLayer /> }
+      <div ref={ref => elementRefs.current.page = ref} className={"game-page" + (gameState.game.currentTurn === "O" ? " O" : " X")}>
+        <Grid
+          height={"100%"}
+          emitCoordinate={(x, y, t) => {
+            // Check if game status is `Waiting`, then don't let player hit table.
+            if(gameState.game.status === "Waiting") return;
 
-          // Check if main player can mark, else terminate.
-          if(
-            props.mainPlayer
-            && props.mainPlayer.mark !== gameState.game.currentTurn
-          ) return;
+            // Check if main player can mark, else terminate.
+            if(
+              props.mainPlayer
+              && props.mainPlayer.mark !== gameState.game.currentTurn
+            ) return;
 
-          // Check if the game has winner, else terminate.
-          if(hasWinner) return;
+            // Check if the game has winner, else terminate.
+            if(hasWinner) return;
 
-          // Check if this square has mark, else terminate.
-          if(Game.hasMarkIn(gameState.game, x, y)) return;
+            // Check if this square has mark, else terminate.
+            if(Game.hasMarkIn(gameState.game, x, y)) return;
 
-          // Play sfx
-          sfx.play("hitTableSound");
+            // Play sfx
+            sfx.play("hitTableSound");
 
-          // If pass all the condition (except check square), add new mark.
-          gameStateFns.addMark(x, y, t, undefined, true);
-        }}
+            // If pass all the condition (except check square), add new mark.
+            gameStateFns.addMark(x, y, t, undefined, true);
+          }}
 
-        renderSVGElements={() => {
-          return Game.renderMarks(gameState.game, function(value) {
-            return value?.element!;
-          });
-        }}
+          renderSVGElements={() => {
+            return Game.renderMarks(gameState.game, function(value) {
+              return value?.element!;
+            });
+          }}
 
-        renderItem={(beh) => (
-          <>
-            <div className="game-info p-4">
-              <div>
-                <h3 className="flex-box ait-center">LƯỢT
-                  {
-                    gameState.game.currentTurn === "X"
-                      ? <span className="material-symbols-outlined x-mark ms-1 fs-1">close</span>
-                      : <span className="material-symbols-outlined o-mark ms-1 fs-1">radio_button_unchecked</span>
-                  }
-                </h3>
-                <ScoreBoard extendClassName='mt-2' game={gameState.game} />
+          renderItem={(beh) => (
+            <>
+              <div className="game-info p-4">
+                <div>
+                  <h3 className="flex-box ait-center">LƯỢT
+                    {
+                      gameState.game.currentTurn === "X"
+                        ? <span className="material-symbols-outlined x-mark ms-1 fs-1">close</span>
+                        : <span className="material-symbols-outlined o-mark ms-1 fs-1">radio_button_unchecked</span>
+                    }
+                  </h3>
+                  <ScoreBoard extendClassName='mt-2' game={gameState.game} />
+                </div>
+                <div>
+                  <p className="flex-box ait-center">
+                    {gameState.game.id}
+                    <span
+                      className="material-symbols-outlined btn-transparent rounded-4 ms-1"
+                    >
+                      content_copy
+                    </span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="flex-box ait-center">
-                  {gameState.game.id}
-                  <span
-                    className="material-symbols-outlined btn-transparent rounded-4 ms-1"
-                  >
-                    content_copy
-                  </span>
-                </p>
+              <div className="grid-controller p-1 m-3 flex-box flex-col">
+                {
+                  canResetBtnShown && (
+                    <span
+                      onClick={() => {
+                        if(props.onResetClick) props.onResetClick();
+                        gameStateFns.startNewRound()
+                      }}
+                      className="material-symbols-outlined btn-no-padd spe-outline p-1 mb-4"
+                    >
+                      restart_alt
+                    </span>
+                  )
+                }
+                <span
+                  onClick={() => { beh.zoomIn() }}
+                  className="material-symbols-outlined btn-no-padd outline p-1"
+                >
+                  add
+                </span>
+                <span
+                  onClick={() => { beh.zoomOut() }}
+                  className="material-symbols-outlined btn-no-padd spe-outline p-1"
+                >
+                  remove
+                </span>
               </div>
-            </div>
-            <div className="grid-controller p-1 m-3 flex-box flex-col">
-              {
-                canResetBtnShown && (
-                  <span
-                    onClick={() => {
-                      if(props.onResetClick) props.onResetClick();
-                      gameStateFns.startNewRound()
-                    }}
-                    className="material-symbols-outlined btn-no-padd spe-outline p-1 mb-4"
-                  >
-                    restart_alt
-                  </span>
-                )
-              }
-              <span
-                onClick={() => { beh.zoomIn() }}
-                className="material-symbols-outlined btn-no-padd outline p-1"
-              >
-                add
-              </span>
-              <span
-                onClick={() => { beh.zoomOut() }}
-                className="material-symbols-outlined btn-no-padd spe-outline p-1"
-              >
-                remove
-              </span>
-            </div>
-          </>
-        )}
-      />
-    </div>
+            </>
+          )}
+        />
+      </div>
+    </>
   )
 }
-
-/*
-OLD CODE:
-[STATE]
-*/
-// const [gameState, gameStateFns] = useStateWESSFns({
-//   game: Game.createGame(props.game.id!, props.game.name!)
-// }, function(changeState) {
-//   return {
-//     /**
-//      * Use to add mark to `markMap`. And handle something like emit message to server.
-//      * @param x 
-//      * @param y 
-//      * @param t 
-//      * @param result 
-//      * @param canCallOnAddMark 
-//      */
-//     addMark: function(
-//       x: number, y: number, t: number,
-//       result?: ResultType,
-//       canCallOnAddMark?: boolean
-//     ) {
-//       changeState("game", function(game) {
-//         let key = Game.createKey(x, y);
-//         // Decide what mark will be added
-//         let element = <Mark key={key} x={x} y={y} t={t} mark='X' />;
-
-//         if(game.currentTurn === "O") {
-//           element = <Mark key={key} x={x} y={y} t={t} mark='O' />;
-//         }
-
-//         // Add mark
-//         Game.addMarkInfo(
-//           game,
-//           key,
-//           game.currentTurn,
-//           element
-//         );
-
-//         // Find winner
-//         if(!result) result = Game.findWinner(game, x, y);
-
-//         if(result) {
-//           // Run onAddMark if game has winner.
-//           if(props.onAddMark && canCallOnAddMark)
-//             props.onAddMark(x, y, t, gameState.game.currentTurn, result);
-
-//           // Set winner for game.
-//           Game.setWinner(game, result.player);
-
-//           // Add mark.
-//           Game.addMarkInfo(
-//             game,
-//             result.from + result.to,
-//             game.currentTurn,
-//             <EndLine key={result.from + result.to} from={result.endline.from} to={result.endline.to} />
-//           );
-
-//           return game;
-//         }
-
-//         // Swith turn
-//         if(game.currentTurn === "X") Game.setTurn(game, "O")
-//         else Game.setTurn(game, "X");
-        
-//         // Subscribe an event here to support outside.
-//         if(props.onAddMark && canCallOnAddMark) props.onAddMark(x, y, t, gameState.game.currentTurn);
-        
-//         return game;
-//       });
-//     },
-
-//     /**
-//      * Use this function to reset the game.
-//      */
-//     resetGame: function() {
-//       changeState("game", function(game) {
-//         // Reset game.
-//         Game.reset(game);
-
-//         return game;
-//       });
-//     },
-
-//     /**
-//      * Use this function to start a new round.
-//      */
-//     startNewRound: function() {
-//       changeState("game", function(game) {
-//         // Start new round.
-//         Game.startNewRound(game);
-
-//         return game;
-//       });
-//     },
-
-//     /**
-//      * Use this function to add player to game.
-//      * @param player 
-//      */
-//     appendPlayer: function(key: PlayersKeyType, player: PlayerType) {
-//       changeState("game", function(game) {
-//         // Set new player.
-//         Game.setPlayer(game, key, player);
-        
-//         // If game has 2 players, then change the status.
-//         if(Game.getPlayer(game, "first") && Game.getPlayer(game, "second")) {
-//           game.status = "Playing";
-//         }
-
-//         return game;
-//       });
-//     },
-
-//     /**
-//      * Use this function to set host.
-//      */
-//     setHost: function(player: PlayerType) {
-//       changeState("game", function(game) {
-//         // Set host
-//         Game.setHost(game, player);
-//         return game;
-//       });
-//     },
-
-//     /**
-//      * Use this function to remove a player from game.
-//      * @param g 
-//      */
-//     removePlayer: function(g: PlayersKeyType | string) {
-//       changeState("game", function(game) {
-//         // If a player leave the game or is kicked by host. The game will be reset.
-//         Game.removePlayer(game, g);
-
-//         // Reset state.
-//         Game.reset(game);
-
-//         // Because of leaving of a player, so game's status must be change
-//         game.status = "Waiting";
-
-//         return game;
-//       });
-//     }
-//   }
-// });

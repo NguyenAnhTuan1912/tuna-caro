@@ -9,6 +9,13 @@ import Article from '../article/Article';
 import ProfileCard from '../profile_card/ProfileCard';
 import KeyGuide from '../key_guide/KeyGuide';
 
+export const name = "mySideMenu";
+
+/**
+ * Component renders a side menu or drawer.
+ * @param props 
+ * @returns 
+ */
 export default function SideMenu(props: CustomizedModalItemProps) {
   const sideMenuRef = React.useRef<HTMLDivElement>(null);
 

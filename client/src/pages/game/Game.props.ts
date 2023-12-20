@@ -101,3 +101,7 @@ export type EmitWinnerMessageDataType =
   & {
     winner: ResultType;
   }
+
+export type PauseGameLayerProps = {
+  canResume?: boolean
+}

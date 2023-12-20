@@ -2,10 +2,27 @@
   /* width: 100%; */
 }
 
+.csnackbar-header {
+  aspect-ratio: 1;
+}
+
 .csnackbar-body {
   width: 100%;
 }
 
 .csnackbar-footer {
 
+}
+
+/* Connection Status Snackbar styles */
+.cscsnackbar-header {
+  width: 25%;
+}
+
+.cscsnackbar-header.connected {
+  background-color: var(--clr-success);
+}
+
+.cscsnackbar-header.disconnected {
+  background-color: var(--clr-error);
 }

@@ -2,16 +2,14 @@ import React from 'react';
 import { CustomizedModalItemProps, openTMI } from 'tunangn-react-modal';
 
 // Import from layouts
+import SnackBarLayout from 'src/layouts/modal_items/snackbar_layout/SnackBarLayout';
 import CloseButton, { CloseButtonPropsType } from 'src/layouts/modal_items/CloseButton';
+import { SnackBarElementRefsType } from 'src/layouts/modal_items/snackbar_layout/SnackbarLayout.props';
 
 // Import styles
 import './SnackBar.styles.css';
 
-const name = "mySnackBar";
-
-interface SnackBarElementsType {
-  container: HTMLDivElement | null;
-}
+export const name = "mySnackBar";
 
 interface SnackBarTransferedDataType {
   closeButtons: Array<CloseButtonPropsType>;
@@ -49,53 +47,38 @@ export function openNotifiableSnackBar(message: string) {
  */
 export default function SnackBar(props: CustomizedModalItemProps) {
   const data = props.item.getData() as SnackBarTransferedDataType;
-  const elementRefs = React.useRef<SnackBarElementsType>({
+  const elementRefs = React.useRef<SnackBarElementRefsType>({
     container: null
   });
 
-  // Setup useEffect to handle some tasks.
-  React.useEffect(() => {
-
-    // For old device.
-    if(!elementRefs.current.container?.animate) return;
-
-    // Run animation.
-    props.utils.runAnimation!(elementRefs.current.container);
-  }, []);
-
   return (
-    <div
+    <SnackBarLayout
       ref={ref => elementRefs.current.container = ref}
       className="csnackbar p-1"
-      style={props.utils.getContainerStyle({
-        boxShadow: "none",
-        backgroundColor: "var(--clr-background)",
-        border: "2px solid var(--clr-outline)",
-        borderRadius: 0,
-        marginTop: "1rem",
-        marginRight: "1rem"
-      })}
-    >
-      <div className="csnackbar-body flex-box ait-center px-1">
-        {
-          typeof data.body === "function"
-            ? data.body()
-            : data.body
-        }
-      </div>
-
-      <div className="csnackbar-footer flex-box flex-rw ait-center">
-        {
-          data.closeButtons.map(closeBtn => (
-            <CloseButton
-              key={closeBtn.icon}
-              icon={closeBtn.icon}
-              isAgree={closeBtn.isAgree}
-              close={props.close}
-            />
-          ))
-        }
-      </div>
-    </div>
+      snackBarProps={props}
+      body={(
+        <div className="csnackbar-body flex-box ait-center px-1">
+          {
+            typeof data.body === "function"
+              ? data.body()
+              : data.body
+          }
+        </div>
+      )}
+      footer={(
+        <div className="csnackbar-footer flex-box flex-rw ait-center">
+          {
+            data.closeButtons.map(closeBtn => (
+              <CloseButton
+                key={closeBtn.icon}
+                icon={closeBtn.icon}
+                isAgree={closeBtn.isAgree}
+                close={props.close}
+              />
+            ))
+          }
+        </div>
+      )}
+    />
   )
 }

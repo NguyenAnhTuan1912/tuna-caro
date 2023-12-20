@@ -19,10 +19,11 @@ import GameRoomPage from './pages/game_rooms/GameRoomPage';
 import GamePage from './pages/game/GamePage';
 
 // Import components
-import SideMenu from './components/side_menu/SideMenu';
+import SideMenu, { name as SMName } from './components/side_menu/SideMenu';
 import GameDialog, { name as GDName } from './components/dialog/GameDialog';
 import CharacterPickerDialog, { name as CPDName } from './components/dialog/CharacterPickerDialog';
-import SnackBar from './components/snack_bar/SnackBar';
+import SnackBar, { name as SBName } from './components/snack_bar/SnackBar';
+import ConnectionStatusSnackBar, { name as CSSBName, openConnectionStatusSnackBar } from './components/snack_bar/ConnectionStatusSnackBar';
 
 /**
  * This component in the center of the app. Contain many component that contains many components and so on...
@@ -34,7 +35,11 @@ function App() {
 
   // Handle some global Socket Exception
   React.useEffect(() => {
-    async function init() {
+    const handleOfflineOnWindow = function() {
+      openConnectionStatusSnackBar({ isConnected: false });
+    };
+
+    const init = async function() {
       // Call API to get ID.
       playerDispatcher.getPlayerIDAsync();
 
@@ -56,8 +61,12 @@ function App() {
     // Theme.
     settingsDispatcher.performTasksRequireSettings();
 
+    // Listen to `offline` event from `window`.
+    window.addEventListener("offline", handleOfflineOnWindow);
+
     return function() {
       console.log("Disconnect socket");
+      window.removeEventListener("offline", handleOfflineOnWindow);
       mySocket.disconnect();
     }
   }, []);
@@ -109,7 +118,7 @@ function App() {
       {/* Modal */}
       <TunangnModal
         items={{
-          mySideMenu: {
+          [SMName]: {
             type: "side",
             placeOn: "right",
             element: SideMenu
@@ -118,10 +127,16 @@ function App() {
             type: "dialog",
             element: GameDialog
           },
-          mySnackBar: {
+          [SBName]: {
             type: "snack-bar",
             position: "top-right",
             element: SnackBar
+          },
+          [CSSBName]: {
+            type: "snack-bar",
+            position: "top",
+            duration: null,
+            element: ConnectionStatusSnackBar
           },
           [CPDName]: {
             type: "dialog",

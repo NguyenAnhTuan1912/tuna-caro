@@ -16,19 +16,11 @@ interface LeaveGameMessageDataType {
 export const LeaveGameSELWrapperInfo = {
   name: MySocket.EventNames.leaveGame,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
-    return function(message: Message<LeaveGameMessageDataType>) {
+    return function __LEAVEGAME__(message: Message<LeaveGameMessageDataType>) {
       let { gameId, player } = message.data!;
       let game = o.gameList.getGame(gameId)!;
-      let players = game.getPlayers(true) as Array<Player>;
-      let remainPlayer, leavePlayer;
-      console.log("Socket rooms (before leave): ", socket.rooms);
-      if(players[0] && players[0].id === player.id) {
-        leavePlayer = players[0];
-        remainPlayer = players[1];
-      } else {
-        remainPlayer = players[0];
-        leavePlayer = players[1];
-      }
+      let remainPlayer = game.getPlayerByExceptedId(player.id);
+      let leavePlayer = game.getPlayerById(player.id)!;
 
       // Remove player from game.
       game.leaveGame(player.id);
@@ -40,6 +32,7 @@ export const LeaveGameSELWrapperInfo = {
       socket.leave(game.id);
 
       // Send message to players
+      // Send message to player still in game.
       if(remainPlayer)
         io
         .to(remainPlayer.socketId!)
@@ -49,11 +42,13 @@ export const LeaveGameSELWrapperInfo = {
             MySocket.EventNames.leaveGame,
             `${leavePlayer.name} đã rời trò chơi.`,
             {
-              playerId: leavePlayer.id
+              playerId: leavePlayer.id,
+              isHostLeaved: leavePlayer.id === game.host.id
             }
           )
         );
 
+      // Send message to player who leave the game.
       socket
       .emit(
         MySocket.EventNames.leaveGame,
@@ -64,7 +59,8 @@ export const LeaveGameSELWrapperInfo = {
       );
       console.log("Socket rooms (after leave): ", socket.rooms);
       console.log("Players: ", game.getPlayers(true));
-      // Check if there are no players in this room
+
+      // Check if there are no players in this room, then remove this game from list.
       if(game.isEmpty()) o.gameList.removeGame(game.id);
     }
   })

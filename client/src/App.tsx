@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
+import { useNavigate } from 'react-router-dom';
 
 // Import from classes
 
@@ -11,19 +12,22 @@ import { mySocket } from 'src/apis/socket';
 import { useSettingsActions } from './hooks/useSettings';
 import { usePlayerActions } from './hooks/usePlayer';
 
-// Import layout and pages
+// Import from layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
 import HomePage from './pages/home/HomePage';
 import SettingsPage from './pages/settings/SettingsPage';
 import GameRoomPage from './pages/game_rooms/GameRoomPage';
-import GamePage from './pages/game/GamePage';
+import GamePage from './pages/game/components/GamePage';
 
-// Import components
+// Import from components
 import SideMenu, { name as SMName } from './components/side_menu/SideMenu';
 import GameDialog, { name as GDName } from './components/dialog/GameDialog';
 import CharacterPickerDialog, { name as CPDName } from './components/dialog/CharacterPickerDialog';
 import SnackBar, { name as SBName } from './components/snack_bar/SnackBar';
 import ConnectionStatusSnackBar, { name as CSSBName, openConnectionStatusSnackBar } from './components/snack_bar/ConnectionStatusSnackBar';
+
+// Import from utils
+import { ROUTES } from './utils/constant';
 
 /**
  * This component in the center of the app. Contain many component that contains many components and so on...
@@ -32,43 +36,59 @@ import ConnectionStatusSnackBar, { name as CSSBName, openConnectionStatusSnackBa
 function App() {
   const playerDispatcher = usePlayerActions();
   const settingsDispatcher = useSettingsActions();
+  
+  const navigate = useNavigate();
 
   // Handle some global Socket Exception
   React.useEffect(() => {
-    const handleOfflineOnWindow = function() {
-      openConnectionStatusSnackBar({ isConnected: false });
-    };
+    const init = function() {
+      let maxDisconnectionDuration = 0;
+      let handleOfflineOnWindow: () => void;
 
-    const init = async function() {
       // Call API to get ID.
       playerDispatcher.getPlayerIDAsync();
 
       // Init
       mySocket.init((message) => {
         let data = message.data!;
+
+        // Set socket id for player.
         playerDispatcher.setPlayer({
           socketId: data.socketId
         });
+
+        // Set configured parameters
+        maxDisconnectionDuration = data.configParams.maxDisconnectionDuration;
       });
 
       // Say hello to server
       mySocket.handshake();
+
+      // Theme.
+      settingsDispatcher.performTasksRequireSettings();
+
+      handleOfflineOnWindow = function() {
+        // If the disconnect is lost too long, navigate to home.
+        let timeoutFunc = setTimeout(() => {
+          // Navigate to Home Page.
+          navigate(ROUTES.Home);
+        }, maxDisconnectionDuration);
+
+        openConnectionStatusSnackBar({ isConnected: false, timeoutFunc });
+      };
+
+      // Listen to `offline` event from `window`.
+      window.addEventListener("offline", handleOfflineOnWindow);
+
+      return function() {
+        console.log("Disconnect socket");
+        window.removeEventListener("offline", handleOfflineOnWindow);
+        mySocket.disconnect();
+      }
     };
-
+    
     // Init socket.
-    init();
-
-    // Theme.
-    settingsDispatcher.performTasksRequireSettings();
-
-    // Listen to `offline` event from `window`.
-    window.addEventListener("offline", handleOfflineOnWindow);
-
-    return function() {
-      console.log("Disconnect socket");
-      window.removeEventListener("offline", handleOfflineOnWindow);
-      mySocket.disconnect();
-    }
+    return init();
   }, []);
 
   return (
@@ -129,7 +149,7 @@ function App() {
           },
           [SBName]: {
             type: "snack-bar",
-            position: "top-right",
+            position: "top",
             element: SnackBar
           },
           [CSSBName]: {

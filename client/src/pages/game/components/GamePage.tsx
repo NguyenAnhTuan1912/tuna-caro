@@ -1,11 +1,10 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import GameOffline from './GameOffline';
-import GameOnline from './GameOnline';
+import GameOffline from '../GameOffline';
+import GameOnline from '../GameOnline';
 
 // Import types
-import { TypeOfGame } from './Game.props';
+import { TypeOfGame } from '../Game.props';
 
 /**
  * Use this component to render Game section.

@@ -1,14 +1,18 @@
-import React from 'react'
-
 // Import from components
 import Button from 'src/components/button/Button';
+import Layer from 'src/components/layer/Layer';
 
 // Locally Import
-import { PauseGameLayerProps } from './Game.props';
+import { PauseGameLayerProps } from '../Game.props';
 
+/**
+ * Component renders a pause game layer.
+ * @param props 
+ * @returns 
+ */
 export default function PauseGameLayer(props: PauseGameLayerProps) {
   return (
-    <div className="pause-game-layer flex-box flex-rw ait-center jc-center">
+    <Layer>
       <Button
         isTransparent
         hasBorder={false}
@@ -19,7 +23,11 @@ export default function PauseGameLayer(props: PauseGameLayerProps) {
       >
         <span className="material-symbols-outlined fs-xl txt-clr-background">play_arrow</span>
       </Button>
-      <p className="fs-xl txt-clr-background ms-2">Tạm dừng</p>
-    </div>
+      <p className="fs-xl txt-clr-background ms-2">
+        {
+          props.text ? props.text : "Tạm dừng"
+        }
+      </p>
+    </Layer>
   )
 }

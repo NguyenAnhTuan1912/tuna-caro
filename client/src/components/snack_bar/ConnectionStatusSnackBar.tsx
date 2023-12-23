@@ -6,11 +6,13 @@ import LoadingIndicator from '../loading_indicator/LoadingIndicator';
 
 // Import from layouts
 import SnackBarLayout from 'src/layouts/modal_items/snackbar_layout/SnackBarLayout';
-import CloseButton from 'src/layouts/modal_items/CloseButton';
 import { SnackBarElementRefsType } from 'src/layouts/modal_items/snackbar_layout/SnackbarLayout.props';
 
 type ConnectionStatusSnackBarDataType = {
   isConnected: boolean;
+  timeoutFunc?: number;
+  disconnectedLabel?: string;
+  connectedLabel?: string;
 };
 
 export const name = "myConnectionStatusSnackBar";
@@ -21,6 +23,9 @@ export const name = "myConnectionStatusSnackBar";
  * @returns 
  */
 export function openConnectionStatusSnackBar(data: ConnectionStatusSnackBarDataType) {
+  data.connectedLabel = data.connectedLabel ? data.connectedLabel : "Kết nối lại thành công!";
+  data.disconnectedLabel = data.disconnectedLabel ? data.disconnectedLabel : "Mất kết nối! Đang kết nối lại...";
+
   return openTMI(name, data);
 }
 
@@ -44,6 +49,9 @@ export default function ConnectionStatusSnackBar(props: CustomizedModalItemProps
   React.useEffect(() => {
     const handleOnlineOnWindow  = function() {
       setIsConnected(true);
+
+      // Remove timeout function from `offline` event.
+      if(data.timeoutFunc) clearTimeout(data.timeoutFunc);
 
       // Close snackbar after `duration` second.
       setTimeout(() => {
@@ -79,11 +87,11 @@ export default function ConnectionStatusSnackBar(props: CustomizedModalItemProps
         <div className="csnackbar-body flex-box ait-center px-1">
           {
             isConnected
-              ? <p>Đã kết nối lại</p>
+              ? <p>{data.connectedLabel}</p>
               : (
                 <LoadingIndicator
                   isTextPlaceBeforeIndicator
-                  text="Mất kết nối! Đang kết nối lại..."
+                  text={data.disconnectedLabel}
                 />
               )
           }

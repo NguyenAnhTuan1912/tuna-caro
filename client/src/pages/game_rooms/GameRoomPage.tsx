@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 // Import from classes
@@ -13,13 +13,13 @@ import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import utils
-import { OtherUtils } from 'src/utils/other';
+// import { OtherUtils } from 'src/utils/other';
 
 // Import from components
 import DataTable from 'src/components/data_table/DataTable';
 
 // Import data for testing
-import gameRoomsTestData from 'src/assets/data/game_rooms.json';
+// import gameRoomsTestData from 'src/assets/data/game_rooms.json';
 
 // Locally Import
 import { GameRoomsStateConfigs } from './state/game_rooms';
@@ -33,30 +33,57 @@ import { GameRoomPageProps } from './GameRoomPage.props';
 // Import styles
 import './GameRoom.styles.css';
 
-async function getDataAsync() {
-  await OtherUtils.wait(2000);
-  return gameRoomsTestData.asyncData as Array<GameRoomType>;
-}
-
 /**
  * Component renders a page that contains a list of game rooms in server.
  * @param props 
  * @returns 
  */
 export default function GameRoomPage(props: GameRoomPageProps) {
-  const limit = 5;
-
   const { player } = usePlayer();
   const [ gameRoomsState, gameRoomsStateFns ] = useStateWESSFns(
     GameRoomsStateConfigs.getInitialState(),
     GameRoomsStateConfigs.getStateFns
   );
-
+  
   const navigate = useNavigate();
   const { changeData } = useGlobalData();
+  
+  const limit = 5;
 
-  // Use to set up socket
+  /**
+   * Use this function to get data from a socket event instead of getting from listener directly.
+   */
+  const getGamesAsync = React.useCallback(function(skip: number, limit: number) {
+    // Emit a message to get data.
+    mySocket.emit(
+      MySocket.createMessage(
+        MySocket.EventNames.getGames,
+        undefined,
+        {
+          limit,
+          skip
+        }
+      )
+    );
+
+    return new Promise<Array<GameRoomType>>((res) => {
+      let listener = mySocket.addEventListener(
+        MySocket.EventNames.getGames,
+        GameRoomsSocketEventListeners.getGetGamesListener({
+          getData: function(data) {
+            res(data);
+            // Remove after get data done
+            mySocket.removeEventListener(MySocket.EventNames.getGames, listener);
+          }
+        })
+      );
+    });
+  }, []);
+
+    
+  // Use to set up socket events in this page.
   React.useEffect(() => {
+
     // Emit to get game.
     mySocket.emit(
       MySocket.createMessage(
@@ -73,11 +100,14 @@ export default function GameRoomPage(props: GameRoomPageProps) {
     let getGamesListener = mySocket.addEventListener(
       MySocket.EventNames.getGames,
       GameRoomsSocketEventListeners.getGetGamesListener({
-        stateFns: gameRoomsStateFns
+        getData: function(data) {
+          gameRoomsStateFns.setGames(data);
+
+          // Remove after get data.
+          mySocket.removeEventListener(MySocket.EventNames.getGames, getGamesListener);
+        }
       })
     );
-
-    gameRoomsStateFns.setGames(gameRoomsTestData.data as GameRoomType[]);
 
     /*
       Set up `join_game` listener for player who want to join.
@@ -95,7 +125,6 @@ export default function GameRoomPage(props: GameRoomPageProps) {
     // Unsubscribe events
     return function() {
       mySocket.removeEventListener(MySocket.EventNames.emitGame, joinGameListener);
-      mySocket.removeEventListener(MySocket.EventNames.getGames, getGamesListener);
     }
   }, []);
 
@@ -113,10 +142,7 @@ export default function GameRoomPage(props: GameRoomPageProps) {
             <td><strong>Trạng thái</strong></td>
           </tr>
         )}
-        getDataAsync={async () => {
-          let data = await getDataAsync();
-          return data;
-        }}
+        getDataAsync={getGamesAsync}
         renderRowData={(item, index) => (
           <GameRow
             key={item.id}

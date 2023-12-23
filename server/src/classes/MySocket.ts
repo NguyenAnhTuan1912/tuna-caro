@@ -1,11 +1,14 @@
 import { Server } from "http";
 import { Socket, Server as SocketServer } from "socket.io";
 
-// Import env
+// Import from env
 import { env } from 'env';
 
-// Import classes
+// Import from classes
 import { GameList } from "./GameList";
+
+// Import from object
+import { MyMap } from "objects/MyMap";
 
 // Import from templates
 import { CreateSEListenerWrapperCallback } from "templates/socket_events";
@@ -86,14 +89,21 @@ export class MySocket {
      */
     startNewRound: "start_new_round",
     /**
+     * This event is mean a player connection status to a game. If player connection status is change, send message
+     * to another player.
+     */
+    gameConnectionStatus: "game_connection_status",
+    /**
      * This event is all about player get games in server. When a player create a game, its data will store (fast solution) in
      * server. So if another player go to Game Rooms Page, they will see multiple Game Rooms.
      */
     getGames: "get_games"
   };
+  static MAX_DISCONNECTION_DURATION = 2 * 60 * 1000 // 2 minutes
 
   private _listeners: Array<ListenerInfo> | null;
   private _listenerWrapper: Array<ListenerWrapperInfo> | null;
+  private _dataRemoveCBs: MyMap<string, NodeJS.Timeout>;
 
   // Objects
   private __o__!: SEListenerObjectsType;
@@ -106,7 +116,7 @@ export class MySocket {
         credentials: true
       },
       connectionStateRecovery: {
-        maxDisconnectionDuration: 2 * 60 * 1000 // 2 minutes
+        maxDisconnectionDuration: MySocket.MAX_DISCONNECTION_DURATION
       }
     });
     this.__o__ = {
@@ -114,6 +124,7 @@ export class MySocket {
     };
     this._listeners = [];
     this._listenerWrapper = [];
+    this._dataRemoveCBs = new MyMap();
 
     // Init
     setTimeout(() => this._init(), 0);
@@ -140,25 +151,104 @@ export class MySocket {
    * Use this method to basically init configurations for socket.
    */
   private _init() {
+    let that = this;
+
     this._io.on("connection", (socket) => {
       console.log("Game in list: ", this.__o__.gameList);
       
       if(socket.recovered) {
+        let [socketId, gameId] = [...socket.rooms];
+        let game = that.__o__.gameList.getGame(gameId);
+        let player = game?.getPlayerBySocketId(socketId);
+
         console.log("Old Connection");
         console.log("SocketID: ", socket.id);
         console.log("Rooms: ", socket.rooms);
-      } else {
-        console.log("New Connection");
-        console.log("SocketID: ", socket.id);
-        console.log("Rooms: ", socket.rooms);
-      }
+        
+        // Cancel data removing by remove the `remove data` callback from `_dataRemoveCBs`.
+        clearTimeout(that._dataRemoveCBs.get(socket.id));
+        
+        // Delelte `remove data` callback.
+        that._dataRemoveCBs.delete(socket.id);
 
+        // Emit a message to another player if player reconnected and in game.
+        if(gameId)
+          socket
+          .broadcast
+          .to(gameId)
+          .emit(
+            MySocket.EventNames.gameConnectionStatus,
+            MySocket.createMessage(
+              MySocket.EventNames.gameConnectionStatus,
+              "Reconnected",
+              {
+                isConnected: true,
+                playerName: player?.name
+              }
+            )
+          );
+      };
       // Set up `disconnect` event for socket to handle some tasks for individual socket.
       socket.on("disconnect", () => {
-        console.log("Disconnect");
+        console.log("Disconnected");
+        socket.removeAllListeners();
+      });
+
+      // Set up `disconnecting` event for socket to handle some tasks for individual socket.
+      socket.on("disconnecting", () => {
+        let [socketId, gameId] = [...socket.rooms];
+        let game = that.__o__.gameList.getGame(gameId);
+        let player = game?.getPlayerBySocketId(socketId);
+
+        console.log("Disconnecting...");
         console.log("SocketID: ", socket.id);
         console.log("Rooms: ", socket.rooms);
-        socket.removeAllListeners();
+
+        // Create the `remove data` callback.
+        let cb = setTimeout(function() {
+          // Clear all the data here.
+          /*
+            Currently, the app has only list of game data is managed
+            directly by Socket.
+          */
+          /*
+            If socket connection has the second room is a id of game,
+            this game will be delete and the server will send a message
+            to client app and let it know that the game was deleted and
+            client app must navigate to home.
+
+            But there isn't id of game, that's mean player doesn't create game.
+            So nothing is clear.
+          */
+          if(gameId && that.__o__.gameList.getGame(gameId)) {
+            // Remove game.
+            that.__o__.gameList.removeGame(gameId);
+
+            // (Client App have to navigate to Home Page) Send message.
+          }
+
+          // Other tasks.
+        }, MySocket.MAX_DISCONNECTION_DURATION);
+
+        // Add the `remove data` callback to `_dataRemoveCBs`
+        that._dataRemoveCBs.set(socket.id, cb);
+
+        // Emit a message to another player if player disconnect and in game.
+        if(gameId)
+          socket
+          .broadcast
+          .to(gameId)
+          .emit(
+            MySocket.EventNames.gameConnectionStatus,
+            MySocket.createMessage(
+              MySocket.EventNames.gameConnectionStatus,
+              "Disconnected",
+              {
+                isConnected: false,
+                playerName: player?.name
+              }
+            )
+          );
       });
 
       // Set up `initial` event for socket.
@@ -167,22 +257,25 @@ export class MySocket {
           MySocket.EventNames.initial,
           MySocket.createMessage(
             MySocket.EventNames.initial,
-            "Hello from Server app of caro game.",
+            "Welcome to caro game by Tuna Nguyen",
             {
-              socketId: socket.id
+              socketId: socket.id,
+              configParams: {
+                maxDisconnectionDuration: MySocket.MAX_DISCONNECTION_DURATION
+              }
             }
           )
         );
       });
 
       // Set up listeners (including listener wrappers)
-      this._listeners?.forEach((data) => {
+      that._listeners?.forEach((data) => {
         socket.on(data.name, (...args) => {
           data.fn(socket, args);
         });
       });
 
-      this._listenerWrapper?.forEach((data) => {
+      that._listenerWrapper?.forEach((data) => {
         let listener = data.fn(socket);
         socket.on(data.name, listener);
       });

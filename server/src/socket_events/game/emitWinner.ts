@@ -19,7 +19,7 @@ interface EmitWinnerMessageDataType {
 export const EmitWinnerSELWrapperInfo = {
   name: MySocket.EventNames.emitWinner,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
-    return function(message: Message<EmitWinnerMessageDataType>) {
+    return function __EMITWINNER__(message: Message<EmitWinnerMessageDataType>) {
       let data = message.data!;
 
       // Send message to opposite player.

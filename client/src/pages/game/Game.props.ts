@@ -103,5 +103,6 @@ export type EmitWinnerMessageDataType =
   }
 
 export type PauseGameLayerProps = {
-  canResume?: boolean
+  canResume?: boolean;
+  text?: string;
 }

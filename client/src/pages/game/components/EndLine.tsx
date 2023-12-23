@@ -1,5 +1,3 @@
-import React from 'react'
-
 // Import classes
 import { Game, Coordinate } from 'src/classes/Game';
 

@@ -6,7 +6,7 @@ import { Coordinate, MarkType, ResultType } from "classes/Game";
 import { createSEListenerWrapper } from "templates/socket_events";
 
 /**
- * Provide a listener to listen event `emit_winner`. Host want to start a new round, they will send a message
+ * Provide a listener to listen event `start_new_round`. Host want to start a new round, they will send a message
  * to server, and this listener will handle it and send message to opposite player.
  */
 export const StartNewRoundSELWrapperInfo = {

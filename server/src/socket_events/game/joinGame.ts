@@ -17,7 +17,7 @@ interface JoinGameMessageDataType {
 export const JoinGameSELWrapperInfo = {
   name: MySocket.EventNames.joinGame,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
-    return async function(message: Message<JoinGameMessageDataType>) {
+    return async function __JOINGAME__(message: Message<JoinGameMessageDataType>) {
       try {
         const { player, game } = message.data!;
         const addedGame = o.gameList.getGame(game.id)!;

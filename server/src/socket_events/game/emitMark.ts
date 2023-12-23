@@ -18,7 +18,7 @@ interface EmitMarkMessageDataType {
 export const EmitMarkSELWrapperInfo = {
   name: MySocket.EventNames.emitMark,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
-    return function(message: Message<EmitMarkMessageDataType>) {
+    return function __EMITMARK__(message: Message<EmitMarkMessageDataType>) {
       let data = message.data!;
       let game = o.gameList.getGame(data.gameId)!;
 

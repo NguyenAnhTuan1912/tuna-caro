@@ -76,7 +76,6 @@ export default function LazyList<T>(props: LazyListProps<T>) {
   const listRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    console.log("Render LazyList Done");
     // Call API to get data for the first time.
     props
     .getListDataAsync(state.skip)

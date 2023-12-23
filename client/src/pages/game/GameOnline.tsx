@@ -3,16 +3,17 @@
  * Its responsibility is handle online game:
  * - Receive and set up some information about game and players.
  * - Handle socket events (send and receive message).
- */
+*/
+import { useNavigate } from 'react-router-dom';
 
 // Import from apis
 import { MySocket, mySocket } from 'src/apis/socket';
 
-// Import hooks
+// Import from hooks
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
-// Import components
+// Import from components
 import GameCore from './GameCore';
 
 // Locally Import
@@ -21,7 +22,6 @@ import { GameOnlineSocketEvents } from './socket_events/game_online';
 // Import types
 import { EmitMarkMessageDataType, EmitWinnerMessageDataType } from './Game.props';
 
-//
 /**
  * This component depend on `GamePage` to render an online game.
  * @returns 
@@ -37,6 +37,7 @@ export default function GameOnline() {
   */
   const { player } = usePlayer();
   const { getData } = useGlobalData();
+  const navigate = useNavigate();
   // Game game data here.
   /*
     Game data can be:
@@ -48,6 +49,7 @@ export default function GameOnline() {
   return (
     <GameCore
       useEffectCB={function(args) {
+        // Set up `emit_mark` listener.
         let emitMarkListener = mySocket.addEventListener(
           MySocket.EventNames.emitMark,
           GameOnlineSocketEvents.getEmitMarkListener({
@@ -55,7 +57,7 @@ export default function GameOnline() {
           })
         );
     
-        // Set up `join_game` listener for host.
+        // Set up `join_game` listener.
         let joinGameListener = mySocket.addEventListener(
           MySocket.EventNames.joinGame,
           GameOnlineSocketEvents.getJoinGameListener({
@@ -63,11 +65,12 @@ export default function GameOnline() {
           })
         );
     
-        // Set up `leave_game` listener for all.
+        // Set up `leave_game` listener.
         let leaveGameListener = mySocket.addEventListener(
           MySocket.EventNames.leaveGame,
           GameOnlineSocketEvents.getLeaveGameListener({
-            useEffectArgs: args
+            useEffectArgs: args,
+            navigate: navigate
           })
         );
 
@@ -77,19 +80,29 @@ export default function GameOnline() {
           GameOnlineSocketEvents.getEmitWinnerListener({
             useEffectArgs: args
           })
-        )
+        );
 
-        // Set up `start_new_round` for all.
+        // Set up `lost_game_connection`.
+        let gameConnectionStatusListener = mySocket.addEventListener(
+          MySocket.EventNames.gameConnectionStatus,
+          GameOnlineSocketEvents.getGameConnectionStatusListener({
+            connectedLabel: "Người chơi đã kết nối lại.",
+            disconnectedLabel: "Người chơi đã mất kết nối."
+          })
+        );
+
+        // Set up `start_new_round`.
         let startNewRoundListener = mySocket.addEventListener(
           MySocket.EventNames.startNewRound,
           GameOnlineSocketEvents.getStartNewRoundListener({
             useEffectArgs: args
           })
-        )
+        );
     
         return function() {
+          console.log("Leave the game.");
           // Leave the game
-          mySocket.emit(
+          mySocket.emitVolatilely(
             MySocket.EventNames.leaveGame,
             MySocket.createMessage(
               MySocket.EventNames.leaveGame,
@@ -106,7 +119,10 @@ export default function GameOnline() {
           mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
           mySocket.removeEventListener(MySocket.EventNames.leaveGame, leaveGameListener);
           mySocket.removeEventListener(MySocket.EventNames.emitWinner, emitWinnerListener);
+          mySocket.removeEventListener(MySocket.EventNames.emitWinner, gameConnectionStatusListener);
           mySocket.removeEventListener(MySocket.EventNames.startNewRound, startNewRoundListener);
+
+          // Remove another event listener
         };
       }}
 
@@ -121,7 +137,16 @@ export default function GameOnline() {
         ));
       }}
 
-      onAddMark={function (x, y, t, currentTurn, winner) {
+      /*
+        TO DO: When player A click/press the table, the information of mark must be
+        transfer to player B to sync with the game state of player A.
+
+        There 2 ways:
+        - If game has winner, so update the game state of player A, that's mean game in player A is stopped. Then
+        emit information of winner to player B, so game state of player B will be updated.
+        - If not, game will be continued.
+      */
+      onAddMark={function (x, y, _, currentTurn, winner) {
         // If the game has winner, emit winner with new mark.
         if(winner) {
           mySocket.emit<EmitWinnerMessageDataType>(MySocket.createMessage(
@@ -152,13 +177,14 @@ export default function GameOnline() {
         }
       }}
 
+      // Pass initial data for game.
       game={data.game!}
       /*
         Handle main player. There are 2 cases:
         - Main player created the game. That fine, because the data dont need to modify before create game.
         - Main player maybe the one who join the game. So data of them maybe different than default.
 
-        Either case 1 or case 2, the data of player in game object must be find out to merge with `mainPlayer`.
+        Either case 1 or case 2, the data of player in game object must be found out to merge with `mainPlayer`.
       */
       mainPlayer={(function() {
         let game = data.game!;

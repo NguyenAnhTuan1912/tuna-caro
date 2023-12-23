@@ -46,6 +46,25 @@ type CharacterPickerType = {
   setChoice: (character: CharacterType) => void;
 };
 
+async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
+  await OtherUtils.wait(1000);
+  let N = charactersData.data.length < to ? charactersData.data.length : to;
+  let data = [];
+
+  console.log("From, to: ", from, to);
+
+  for(let i = from; i < N; i++) {
+    data.push(charactersData.data[i]);
+  };
+
+  return data;
+}
+
+/**
+ * Component renders a button that player can click/press to choose character.
+ * @param props 
+ * @returns 
+ */
 function CharacterPicker(props: CharacterPickerType) {
   let extendClassName = "character-img circle";
   if(props.data._id === props.choicedId) extendClassName += " choice";
@@ -62,27 +81,13 @@ function CharacterPicker(props: CharacterPickerType) {
   )
 }
 
-async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
-  await OtherUtils.wait(1000);
-  let N = charactersData.data.length < to ? charactersData.data.length : to;
-  let data = [];
-
-  console.log("From, to: ", from, to);
-
-  for(let i = from; i < N; i++) {
-    data.push(charactersData.data[i]);
-  };
-
-  return data;
-}
-
 /**
  * Component renders a dialog that allows user to pick a character (image).
  * @param props 
  * @returns 
  */
 export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
-  const [data, setDataFns] = useStateWESSFns(
+  const [state, setStateFns] = useStateWESSFns(
     CharacterPickerDialogStateConfigs.getInitialState(),
     CharacterPickerDialogStateConfigs.getStateFns
   );
@@ -94,13 +99,13 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
     // Call API to get characters from server.
     getCharactersAsync(0, 10)
     .then(payload => {
-      setDataFns.addCharacters(payload);
+      setStateFns.addCharacters(payload);
     })
   };
 
   React.useEffect(() => {
     return function() {
-      setDataFns.clearCharacter();
+      setStateFns.clearCharacter();
     }
   }, []);
 
@@ -140,8 +145,8 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
               <CharacterPicker
                 key={item._id}
                 data={item}
-                setChoice={setDataFns.setChoice}
-                choicedId={data.choice._id}
+                setChoice={setStateFns.setChoice}
+                choicedId={state.choice._id}
               />
             )}
           />
@@ -149,12 +154,12 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
         <div className="flex-box jc-flex-end ait-center">
           <div className="me-2">
             <span className="fw-bold me-1">Bạn chọn:</span>
-            <span>{data.choice.name.toUpperCase()}</span>
+            <span>{state.choice.name.toUpperCase()}</span>
           </div>
           <Button
             onClick={() => {
               // Set img for player.
-              setPlayer({ img: data.choice.img });
+              setPlayer({ img: state.choice.img });
               // Then close the dialog.
               props.close({ isAgree: true });
             }}

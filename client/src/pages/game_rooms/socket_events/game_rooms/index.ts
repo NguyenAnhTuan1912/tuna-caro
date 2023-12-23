@@ -18,13 +18,13 @@ type ListenerArgsType = {
   changeData?: ChangeDataFnType
   navigate?: NavigateFunction
 };
-type GetGamesListenerArgsType = ListenerArgsType;
+type GetGamesListenerArgsType = { getData: (data: any) => void };
 type JoinGameListenerArgsType = ListenerArgsType;
 
 function getGetGamesListener(args: GetGamesListenerArgsType) {
   return function getGamesListener(m: Message<Array<GameRoomType>>) {
     console.log("Message from `getGames`: ", m);
-    args.stateFns!.setGames(m.data!);
+    args.getData(m.data!);
   }
 }
 

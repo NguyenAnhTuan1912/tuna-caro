@@ -10,14 +10,14 @@ import { useSFX } from 'src/hooks/useSFX';
 
 // Import components
 import Grid from 'src/components/grid/Grid';
-import ScoreBoard from './ScoreBoard';
+import ScoreBoard from './components/ScoreBoard';
 
 // Locally Import
 // Import functions.
 import { GameCoreStateConfigs } from './state/game_core';
 
 // Import components
-import PauseGameLayer from './PauseGameLayer';
+import PauseGameLayer from './components/PauseGameLayer';
 
 // Import types
 import { GameCoreProps } from './Game.props';
@@ -72,7 +72,6 @@ export default function GameCore(props: GameCoreProps) {
       // Add to game and update state as the same time.
       gameStateFns.appendPlayer("first", firstPlayer);
       gameStateFns.appendPlayer("second", secondPlayer);
-      gameStateFns.pause(false);
     } else {
       /*
         That mean the game has host => is online game.
@@ -105,24 +104,51 @@ export default function GameCore(props: GameCoreProps) {
 
   return (
     <>
-      { gameState.game.status === "Waiting" && <PauseGameLayer /> }
+      {
+        /*
+          Render a Layer for pausing game.
+
+          Because the status of game is `Waiting`,
+          so the `text` of PauseGameLayer must be "Đang chờ người chơi khác..." or "Waiting for another player...".
+        */ 
+        gameState.game.status === "Waiting"
+        && (
+          <PauseGameLayer
+            text="Đang chờ người chơi khác..."
+          />
+        )
+      }
+      {
+        /*
+          Render a Layer for revealing winner.
+
+          If game has winner, so a layer is rendered to reveal the name of winner.
+        */
+        Game.hasWinner(gameState.game) && (
+          <></>
+        )
+      }
       <div ref={ref => elementRefs.current.page = ref} className={"game-page" + (gameState.game.currentTurn === "O" ? " O" : " X")}>
         <Grid
           height={"100%"}
           emitCoordinate={(x, y, t) => {
+            // Status Checking
             // Check if game status is `Waiting`, then don't let player hit table.
             if(gameState.game.status === "Waiting") return;
 
-            // Check if main player can mark, else terminate.
+            // Turn Checking
+            // Check if main player can mark, then prevent mark. Else continute.
             if(
               props.mainPlayer
               && props.mainPlayer.mark !== gameState.game.currentTurn
             ) return;
 
-            // Check if the game has winner, else terminate.
+            // Winner Checking
+            // Check if the game has winner, then prevent mark. Else continute.
             if(hasWinner) return;
 
-            // Check if this square has mark, else terminate.
+            // Existed Mark Checking
+            // Check if this square has mark, then prevent mark. Else continute.
             if(Game.hasMarkIn(gameState.game, x, y)) return;
 
             // Play sfx

@@ -9,6 +9,7 @@ function getInitialState<T>(props: DataTableProps<T>, maxRows = 5) {
     hasInitialData: false,
     isFetching: false,
     currentPage: 1,
+    limit: maxRows,
     data: props.data,
     totalPages: Math.ceil(props.data.length / maxRows)
   }
@@ -31,13 +32,13 @@ function getStateFns<T>(
         // Prevent users increase the number of pages.
         function(data, _state) {
           // If the comopnent can get data asynchronously, the set `isFetching` to true and wait...
-          if(props.getDataAsync && data > _state.totalPages) {
+          if(props.getDataAsync && data >= _state.totalPages) {
             // Change `isFetching` to false.
             changeState("isFetching", function() { return true });
 
             // Fetch data.
             props
-              .getDataAsync()
+              .getDataAsync(_state.limit, _state.data.length)
               .then(payload => {
                 // Change `isFetching` to true.
                 changeState("isFetching", function() { return false });
@@ -56,7 +57,7 @@ function getStateFns<T>(
               })
           }
 
-          return data < 1 || data > _state.totalPages;
+          return data < 1 || data >= _state.totalPages;
         }
       );
     },

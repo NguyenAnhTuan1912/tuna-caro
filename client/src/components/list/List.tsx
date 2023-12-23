@@ -32,7 +32,7 @@ const List = React.forwardRef(function(props, ref) {
   // Sync the outer ref `ref` with inner ref `elementRefs.current.list`.
   // React.useImperativeHandle(ref, () => elementRefs.current.list!, []);
 
-  return React.useMemo(() => (
+  return (
     <div
       className="list"
       style={{
@@ -56,7 +56,7 @@ const List = React.forwardRef(function(props, ref) {
         }
       </div>
     </div>
-  ), [props.data]);
+  )
 }) as <T>(p: ListProps<T> & { ref?: React.ForwardedRef<HTMLDivElement> }) => React.ReactElement;
 
 export default List;

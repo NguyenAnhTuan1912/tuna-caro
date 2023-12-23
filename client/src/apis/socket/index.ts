@@ -3,6 +3,9 @@ import { io, Socket } from "socket.io-client";
 // Import constant
 import { API_ROOT } from 'src/utils/constant';
 
+// Import from types
+import { InitialEventDataType } from "src/types/socket.types";
+
 // Private instance
 let __private__: MySocket | null = null;
 
@@ -25,37 +28,42 @@ export class MySocket {
      */
     initial: "initial",
     /**
-     * This event is all about create game and emit it to server. Then
+     * This event is mean create game and emit it to server. Then
      * get it back with `id`.
      */
     emitGame: "emit_game",
     /**
-     * This event is all about when a player mark to table, this will emit the message and
+     * This event is mean when a player mark to table, this will emit the message and
      * listen to this event, then opposite player can catch the change.
      */
     emitMark: "emit_mark",
     /**
-     * This event is all about a player join a game, this will emit the message and listen to this event.
+     * This event is mean a player join a game, this will emit the message and listen to this event.
      * So a player join a game, and opposite player will know about it.
      */
     joinGame: "join_game",
     /**
-     * This event is all about a player leave the game, this will emit the message and listen to this event.
+     * This event is mean a player leave the game, this will emit the message and listen to this event.
      * If a player leave the game, opposite player will know and app will calculate and re-render to sync with state.
      */
     leaveGame: "leave_game",
     /**
-     * This event is all about the game has player. When player hit the table and win the game, this event will be fired.
+     * This event is mean the game has player. When player hit the table and win the game, this event will be fired.
      * Sending new information of mark and winner.
      */
     emitWinner: "emit_winner",
     /**
-     * This event is all about the game move to new round. When the round has winner, host will be click the start new round
+     * This event is mean the game move to new round. When the round has winner, host will be click the start new round
      * in the right bottom corner. This event will send the message to another player to tell them start new round.
      */
     startNewRound: "start_new_round",
     /**
-     * This event is all about player get games in server. When a player create a game, its data will store (fast solution) in
+     * This event is mean a player connection status to a game. If player connection status is change, send message
+     * to another player.
+     */
+    gameConnectionStatus: "game_connection_status",
+    /**
+     * This event is mean player get games in server. When a player create a game, its data will store (fast solution) in
      * server. So if another player go to Game Rooms Page, they will see multiple Game Rooms.
      */
     getGames: "get_games"
@@ -88,9 +96,10 @@ export class MySocket {
    * Use this method to init socket.
    * @param cb 
    */
-  init(cb: (message: Message<{ socketId: string }>) => void) {
+  init(cb: (message: Message<InitialEventDataType>) => void) {
     if(!MySocket._canInit) return;
-    this._socket.on(MySocket.EventNames.initial, (message: Message<{ socketId: string }>) => {
+    // Set up initial event to do something at first.
+    this._socket.on(MySocket.EventNames.initial, (message: Message<InitialEventDataType>) => {
       cb(message);
     });
     MySocket._canInit = false;
@@ -132,7 +141,7 @@ export class MySocket {
   }
 
   /**
-   * Use this method to send message to `name` event with a `message`.
+   * Use this method to send message to `name` event with a `message`. Neither the socket is connected nor isn't connected.
    * @param name 
    * @param message 
    */
@@ -144,6 +153,23 @@ export class MySocket {
       return;
     } else {
       this._socket.emit(_?.eventName!, _);
+    }
+  }
+
+  /**
+   * Use this method to send message to `name` event with a `message` when the `socket.connected` is true, if not,
+   * socket will terminate message.
+   * @param name 
+   * @param message 
+   */
+  emitVolatilely<T>(message?: Message<T>): void;
+  emitVolatilely<T>(name?: string | Message<T>, message?: Message<T>): void;
+  emitVolatilely<T>(_?: string | Message<T>, message?: Message<T>) {
+    if(typeof _ === "string") {
+      this._socket.volatile.emit(_, message);
+      return;
+    } else {
+      this._socket.volatile.emit(_?.eventName!, _);
     }
   }
 }

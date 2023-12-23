@@ -144,6 +144,16 @@ export class Game {
   }
 
   /**
+   * Use this method to get player by socket id.
+   * @param socketId 
+   */
+  getPlayerBySocketId(socketId: string) {
+    let players = this.getPlayers(true) as Array<Player>;
+
+    return players.find(player => { if(player) return player.socketId === socketId });
+  }
+
+  /**
    * Use this method to get the player whose `id` does not match with `playerId`.
    * @param playerId 
    */
@@ -174,9 +184,9 @@ export class Game {
     let target = "second";
 
     // Find
-    Game.iteratePlayers(this, (player, index) => {
-      if(player && player.id === playerId) target = index === 0 ? "first" : "second"
-    });
+    for(let key in this._players) {
+      if(this._players[key]?.id === playerId) target = key;
+    }
 
     return target;
   }
@@ -242,13 +252,7 @@ export class Game {
   leaveGame(playerId: string) {
     if(!this._players) return;
     let onum = this.getPlayerONumById(playerId);
-    // Get non host player (this will check `is host in this game?`)
-    let nonHostPlayer = this.getNonHostPlayer()!;
-
-    if(this.host.id === playerId && nonHostPlayer) {
-      this.host = nonHostPlayer;
-    }
-
+    console.log("Remove index: ", onum);
     // Delete this player.
     delete this._players[onum];
   }

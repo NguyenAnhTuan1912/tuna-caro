@@ -17,7 +17,7 @@ interface GetGamesMessageDataType {
 export const GetGamesSELWrapperInfo = {
   name: MySocket.EventNames.getGames,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
-    return function(message: Message<GetGamesMessageDataType>) {
+    return function __GETGAMES__(message: Message<GetGamesMessageDataType>) {
       let { skip = 0, limit = 5 } = message.data!;
       let from = skip;
       let to = skip + limit;
@@ -32,7 +32,7 @@ export const GetGamesSELWrapperInfo = {
             status: game?.status
           } as GameRoomType
         }
-      })
+      });
 
       // Send message to opposite player.
       socket

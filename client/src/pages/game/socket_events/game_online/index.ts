@@ -1,9 +1,14 @@
+import { NavigateFunction } from "react-router-dom";
+
 // Import from classes
 import { Game } from "src/classes/Game";
 import { PlayerType } from "src/classes/Player";
 
 // Import from `apis/socket`
 import { Message } from "src/apis/socket";
+
+// Import from utils
+import { ROUTES } from "src/utils/constant";
 
 // Import from components
 import { openNotifiableSnackBar } from "src/components/snack_bar/SnackBar";
@@ -21,8 +26,19 @@ type ListenerArgsType = {
 type EmitMarkListenerArgsType = ListenerArgsType;
 type EmitWinnerListener = ListenerArgsType;
 type JoinGameListenerArgsType = ListenerArgsType;
-type LeaveGameListenerArgsType = ListenerArgsType;
+type LeaveGameListenerArgsType = ListenerArgsType & {
+  navigate: NavigateFunction;
+};
+type GameConnectionStatusArgsType = {
+  connectedLabel: string;
+  disconnectedLabel: string;
+};
 type StartNewRoundListenerArgsType = ListenerArgsType;
+
+type GameConnectionStatusMessageDataType = { 
+  isConnected: boolean;
+  playerName: string;
+}
 
 function getEmitMarkListener(args: EmitMarkListenerArgsType) {
   return function emitMarkListener(m: Message<EmitMarkMessageDataType>) {
@@ -51,16 +67,36 @@ function getJoinGameListener(args: JoinGameListenerArgsType) {
     // Add player to game.
     // Because first player always "X", so the second will be "O".
     args.useEffectArgs.appendPlayer("second", player);
-  } 
+  }
 }
 
 function getLeaveGameListener(args: LeaveGameListenerArgsType) {
-  return function leaveGameListener(m: Message<{ playerId: string }>) {
+  return function leaveGameListener(m: Message<{ playerId: string, isHostLeaved: boolean }>) {
     // Announce to player.
     openNotifiableSnackBar(m.text!);
 
+    // If player leaves game is host. So the game will be removed from list in server.
+    if(m.data?.isHostLeaved) {
+      args.navigate(ROUTES.Home);
+      return;
+    }
+
     // When receive a message that player is leave the game, remove them from game.
     args.useEffectArgs.removePlayer(m.data?.playerId!);
+  }
+}
+
+function getGameConnectionStatusListener(args: GameConnectionStatusArgsType) {
+  return function gameConnectionStastusListener(m: Message<GameConnectionStatusMessageDataType>) {
+    let data = m.data!;
+    if(data.isConnected) {
+      // Show a snackbar.
+      openNotifiableSnackBar(data.playerName + " đã kết nối lại.");
+    }
+    else {
+      // Show a snackbar.
+      openNotifiableSnackBar(data.playerName + " đã mất kết nối.");
+    }
   }
 }
 
@@ -75,5 +111,6 @@ export const GameOnlineSocketEvents = {
   getEmitWinnerListener,
   getJoinGameListener,
   getLeaveGameListener,
-  getStartNewRoundListener
+  getStartNewRoundListener,
+  getGameConnectionStatusListener
 };

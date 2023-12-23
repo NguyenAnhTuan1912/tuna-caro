@@ -10,8 +10,8 @@ import { PlayerType } from "src/classes/Player";
 import { ChangeStateFnType } from "src/hooks/useStateWESSFns";
 
 // Import components.
-import Mark from "../../Mark";
-import EndLine from "../../EndLine";
+import Mark from "../../components/Mark";
+import EndLine from "../../components/EndLine";
 
 // Import types.
 import { GameCoreProps } from "../../Game.props";
@@ -121,7 +121,7 @@ function getStateFns(
         
         // If game has 2 players, then change the status.
         if(Game.getPlayer(game, "first") && Game.getPlayer(game, "second")) {
-          game.status = "Playing";
+          Game.resume(game);
         }
 
         return game;

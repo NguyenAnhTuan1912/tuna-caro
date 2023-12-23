@@ -11,7 +11,7 @@ import { CharacterType } from 'src/types/character.types';
  * @returns 
  */
 async function getRandomIDAsync(): Promise<HTTPResponse<{ id: string }>> {
-  const response = await fetch(API_URL);
+  const response = await fetch(API_ROOT);
   return response.json();
 }
 

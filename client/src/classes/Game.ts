@@ -618,7 +618,7 @@ export class Game {
 
     // Always init for game.
     Player.initForGame(player);
-
+    
     game._players[key] = player;
   }
 
@@ -883,18 +883,32 @@ export class Game {
   }
 
   /**
+   * Use this static method to get winner's information from `game`.
+   * @param game 
+   * @returns 
+   */
+  static getWinner(game: GameType) {
+    if(!game._players) return undefined;
+
+    let result = (Game.getPlayers(game, true) as Array<PlayerType>).find(player => {
+      if(player) return player.isWinner;
+      return false;
+    });
+
+    return result;
+  }
+
+  /**
    * Use this static method to check "Is game complete?" or "Has winner?"
    * @param game 
    * @returns 
    */
   static hasWinner(game: GameType) {
     if(!game._players) return false;
-    let result = (Game.getPlayers(game, true) as Array<PlayerType>).some(player => {
-      if(player) return player.isWinner;
-      return false;
-    });
 
-    return result;
+    let result = Game.getWinner(game);
+    
+    return !!(result);
   }
 
   /**

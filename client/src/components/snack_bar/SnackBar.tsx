@@ -13,7 +13,7 @@ export const name = "mySnackBar";
 
 interface SnackBarTransferedDataType {
   closeButtons: Array<CloseButtonPropsType>;
-  body: () => JSX.Element | JSX.Element | string;
+  body: (() => JSX.Element | string) | JSX.Element | string;
 }
 
 /*
@@ -27,9 +27,9 @@ interface SnackBarTransferedDataType {
  * @param data 
  * @returns 
  */
-export function openNotifiableSnackBar(message: string) {
+export function openNotifiableSnackBar(body: (() => JSX.Element | string) | JSX.Element | string) {
   return openTMI(name, {
-    body: message,
+    body,
     closeButtons: [
       {
         icon: "close",

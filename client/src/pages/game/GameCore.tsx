@@ -11,6 +11,7 @@ import { useSFX } from 'src/hooks/useSFX';
 // Import components
 import Grid from 'src/components/grid/Grid';
 import ScoreBoard from './components/ScoreBoard';
+import Button from 'src/components/button/Button';
 
 // Locally Import
 // Import functions.
@@ -18,6 +19,7 @@ import { GameCoreStateConfigs } from './state/game_core';
 
 // Import components
 import PauseGameLayer from './components/PauseGameLayer';
+import WinnerLayer from './components/WinnerLayer';
 
 // Import types
 import { GameCoreProps } from './Game.props';
@@ -35,7 +37,7 @@ interface GamePageElements {
  * @returns 
  */
 export default function GameCore(props: GameCoreProps) {
-  const [gameState, gameStateFns] = useStateWESSFns(
+  const [state, stateFns] = useStateWESSFns(
     GameCoreStateConfigs.getInitialState(props.game.id!, props.game.name!, props.game.status === "Waiting"),
     function(changeState) {
       return GameCoreStateConfigs.getStateFns(changeState, props)
@@ -48,7 +50,8 @@ export default function GameCore(props: GameCoreProps) {
   });
 
   // Some logic
-  const hasWinner = Game.hasWinner(gameState.game);
+  const winner = Game.getWinner(state.game);
+  const hasWinner = !!(winner);
   const canResetBtnShown = hasWinner && (!props.host
     ? true
     : props.host.id === props.mainPlayer!.id
@@ -70,8 +73,8 @@ export default function GameCore(props: GameCoreProps) {
       secondPlayer.mark = "O";
 
       // Add to game and update state as the same time.
-      gameStateFns.appendPlayer("first", firstPlayer);
-      gameStateFns.appendPlayer("second", secondPlayer);
+      stateFns.appendPlayer("first", firstPlayer);
+      stateFns.appendPlayer("second", secondPlayer);
     } else {
       /*
         That mean the game has host => is online game.
@@ -85,20 +88,20 @@ export default function GameCore(props: GameCoreProps) {
       if(props.game._players && props.game._players["second"]) secondPlayer = props.game._players["second"];
 
       // Add player to the game and prepare to update state.
-      gameStateFns.appendPlayer("first", firstPlayer);
+      stateFns.appendPlayer("first", firstPlayer);
       if(secondPlayer) {
-        gameStateFns.appendPlayer("second", secondPlayer);
+        stateFns.appendPlayer("second", secondPlayer);
 
         // Resume game
-        gameStateFns.pause(false);
+        stateFns.pause(false);
       };
 
       // Set host and update state.
-      gameStateFns.setHost(firstPlayer);
+      stateFns.setHost(firstPlayer);
     }
 
     if(props.useEffectCB) {
-      return props.useEffectCB(gameStateFns);
+      return props.useEffectCB(stateFns);
     }
   }, []);
 
@@ -111,7 +114,7 @@ export default function GameCore(props: GameCoreProps) {
           Because the status of game is `Waiting`,
           so the `text` of PauseGameLayer must be "Đang chờ người chơi khác..." or "Waiting for another player...".
         */ 
-        gameState.game.status === "Waiting"
+        state.game.status === "Waiting"
         && (
           <PauseGameLayer
             text="Đang chờ người chơi khác..."
@@ -124,23 +127,38 @@ export default function GameCore(props: GameCoreProps) {
 
           If game has winner, so a layer is rendered to reveal the name of winner.
         */
-        Game.hasWinner(gameState.game) && (
-          <></>
-        )
+        // hasWinner && (
+        //   <WinnerLayer
+        //     winner={winner}
+        //     button={
+        //       canResetBtnShown ? (
+        //         <Button
+        //           onClick={() => {
+        //             if(props.onResetClick) props.onResetClick();
+        //             stateFns.startNewRound();
+        //           }}
+        //         >
+        //           <span className="material-symbols-outlined me-2">restart_alt</span>
+        //           Chơi lại
+        //         </Button>
+        //       ) : undefined
+        //     }
+        //   />
+        // )
       }
-      <div ref={ref => elementRefs.current.page = ref} className={"game-page" + (gameState.game.currentTurn === "O" ? " O" : " X")}>
+      <div ref={ref => elementRefs.current.page = ref} className={"game-page" + (state.game.currentTurn === "O" ? " O" : " X")}>
         <Grid
           height={"100%"}
           emitCoordinate={(x, y, t) => {
             // Status Checking
             // Check if game status is `Waiting`, then don't let player hit table.
-            if(gameState.game.status === "Waiting") return;
+            if(state.game.status === "Waiting") return;
 
             // Turn Checking
             // Check if main player can mark, then prevent mark. Else continute.
             if(
               props.mainPlayer
-              && props.mainPlayer.mark !== gameState.game.currentTurn
+              && props.mainPlayer.mark !== state.game.currentTurn
             ) return;
 
             // Winner Checking
@@ -149,17 +167,17 @@ export default function GameCore(props: GameCoreProps) {
 
             // Existed Mark Checking
             // Check if this square has mark, then prevent mark. Else continute.
-            if(Game.hasMarkIn(gameState.game, x, y)) return;
+            if(Game.hasMarkIn(state.game, x, y)) return;
 
             // Play sfx
             sfx.play("hitTableSound");
 
             // If pass all the condition (except check square), add new mark.
-            gameStateFns.addMark(x, y, t, undefined, true);
+            stateFns.addMark(x, y, t, undefined, true);
           }}
 
           renderSVGElements={() => {
-            return Game.renderMarks(gameState.game, function(value) {
+            return Game.renderMarks(state.game, function(value) {
               return value?.element!;
             });
           }}
@@ -167,26 +185,22 @@ export default function GameCore(props: GameCoreProps) {
           renderItem={(beh) => (
             <>
               <div className="game-info p-4">
-                <div>
-                  <h3 className="flex-box ait-center">LƯỢT
-                    {
-                      gameState.game.currentTurn === "X"
-                        ? <span className="material-symbols-outlined x-mark ms-1 fs-1">close</span>
-                        : <span className="material-symbols-outlined o-mark ms-1 fs-1">radio_button_unchecked</span>
-                    }
-                  </h3>
-                  <ScoreBoard extendClassName='mt-2' game={gameState.game} />
-                </div>
-                <div>
-                  <p className="flex-box ait-center">
-                    {gameState.game.id}
-                    <span
-                      className="material-symbols-outlined btn-transparent rounded-4 ms-1"
-                    >
-                      content_copy
-                    </span>
-                  </p>
-                </div>
+                {/* <h3 className="flex-box ait-center">LƯỢT
+                  {
+                    state.game.currentTurn === "X"
+                      ? <span className="material-symbols-outlined x-mark ms-1 fs-1">close</span>
+                      : <span className="material-symbols-outlined o-mark ms-1 fs-1">radio_button_unchecked</span>
+                  }
+                </h3> */}
+                <ScoreBoard game={state.game} />
+                {/* <p className="flex-box ait-center">
+                  {state.game.id}
+                  <span
+                    className="material-symbols-outlined btn-transparent rounded-4 ms-1"
+                  >
+                    content_copy
+                  </span>
+                </p> */}
               </div>
               <div className="grid-controller p-1 m-3 flex-box flex-col">
                 {
@@ -194,7 +208,7 @@ export default function GameCore(props: GameCoreProps) {
                     <span
                       onClick={() => {
                         if(props.onResetClick) props.onResetClick();
-                        gameStateFns.startNewRound()
+                        stateFns.startNewRound()
                       }}
                       className="material-symbols-outlined btn-no-padd spe-outline p-1 mb-4"
                     >

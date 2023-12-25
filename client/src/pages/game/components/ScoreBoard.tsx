@@ -1,7 +1,18 @@
 import React from 'react'
 
-// Import classes
+// Import from classes
+import { mySocket, MySocket } from 'src/apis/socket';
 import { Game, GameType } from 'src/classes/Game'
+
+// Import from hooks
+import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
+
+// Locally Import
+// Import state configs
+import { ScoreBoardStateConfigs } from '../state/score_board';
+
+// Import socket event listeners
+import { ScoreBoardSocketEvents } from '../socket_events/score_board';
 
 interface ScoreBoardProps {
   game: GameType;
@@ -14,6 +25,11 @@ interface ScoreBoardProps {
  * @returns 
  */
 export default function ScoreBoard(props: ScoreBoardProps) {
+  const [ state, setStateFns ] = useStateWESSFns(
+    ScoreBoardStateConfigs.getInitialState(),
+    ScoreBoardStateConfigs.getStateFns
+  );
+
   let firstPlayer = Game.getPlayerInformation(props.game, "first");
   let secondPlayer = Game.getPlayerInformation(props.game, "second");
 
@@ -22,16 +38,76 @@ export default function ScoreBoard(props: ScoreBoardProps) {
   let fpScore = firstPlayer ? firstPlayer.score : 0;
   let spScore = secondPlayer ? secondPlayer.score : 0;
 
-  return React.useMemo(() => (
+  // Set up somethings
+  React.useEffect(() => {
+    // Set up listener for socket event.
+    let gameConnectionStatusListener = mySocket.addEventListener(
+      MySocket.EventNames.gameConnectionStatus,
+      ScoreBoardSocketEvents.getGameConnectionStatusListener({
+        setStateFns: setStateFns
+      })
+    );
+
+    return function() {
+      mySocket.removeEventListener(MySocket.EventNames.gameConnectionStatus, gameConnectionStatusListener);
+    }
+  }, []);
+
+  return (
     <div className={"score-board" + (props.extendClassName ? " " + props.extendClassName : "")}>
-      <p>
-        <span className="x-mark">{fpName}</span>:
-        <strong className="mx-1 x-mark">{fpScore}</strong>
-      </p>
-      <p>
-        <span className="o-mark">{spName}</span>:
-        <strong className="mx-1 o-mark">{spScore}</strong>
-      </p>
+      <div className="flex-box">
+        {/* First player information */}
+        <div>
+          <div className="flex-box flex-row ait-center">
+            {
+              firstPlayer?.img
+              ? ( 
+                <img className="score-board-avatar me-2" src={firstPlayer?.img} alt="representation image of first player" />
+              ) : (
+                <div className="empty-avatar circle me-2"></div>
+              )
+            }
+            <p>
+              <span>{fpName}</span>
+              <strong className="mx-1 x-mark">{fpScore}</strong>
+            </p>
+          </div>
+          {
+            state.lostConnectionPlayer?.id === firstPlayer?.id
+            && (
+              <p className="fs-5 txt-clr-error">Mất kết nối</p>
+            )
+          }
+        </div>
+
+        {/* Second player information */}
+        <div>
+          <div className="flex-box flex-row ait-center">
+            <p>
+              <strong className="mx-1 o-mark">{spScore}</strong>
+              <span>{spName}</span>
+            </p>
+            {
+              secondPlayer?.img
+              ? (
+                <img className="score-board-avatar ms-2" src={secondPlayer?.img} alt="representation image of first player" />
+              ) : (
+                <div className="empty-avatar circle ms-2"></div>
+              )
+            }
+          </div>
+          {
+            state.lostConnectionPlayer?.id === secondPlayer?.id
+            && (
+              <p className="fs-5 txt-clr-error txt-right">Mất kết nối</p>
+            )
+          }
+        </div>
+      </div>
+      {/* Turn indicator */}
+      <div className="turn mt-1">
+        <div className={"turn-indicator " + (props.game.currentTurn)}></div>
+      </div>
     </div>
-  ), [fpName, fpScore, spName, spScore]);
+  )
 }

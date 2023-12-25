@@ -2,12 +2,14 @@
 import { GameType } from "src/classes/Game";
 
 export interface GlobalDataType {
-  game: GameType | null
+  game: GameType | null;
+  maxDisconnectionDuration: number;
 };
 export type ChangeDataFnType = <N extends keyof GlobalDataType>(name: N, fn: (data: GlobalDataType[N]) => GlobalDataType[N]) => void
 
 const __privateData__: GlobalDataType = {
-  game: null
+  game: null,
+  maxDisconnectionDuration: 0
 }
 let __privateInstance__: GlobalPrivateData | null = null;
 

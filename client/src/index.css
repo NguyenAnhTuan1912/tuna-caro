@@ -43,6 +43,8 @@ a {
 /* width */
 ::-webkit-scrollbar {
   cursor: pointer;
+  width: .5rem;
+  height: .5rem;
 }
 
 /* Track */

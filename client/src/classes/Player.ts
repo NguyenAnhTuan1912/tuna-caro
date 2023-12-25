@@ -19,7 +19,7 @@ export class Player {
     o.id = _.id ? _.id : "";
     o.name = _.name ? _.name : `Player[${_.id}]`;
     for(let key in _) {
-      if((_ as any)[key]) (o as any)[key] = (_ as any)[key];
+      if((_ as any)[key] && typeof (_ as any)[key] !== "function") (o as any)[key] = (_ as any)[key];
     }
     return o;
   }

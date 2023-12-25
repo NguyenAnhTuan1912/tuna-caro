@@ -20,6 +20,9 @@ import {
   UseEffectCBArgsType
 } from "../../Game.props";
 
+// Import types
+import { GameConnectionStatusMessageDataType } from "../../types";
+
 type ListenerArgsType = {
   useEffectArgs: UseEffectCBArgsType
 }
@@ -29,16 +32,8 @@ type JoinGameListenerArgsType = ListenerArgsType;
 type LeaveGameListenerArgsType = ListenerArgsType & {
   navigate: NavigateFunction;
 };
-type GameConnectionStatusArgsType = {
-  connectedLabel: string;
-  disconnectedLabel: string;
-};
+type GameConnectionStatusArgsType = {};
 type StartNewRoundListenerArgsType = ListenerArgsType;
-
-type GameConnectionStatusMessageDataType = { 
-  isConnected: boolean;
-  playerName: string;
-}
 
 function getEmitMarkListener(args: EmitMarkListenerArgsType) {
   return function emitMarkListener(m: Message<EmitMarkMessageDataType>) {
@@ -86,16 +81,16 @@ function getLeaveGameListener(args: LeaveGameListenerArgsType) {
   }
 }
 
-function getGameConnectionStatusListener(args: GameConnectionStatusArgsType) {
+function getGameConnectionStatusListener(args?: GameConnectionStatusArgsType) {
   return function gameConnectionStastusListener(m: Message<GameConnectionStatusMessageDataType>) {
     let data = m.data!;
     if(data.isConnected) {
       // Show a snackbar.
-      openNotifiableSnackBar(data.playerName + " đã kết nối lại.");
+      openNotifiableSnackBar(data.player.name + " đã kết nối lại.");
     }
     else {
       // Show a snackbar.
-      openNotifiableSnackBar(data.playerName + " đã mất kết nối.");
+      openNotifiableSnackBar(data.player.name + " đã mất kết nối.");
     }
   }
 }

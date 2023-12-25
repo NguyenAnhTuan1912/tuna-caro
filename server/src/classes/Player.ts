@@ -19,29 +19,27 @@ export class Player {
   score!: number;
 
   private static __hasArgsDefaultConstruct__(
-    o: Player,
-    id: string,
-    name?: string,
-    isWinner?: boolean,
-    score?: number,
-    socketId?: string
+    o: PlayerType,
+    _: Partial<PlayerType>
   ) {
-    o.id = id;
-    o.name = name ? name : `Player[${id}]`;
-    o.isWinner = isWinner ? isWinner : false;
-    o.score = score ? score : 0;
-    if(socketId) o.socketId = socketId;
+    o.id = _.id ? _.id : "";
+    o.name = _.name ? _.name : `Player[${_.id}]`;
+
+    for(let key in _) {
+      if((_ as any)[key] && typeof (_ as any)[key] !== "function") (o as any)[key] = (_ as any)[key];
+    }
+
+    return o;
   }
 
   constructor(game: PlayerType);
   constructor(id: string, name?: string);
   constructor(id: string, name?: string, isWinner?: boolean, score?: number, socketId?: string);
-  constructor(_: string | PlayerType, name?: string, isWinner?: boolean, score?: number, socketId?: string) {
-    if(typeof _ === "string") {
-      Player.__hasArgsDefaultConstruct__(this, _, name, isWinner, score, socketId);
-    } else {
-      Player.__hasArgsDefaultConstruct__(this, _.id, _.name, _.isWinner, _.score, _.socketId);
-    }
+  constructor(generic: string | PlayerType, name?: string, isWinner?: boolean, score?: number, socketId?: string) {
+    if(typeof generic === "object")
+      Player.__hasArgsDefaultConstruct__(this, generic);
+    else
+      Player.__hasArgsDefaultConstruct__(this, { id: generic, name, isWinner, score, socketId });
   }
 
   /**

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,7 @@ import { mySocket } from 'src/apis/socket';
 // Import from hooks
 import { useSettingsActions } from './hooks/useSettings';
 import { usePlayerActions } from './hooks/usePlayer';
+import { useGlobalData } from './hooks/useGlobalData';
 
 // Import from layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
@@ -36,14 +37,16 @@ import { ROUTES } from './utils/constant';
 function App() {
   const playerDispatcher = usePlayerActions();
   const settingsDispatcher = useSettingsActions();
+  const gpd = useGlobalData();
   
   const navigate = useNavigate();
 
   // Handle some global Socket Exception
   React.useEffect(() => {
     const init = function() {
-      let maxDisconnectionDuration = 0;
-      let handleOfflineOnWindow: () => void;
+      let handleOfflineOnWindow = function() {
+        openConnectionStatusSnackBar({ isConnected: false });
+      };
 
       // Call API to get ID.
       playerDispatcher.getPlayerIDAsync();
@@ -58,7 +61,9 @@ function App() {
         });
 
         // Set configured parameters
-        maxDisconnectionDuration = data.configParams.maxDisconnectionDuration;
+        gpd.changeData("maxDisconnectionDuration", function() {
+          return data.configParams.maxDisconnectionDuration;
+        });
       });
 
       // Say hello to server
@@ -66,16 +71,6 @@ function App() {
 
       // Theme.
       settingsDispatcher.performTasksRequireSettings();
-
-      handleOfflineOnWindow = function() {
-        // If the disconnect is lost too long, navigate to home.
-        let timeoutFunc = setTimeout(() => {
-          // Navigate to Home Page.
-          navigate(ROUTES.Home);
-        }, maxDisconnectionDuration);
-
-        openConnectionStatusSnackBar({ isConnected: false, timeoutFunc });
-      };
 
       // Listen to `offline` event from `window`.
       window.addEventListener("offline", handleOfflineOnWindow);
@@ -94,9 +89,12 @@ function App() {
   return (
     <>
       <Routes>
+        {/* Redirect */}
+        <Route path={ROUTES.Game} element={<Navigate to={ROUTES.GameOffline} />} />
+
         {/* Home Page */}
         <Route
-          path='/'
+          path={ROUTES.Home}
           element={
             <BaseLayout headerTitle={"Trang chủ"}>
               <HomePage />
@@ -106,7 +104,7 @@ function App() {
 
         {/* Settings Page */}
         <Route
-          path='/settings'
+          path={ROUTES.Settings}
           element={
             <BaseLayout headerTitle={"Cài đặt"}>
               <SettingsPage />
@@ -116,7 +114,7 @@ function App() {
 
         {/* GameRoomPage */}
         <Route
-          path='/rooms'
+          path={ROUTES.GameRooms}
           element={
             <BaseLayout headerTitle={"Phòng"}>
               <GameRoomPage />
@@ -126,7 +124,7 @@ function App() {
 
         {/* Game Page */}
         <Route
-          path='/game/:type'
+          path={ROUTES.Game + "/:type"}
           element={
             <BaseLayout headerTitle={"Game"} shownFooter={false} shownHeader={false}>
               <GamePage />
@@ -149,7 +147,7 @@ function App() {
           },
           [SBName]: {
             type: "snack-bar",
-            position: "top",
+            position: "top-left",
             element: SnackBar
           },
           [CSSBName]: {

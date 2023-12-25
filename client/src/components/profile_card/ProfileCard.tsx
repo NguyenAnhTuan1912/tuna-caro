@@ -17,12 +17,40 @@ import { ProfileCardStateConfigs } from './state/profile_card';
 import './ProfileCard.stlyes.css';
 
 // Import types
-import { ProfileCardProps } from './ProfileCard.props';
+import { ProfileCardProps, StaticProfileCardProps } from './ProfileCard.props';
 
 interface ProfileCardElementsType {
   playerName: HTMLInputElement | null;
 }
 
+/**
+ * Component renders a static profile of player.
+ * @param props 
+ * @returns 
+ */
+export function StaticProfileCard(props: StaticProfileCardProps) {
+  return (
+    <div className={"profile-card-container ait-center" + (props.isVertical ? " flex-col" : " flex-rw")}>
+      {/* Representation Image */}
+      <div className="user-img outline">
+        {
+          Boolean(props.player!.img) && <img className="" src={props.player!.img} alt={"Avatar of " + props.player!.name} />
+        }
+      </div>
+
+      {/* Name */}
+      <div className={"flex-box flex-col w-100" + (props.isVertical ? " mt-1" : " ms-1 ait-flex-start")}>
+        <h2 className="player-name txt-center p-1">{props.player!.name}</h2>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Component renders a profile card for player. Including avatar (character) and name.
+ * @param props 
+ * @returns 
+ */
 export default function ProfileCard(props: ProfileCardProps) {
   const { player, playerDispatcher } = usePlayer();
   const [ profileState, profileStateFns ] = useStateWESSFns(

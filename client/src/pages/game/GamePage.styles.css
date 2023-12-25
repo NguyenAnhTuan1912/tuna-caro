@@ -17,20 +17,21 @@
 
 .game-info {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  justify-content: center;
   position: fixed;
   width: 100%;
   left: 0;
   top: 0;
 }
 
-.game-page.O {
+/* .game-page.O {
   border: 5px solid rgba(var(--clr-rgb-o), .5);
 }
 
 .game-page.X {
   border: 5px solid rgba(var(--clr-rgb-x), .5);
-}
+} */
 
 .game-page.O .end-line {
   stroke: var(--clr-o);
@@ -62,4 +63,82 @@
   to {
     stroke-dasharray: 100% 100%;
   }
+}
+
+/* ScoreBoard */
+.score-board-avatar,
+.empty-avatar {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.empty-avatar {
+  background-color: var(--clr-subOutline);
+}
+
+.turn {
+  width: 100%;
+  height: 5px;
+}
+
+.turn-indicator {
+  width: 25%;
+  height: 5px;
+}
+
+.turn-indicator.X {
+  background-color: var(--clr-x);
+  transform: translateX(0);
+  -o-transform: translateX(0);
+  -moz-transform: translateX(0);
+  -ms-transform: translateX(0);
+  -webkit-transform: translateX(0);
+
+  animation: turnIndicatorMoveToLeft forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -o-animation: turnIndicatorMoveToLeft forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -moz-animation: turnIndicatorMoveToLeft forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -ms-animation: turnIndicatorMoveToLeft forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -webkit-animation: turnIndicatorMoveToLeft forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.turn-indicator.O {
+  background-color: var(--clr-o);
+  transform: translateX(300%);
+  -o-transform: translateX(300%);
+  -moz-transform: translateX(300%);
+  -ms-transform: translateX(300%);
+  -webkit-transform: translateX(300%);
+
+  animation: turnIndicatorMoveToRight forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -o-animation: turnIndicatorMoveToRight forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -moz-animation: turnIndicatorMoveToRight forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -ms-animation: turnIndicatorMoveToRight forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  -webkit-animation: turnIndicatorMoveToRight forwards .4s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@keyframes turnIndicatorMoveToLeft {
+  0% {
+    transform: translateX(300%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes turnIndicatorMoveToRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+/* WinnerLayer */
+.winner-layer-content {
+  width: 100%;
+  background-color: var(--clr-background);
 }

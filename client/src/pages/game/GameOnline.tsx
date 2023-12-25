@@ -13,6 +13,9 @@ import { MySocket, mySocket } from 'src/apis/socket';
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
+// Import from utils
+import { ROUTES } from 'src/utils/constant';
+
 // Import from components
 import GameCore from './GameCore';
 
@@ -31,6 +34,7 @@ export default function GameOnline() {
     Player will only has 3 properties are treated as global state:
     - Id: id code of player.
     - Name: name of player.
+    - Img: image of character.
     - SocketId: id code of socket.
 
     So the player's information must be cloned before create the game.
@@ -49,6 +53,19 @@ export default function GameOnline() {
   return (
     <GameCore
       useEffectCB={function(args) {
+        let timeoutFunc: number = 0;
+        let handleOfflineOnWindow = function() {
+          // If the disconnect is lost too long, navigate to home.
+          timeoutFunc = setTimeout(() => {
+            // Navigate to Home Page.
+            console.log("Navigate to Home Page");
+            navigate(ROUTES.Home);
+          }, data.maxDisconnectionDuration);
+        };
+        let handleOnlineOnWindow = function() {
+          clearTimeout(timeoutFunc);
+        };
+
         // Set up `emit_mark` listener.
         let emitMarkListener = mySocket.addEventListener(
           MySocket.EventNames.emitMark,
@@ -85,10 +102,7 @@ export default function GameOnline() {
         // Set up `lost_game_connection`.
         let gameConnectionStatusListener = mySocket.addEventListener(
           MySocket.EventNames.gameConnectionStatus,
-          GameOnlineSocketEvents.getGameConnectionStatusListener({
-            connectedLabel: "Người chơi đã kết nối lại.",
-            disconnectedLabel: "Người chơi đã mất kết nối."
-          })
+          GameOnlineSocketEvents.getGameConnectionStatusListener()
         );
 
         // Set up `start_new_round`.
@@ -98,6 +112,10 @@ export default function GameOnline() {
             useEffectArgs: args
           })
         );
+
+        // Listen to `offline` event from `window`.
+        window.addEventListener("offline", handleOfflineOnWindow);
+        window.addEventListener("online", handleOnlineOnWindow);
     
         return function() {
           console.log("Leave the game.");
@@ -123,6 +141,8 @@ export default function GameOnline() {
           mySocket.removeEventListener(MySocket.EventNames.startNewRound, startNewRoundListener);
 
           // Remove another event listener
+          window.removeEventListener("offline", handleOfflineOnWindow);
+          window.removeEventListener("online", handleOnlineOnWindow);
         };
       }}
 

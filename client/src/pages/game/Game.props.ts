@@ -1,47 +1,14 @@
 import { GameType, Coordinate, MarkType, PlayersKeyType, ResultType } from "src/classes/Game";
 import { PlayerType } from "src/classes/Player";
 
+import { GameCoreStateFnsType } from "./state/game_core";
+
 export type TypeOfGame = "offline" | "online";
 
 /**
  * This use to set up some outside works for GameCore about socket.
  */
-export type UseEffectCBArgsType = {
-  /**
-   * Use this to add new mark to table. Can receive a information about winner (result)
-   * and onAddMark can be called inside.
-   * @param x 
-   * @param y 
-   * @param t 
-   * @param result 
-   * @param canCallOnAddMark 
-   * @returns 
-   */
-  addMark: (x: number, y: number, t: number, result?: ResultType, canCallOnAddMark?: boolean) => void;
-  /**
-   * Use this function to reset game.
-   * @returns 
-   */
-  resetGame: () => void;
-  /**
-   * Use this function to add a player.
-   * @param key 
-   * @param player 
-   * @returns 
-   */
-  appendPlayer: (key: PlayersKeyType, player: PlayerType) => void;
-  /**
-   * Use this function to remove a player.
-   * @param g 
-   * @returns 
-   */
-  removePlayer: (g: PlayersKeyType | string) => void;
-  /**
-   * Use this function to start a new round.
-   * @returns 
-   */
-  startNewRound: () => void;
-}
+export type UseEffectCBArgsType = GameCoreStateFnsType;
 
 export type GameCoreProps = {
   /**

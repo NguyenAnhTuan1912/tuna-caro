@@ -4,6 +4,7 @@
  * - Receive and set up some information about game and players.
  * - Handle socket events (send and receive message).
 */
+import { Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 
 // Import from apis
@@ -65,6 +66,21 @@ export default function GameOnline() {
         let handleOnlineOnWindow = function() {
           clearTimeout(timeoutFunc);
         };
+        let connectListener = function(socket: Socket) {
+          // Try to reconnect to game.
+          if(!socket.recovered)
+            mySocket.emit(
+              MySocket.EventNames.reconnectGame,
+              MySocket.createMessage(
+                MySocket.EventNames.reconnectGame,
+                undefined,
+                {
+                  game: data.game,
+                  player
+                }
+              )
+            );
+        };
 
         // Set up `emit_mark` listener.
         let emitMarkListener = mySocket.addEventListener(
@@ -91,6 +107,15 @@ export default function GameOnline() {
           })
         );
 
+        let reconnectGameListener = mySocket.addEventListener(
+          MySocket.EventNames.reconnectGame,
+          GameOnlineSocketEvents.getReconnectGameListener({
+            useEffectArgs: args,
+            navigate: navigate,
+            player
+          })
+        );
+
         // Set up `emit_winner` listener.
         let emitWinnerListener = mySocket.addEventListener(
           MySocket.EventNames.emitWinner,
@@ -112,6 +137,9 @@ export default function GameOnline() {
             useEffectArgs: args
           })
         );
+
+        // Listen to `connect` event of socket.
+        mySocket.connect(connectListener);
 
         // Listen to `offline` event from `window`.
         window.addEventListener("offline", handleOfflineOnWindow);
@@ -136,9 +164,11 @@ export default function GameOnline() {
           mySocket.removeEventListener(MySocket.EventNames.emitMark, emitMarkListener);
           mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
           mySocket.removeEventListener(MySocket.EventNames.leaveGame, leaveGameListener);
+          mySocket.removeEventListener(MySocket.EventNames.leaveGame, reconnectGameListener);
           mySocket.removeEventListener(MySocket.EventNames.emitWinner, emitWinnerListener);
           mySocket.removeEventListener(MySocket.EventNames.emitWinner, gameConnectionStatusListener);
           mySocket.removeEventListener(MySocket.EventNames.startNewRound, startNewRoundListener);
+          mySocket.removeEventListener("connect", connectListener);
 
           // Remove another event listener
           window.removeEventListener("offline", handleOfflineOnWindow);

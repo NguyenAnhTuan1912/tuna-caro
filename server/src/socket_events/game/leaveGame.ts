@@ -17,51 +17,58 @@ export const LeaveGameSELWrapperInfo = {
   name: MySocket.EventNames.leaveGame,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
     return function __LEAVEGAME__(message: Message<LeaveGameMessageDataType>) {
-      let { gameId, player } = message.data!;
-      let game = o.gameList.getGame(gameId)!;
-      let remainPlayer = game.getPlayerByExceptedId(player.id);
-      let leavePlayer = game.getPlayerById(player.id)!;
+      try {
+        let { gameId, player } = message.data!;
+        let game = o.gameList.getGame(gameId)!;
 
-      // Remove player from game.
-      game.leaveGame(player.id);
+        if(!game) return;
 
-      // Change status of game.
-      game.status = "Waiting";
+        let remainPlayer = game.getPlayerByExceptedId(player.id);
+        let leavePlayer = game.getPlayerById(player.id)!;
 
-      // Disconnect from room
-      socket.leave(game.id);
+        // Remove player from game.
+        game.leaveGame(player.id);
 
-      // Send message to players
-      // Send message to player still in game.
-      if(remainPlayer)
-        io
-        .to(remainPlayer.socketId!)
+        // Change status of game.
+        game.status = "Waiting";
+
+        // Disconnect from room
+        socket.leave(game.id);
+
+        // Send message to players
+        // Send message to player still in game.
+        if(remainPlayer)
+          io
+          .to(remainPlayer.socketId!)
+          .emit(
+            MySocket.EventNames.leaveGame,
+            MySocket.createMessage(
+              MySocket.EventNames.leaveGame,
+              `${leavePlayer.name} đã rời trò chơi.`,
+              {
+                playerId: leavePlayer.id,
+                isHostLeaved: leavePlayer.id === game.host.id
+              }
+            )
+          );
+
+        // Send message to player who leave the game.
+        socket
         .emit(
           MySocket.EventNames.leaveGame,
           MySocket.createMessage(
             MySocket.EventNames.leaveGame,
-            `${leavePlayer.name} đã rời trò chơi.`,
-            {
-              playerId: leavePlayer.id,
-              isHostLeaved: leavePlayer.id === game.host.id
-            }
+            `Bạn đã rời trò chơi.`
           )
         );
+        console.log("Socket rooms (after leave): ", socket.rooms);
+        console.log("Players: ", game.getPlayers(true));
 
-      // Send message to player who leave the game.
-      socket
-      .emit(
-        MySocket.EventNames.leaveGame,
-        MySocket.createMessage(
-          MySocket.EventNames.leaveGame,
-          `Bạn đã rời trò chơi.`
-        )
-      );
-      console.log("Socket rooms (after leave): ", socket.rooms);
-      console.log("Players: ", game.getPlayers(true));
-
-      // Check if there are no players in this room, then remove this game from list.
-      if(game.isEmpty()) o.gameList.removeGame(game.id);
+        // Check if there are no players in this room, then remove this game from list.
+        if(game.isEmpty()) o.gameList.removeGame(game.id);
+      } catch (error: any) {
+        console.log("Error ~ LeaveGame SEvent: ", error);
+      }
     }
   })
 };

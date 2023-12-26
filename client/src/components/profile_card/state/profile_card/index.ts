@@ -34,6 +34,8 @@ function getStateFns(changeState: ChangeStateFnType<ReturnType<typeof getInitial
   }
 }
 
+export type ProfileCardStateFnsType = ReturnType<typeof getStateFns>;
+
 export const ProfileCardStateConfigs = {
   getInitialState,
   getStateFns

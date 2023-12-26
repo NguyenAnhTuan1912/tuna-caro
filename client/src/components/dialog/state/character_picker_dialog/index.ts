@@ -71,6 +71,8 @@ function getStateFns(changeState: ChangeStateFnType<ReturnType<typeof getInitial
   }
 }
 
+export type CharacterPickerDialogStateFnsType = ReturnType<typeof getStateFns>;
+
 export const CharacterPickerDialogStateConfigs = {
   getInitialState,
   getStateFns

@@ -35,6 +35,7 @@ export type ListenerFn = (socket: Socket, ...args: any[]) => void;
 export type ListenerWrapperFn = (socket: Socket) => SocketListnerFn;
 export interface SEListenerObjectsType {
   gameList: GameList;
+  dataRemoveCBs: MyMap<string, NodeJS.Timeout>;
 }
 
 export interface ListenerInfo {
@@ -48,72 +49,79 @@ export interface ListenerWrapperInfo {
 }
 
 /**
- * Define a listener for `disconnecting` event of socket.
+ * Use this function to prepare for game removing.
  * @param socket 
  * @param globalSocketManagerObject 
- * @param dataRemoveCBs 
+ * @param gameId
+ * @returns 
  */
-function disconnectingListener(
+function prepareToRemoveGame(
   socket: Socket,
   globalSocketManagerObject: SEListenerObjectsType,
-  dataRemoveCBs: MyMap<string, NodeJS.Timeout>
+  gameId: string
 ) {
-  let [socketId, gameId] = [...socket.rooms];
+  /*
+    Currently, the app has only list of game data is managed
+    directly by Socket.
+  */
+  /*
+    If socket connection has the second room is a id of game,
+    this game will be delete and the server will send a message
+    to client app and let it know that the game was deleted and
+    client app must navigate to home.
+
+    But there isn't id of game, that's mean player doesn't create game.
+    So nothing is clear.
+  */
   let game = globalSocketManagerObject.gameList.getGame(gameId);
+
+  // If there isn't game exist, terminate this task.
+  if(!game) return;
+
+  let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
   let remainPlayer = game?.getPlayerByExceptedId(player?.id!);
+  let isHostLeaved = player!.id === game!.host.id;
 
-  console.log("Disconnecting...");
-  console.log("SocketID: ", socket.id);
+  console.log("Disconnecting: ", socket.id);
   console.log("Rooms: ", socket.rooms);
 
   // Create the `remove data` callback.
   let cb = setTimeout(function() {
+    console.log("EXECUTE CLEAR FUNCTION.");
     // Clear all the data here.
-    /*
-      Currently, the app has only list of game data is managed
-      directly by Socket.
-    */
-    /*
-      If socket connection has the second room is a id of game,
-      this game will be delete and the server will send a message
-      to client app and let it know that the game was deleted and
-      client app must navigate to home.
-
-      But there isn't id of game, that's mean player doesn't create game.
-      So nothing is clear.
-    */
-    if(gameId && globalSocketManagerObject.gameList.getGame(gameId)) {
-      // Before the game remove, remain player must be know this.
-      // Send a message to remain player.
-      if(remainPlayer)
-        socket
-        .broadcast
-        .to(gameId)
-        .emit(
+    // Before the game remove, remain player must be know this.
+    // Send a message to remain player.
+    if(remainPlayer) {
+      socket
+      .broadcast
+      .to(gameId)
+      .emit(
+        MySocket.EventNames.leaveGame,
+        MySocket.createMessage(
           MySocket.EventNames.leaveGame,
-          MySocket.createMessage(
-            MySocket.EventNames.leaveGame,
-            `${player!.name} đã rời trò chơi.`,
-            {
-              playerId: player!.id,
-              isHostLeaved: player!.id === game!.host.id
-            }
-          )
+          MySocket.EventNames.leaveGame,
+          {
+            playerId: player!.id,
+            isHostLeaved
+          }
         )
-
+      )
+    } else {
+      // If game has only host, remove game.
       // Remove game.
       console.log("Remove game");
-      // globalSocketManagerObject.removeGame(gameId);
+      globalSocketManagerObject.gameList.removeGame(gameId);
+    };
 
-      // (Client App have to navigate to Home Page) Send message.
-    }
-
+    // (Client App have to navigate to Home Page) Send message.
     // Other tasks.
   }, MySocket.MAX_DISCONNECTION_DURATION);
 
   // Add the `remove data` callback to `_dataRemoveCBs`
-  dataRemoveCBs.set(socket.id, cb);
+  globalSocketManagerObject.dataRemoveCBs.set(gameId, cb);
+
+  console.log("PREPARE FOR GAME REMOVING: ", globalSocketManagerObject.dataRemoveCBs);
 
   // Emit a message to another player if player disconnect and in game.
   if(gameId)
@@ -134,29 +142,32 @@ function disconnectingListener(
 }
 
 /**
- * This function will be executed when a socket connection is recovered.
+ * Use this function to cancel game removing.
  * @param socket 
  * @param globalSocketManagerObject 
- * @param dataRemoveCBs 
+ * @param gameId
  */
-function executeWhenSocketIsRecovered(
+function cancelGameRemoving(
   socket: Socket,
   globalSocketManagerObject: SEListenerObjectsType,
-  dataRemoveCBs: MyMap<string, NodeJS.Timeout>
+  gameId: string
 ) {
-  let [socketId, gameId] = [...socket.rooms];
   let game = globalSocketManagerObject.gameList.getGame(gameId);
+
+  // If there isn't game exist, terminate this task.
+  if(!game) return;
+
+  let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
 
-  console.log("Old Connection");
-  console.log("SocketID: ", socket.id);
-  console.log("Rooms: ", socket.rooms);
+  console.log("Old Connection: ", socketId);
+  console.log("Old Connection's Rooms: ", socket.rooms);
   
   // Cancel data removing by remove the `remove data` callback from `_dataRemoveCBs`.
-  clearTimeout(dataRemoveCBs.get(socket.id));
+  clearTimeout(globalSocketManagerObject.dataRemoveCBs.get(gameId));
   
   // Delelte `remove data` callback.
-  dataRemoveCBs.delete(socket.id);
+  globalSocketManagerObject.dataRemoveCBs.delete(gameId);
 
   // Emit a message to another player if player reconnected and in game.
   if(gameId)
@@ -174,6 +185,34 @@ function executeWhenSocketIsRecovered(
         }
       )
     );
+}
+
+/**
+ * Define a listener for `disconnecting` event of socket.
+ * @param socket 
+ * @param globalSocketManagerObject 
+ * @param dataRemoveCBs 
+ */
+function disconnectingListener(
+  socket: Socket,
+  globalSocketManagerObject: SEListenerObjectsType
+) {
+  let [, gameId] = [...socket.rooms];
+  prepareToRemoveGame(socket, globalSocketManagerObject, gameId);
+}
+
+/**
+ * This function will be executed when a socket connection is recovered.
+ * @param socket 
+ * @param globalSocketManagerObject 
+ * @param dataRemoveCBs 
+ */
+function executeWhenSocketIsRecovered(
+  socket: Socket,
+  globalSocketManagerObject: SEListenerObjectsType
+) {
+  let [, gameId] = [...socket.rooms];
+  cancelGameRemoving(socket, globalSocketManagerObject, gameId);
 }
 
 /**
@@ -210,6 +249,12 @@ export class MySocket {
      */
     leaveGame: "leave_game",
     /**
+     * This event is all about a socket instance (client) try to reconnect to a game,
+     * this will emit the message and listen to this event. If a player is on a game and disconnect to server,
+     * then socket instance will be try to reconnect to game with this event.
+     */
+    reconnectGame: "reconnect_game",
+    /**
      * This event is all about the game has player. When player hit the table and win the game, this event will be fired.
      * Sending new information of mark and winner.
      */
@@ -234,7 +279,6 @@ export class MySocket {
 
   private _listeners: Array<ListenerInfo> | null;
   private _listenerWrapper: Array<ListenerWrapperInfo> | null;
-  private _dataRemoveCBs: MyMap<string, NodeJS.Timeout>;
 
   // Objects
   private __o__!: SEListenerObjectsType;
@@ -251,11 +295,11 @@ export class MySocket {
       }
     });
     this.__o__ = {
-      gameList: new GameList()
+      gameList: new GameList(),
+      dataRemoveCBs: new MyMap()
     };
     this._listeners = [];
     this._listenerWrapper = [];
-    this._dataRemoveCBs = new MyMap();
 
     // Init
     setTimeout(() => this._init(), 0);
@@ -285,21 +329,22 @@ export class MySocket {
     let that = this;
 
     this._io.on("connection", (socket) => {
+      console.log("New connection: ", socket.id);
+      console.log("New connection's rooms: ", socket.rooms);
       console.log("Game in list: ", this.__o__.gameList);
       
       if(socket.recovered) {
-        executeWhenSocketIsRecovered(socket, this.__o__, this._dataRemoveCBs);
+        executeWhenSocketIsRecovered(socket, this.__o__);
       };
 
       // Set up `disconnect` event for socket to handle some tasks for individual socket.
       socket.on("disconnect", () => {
-        console.log("Disconnected");
         socket.removeAllListeners();
       });
 
       // Set up `disconnecting` event for socket to handle some tasks for individual socket.
       socket.on("disconnecting", () => {
-        disconnectingListener(socket, this.__o__, this._dataRemoveCBs);
+        disconnectingListener(socket, this.__o__);
       });
 
       // Set up `initial` event for socket.
@@ -310,7 +355,6 @@ export class MySocket {
             MySocket.EventNames.initial,
             "Welcome to caro game by Tuna Nguyen",
             {
-              socketId: socket.id,
               configParams: {
                 maxDisconnectionDuration: MySocket.MAX_DISCONNECTION_DURATION
               }

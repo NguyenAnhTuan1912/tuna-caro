@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import { TunangnModal } from 'tunangn-react-modal';
+import { TunangnModal, snackbar } from 'tunangn-react-modal';
 import { useNavigate } from 'react-router-dom';
 
 // Import from classes
@@ -24,7 +24,7 @@ import GamePage from './pages/game/components/GamePage';
 import SideMenu, { name as SMName } from './components/side_menu/SideMenu';
 import GameDialog, { name as GDName } from './components/dialog/GameDialog';
 import CharacterPickerDialog, { name as CPDName } from './components/dialog/CharacterPickerDialog';
-import SnackBar, { name as SBName } from './components/snack_bar/SnackBar';
+import SnackBar, { name as SBName, NotifiableSnackBars } from './components/snack_bar/SnackBar';
 import ConnectionStatusSnackBar, { name as CSSBName, openConnectionStatusSnackBar } from './components/snack_bar/ConnectionStatusSnackBar';
 
 // Import from utils
@@ -52,18 +52,36 @@ function App() {
       playerDispatcher.getPlayerIDAsync();
 
       // Init
-      mySocket.init((message) => {
-        let data = message.data!;
-
-        // Set socket id for player.
-        playerDispatcher.setPlayer({
-          socketId: data.socketId
-        });
-
+      mySocket.init((data) => {
         // Set configured parameters
-        gpd.changeData("maxDisconnectionDuration", function() {
-          return data.configParams.maxDisconnectionDuration;
-        });
+        if(data.configParams !== undefined)
+          gpd.changeData("maxDisconnectionDuration", function() {
+            return data.configParams!.maxDisconnectionDuration;
+          });
+      });
+
+      // Listen to `connect` event.
+      mySocket.connect(function(socket) {
+        let socketId = socket.id;
+
+        if(socket.recovered) {
+          // Old connection is recovered.
+          console.log("Old connection: ", socketId);
+        } else {
+          // New connection is established.
+          console.log("New connection: ", socketId);
+          /*
+            Whenever a new connection is established, this playerDispatcher will dispatch
+            a payload to Redux Store to update socketId of player.
+            There are 2 cases a new connection is established:
+              - Player enter the app at first.
+              - The reconnection times of socket instance (client) is over 5 times. Then
+              the new connection will be established.
+          */
+          playerDispatcher.setPlayer({
+            socketId
+          });
+        }
       });
 
       // Say hello to server
@@ -147,7 +165,7 @@ function App() {
           },
           [SBName]: {
             type: "snack-bar",
-            position: "top-left",
+            position: "top-right",
             element: SnackBar
           },
           [CSSBName]: {

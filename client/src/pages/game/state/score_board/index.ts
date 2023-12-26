@@ -22,6 +22,8 @@ function getStateFns(changeState: ChangeStateFnType<ReturnType<typeof getInitial
   }
 }
 
+export type ScoreBoardStateFns = ReturnType<typeof getStateFns>;
+
 export const ScoreBoardStateConfigs = {
   getInitialState,
   getStateFns

@@ -168,9 +168,23 @@ function getStateFns(
         else Game.resume(game);
         return game;
       })
+    },
+
+    /**
+     * Use this function to update player in game.
+     * @param player 
+     */
+    updatePlayer: function(player: PlayerType) {
+      changeState("game", function(game) {
+        // Update player.
+        Game.updatePlayer(game, player);
+        return game;
+      })
     }
   }
 }
+
+export type GameCoreStateFnsType = ReturnType<typeof getStateFns>;
 
 export const GameCoreStateConfigs = {
   getInitialState,

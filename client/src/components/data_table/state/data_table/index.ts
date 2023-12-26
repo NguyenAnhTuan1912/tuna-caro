@@ -97,6 +97,8 @@ function getStateFns<T>(
   return fns;
 }
 
+export type DatatableStateFnsType = ReturnType<typeof getStateFns>;
+
 export const DatatableStateConfigs = {
   getInitialState,
   getStateFns

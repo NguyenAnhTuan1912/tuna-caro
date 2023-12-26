@@ -20,24 +20,28 @@ export const EmitWinnerSELWrapperInfo = {
   name: MySocket.EventNames.emitWinner,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
     return function __EMITWINNER__(message: Message<EmitWinnerMessageDataType>) {
-      let data = message.data!;
+      try {
+        let data = message.data!;
 
-      // Send message to opposite player.
-      socket
-      .broadcast
-      .to(data.gameId)
-      .emit(
-        MySocket.EventNames.emitWinner,
-        MySocket.createMessage(
+        // Send message to opposite player.
+        socket
+        .broadcast
+        .to(data.gameId)
+        .emit(
           MySocket.EventNames.emitWinner,
-          undefined,
-          {
-            coor: data.coor,
-            mark: data.mark,
-            winner: data.winner
-          }
-        )
-      );
+          MySocket.createMessage(
+            MySocket.EventNames.emitWinner,
+            undefined,
+            {
+              coor: data.coor,
+              mark: data.mark,
+              winner: data.winner
+            }
+          )
+        );
+      } catch (error: any) {
+        console.log("Error ~ EmitWinner SEvent: ", error);
+      }
     }
   })
 };

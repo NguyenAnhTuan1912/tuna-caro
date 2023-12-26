@@ -6,10 +6,10 @@ import { Player, PlayerType } from "classes/Player";
 // Import from templates
 import { createSEListenerWrapper } from "templates/socket_events";
 
-interface JoinGameMessageDataType {
+type JoinGameMessageDataType = {
   game: GameType;
   player: PlayerType;
-}
+};
 
 /**
  * Containing event name and listener for `join_game` event.
@@ -24,34 +24,18 @@ export const JoinGameSELWrapperInfo = {
         const wannaJoinPlayer = new Player(player);
         let checkPassword = true;
 
+        // Check if game is not exist
+        if(!addedGame) throw new Error("not_exist");
+
         // Check if room is full
-        if(addedGame?.isFull()) {
-          // Send a message back to player who join.
-          socket.emit(
-            MySocket.EventNames.joinGame,
-            MySocket.createMessage(
-              MySocket.EventNames.joinGame,
-              "Phòng đã đầy."
-            )
-          );
-          return;
-        }
+        if(addedGame?.isFull()) throw new Error("full_room");
 
         // Checkpassword
         if(addedGame?.hasPassword()) {
           checkPassword = await addedGame.comparePassword(game.password!);
         }
 
-        if(!checkPassword) {
-          socket.emit(
-            MySocket.EventNames.joinGame,
-            MySocket.createMessage(
-              MySocket.EventNames.joinGame,
-              "Sai mật khẩu!"
-            )
-          );
-          return;
-        }
+        if(!checkPassword) throw new Error("wrong_password");
 
         // Modify something
         addedGame.setPlayer(wannaJoinPlayer);
@@ -83,7 +67,17 @@ export const JoinGameSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ JOIN GAME: ", error.message);
+        console.log("Error ~ JOINGAME SEvent: ", error);
+
+        socket.emit(
+          MySocket.EventNames.joinGame,
+          MySocket.createMessage(
+            MySocket.EventNames.joinGame,
+            error.message,
+            undefined,
+            true
+          )
+        );
       }
     }
   }) 

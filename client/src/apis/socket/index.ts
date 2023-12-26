@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { API_ROOT } from 'src/utils/constant';
 
 // Import from types
-import { InitialEventDataType } from "src/types/socket.types";
+import { InitCallBackDataType } from "src/types/socket.types";
 
 // Private instance
 let __private__: MySocket | null = null;
@@ -48,6 +48,12 @@ export class MySocket {
      */
     leaveGame: "leave_game",
     /**
+     * This event is all about a socket instance (client) try to reconnect to a game,
+     * this will emit the message and listen to this event. If a player is on a game and disconnect to server,
+     * then socket instance will be try to reconnect to game with this event.
+     */
+    reconnectGame: "reconnect_game",
+    /**
      * This event is mean the game has player. When player hit the table and win the game, this event will be fired.
      * Sending new information of mark and winner.
      */
@@ -72,7 +78,14 @@ export class MySocket {
   constructor() {
     // Apply singleton pattern.
     if(__private__) return __private__;
-    this._socket = io(API_ROOT);
+    this._socket = io(
+      API_ROOT,
+      {
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: 10
+      }
+    );
   }
 
   /**
@@ -96,13 +109,25 @@ export class MySocket {
    * Use this method to init socket.
    * @param cb 
    */
-  init(cb: (message: Message<InitialEventDataType>) => void) {
+  init(cb: (data: InitCallBackDataType) => void) {
     if(!MySocket._canInit) return;
     // Set up initial event to do something at first.
-    this._socket.on(MySocket.EventNames.initial, (message: Message<InitialEventDataType>) => {
-      cb(message);
+    this._socket.on(MySocket.EventNames.initial, (message: Message<InitCallBackDataType>) => {
+      cb(message.data!);
     });
     MySocket._canInit = false;
+  }
+
+  /**
+   * Use this method to set up listener to `connect` socket event.
+   * @param cb 
+   */
+  connect(cb: (socket: Socket) => void) {
+    // Connection
+    let that = this;
+    this._socket.on("connect", function() {
+      cb(that._socket);
+    });
   }
 
   /**

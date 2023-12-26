@@ -4,7 +4,29 @@
 
 .csnackbar-header {
   aspect-ratio: 1;
+  width: 25%;
 }
+
+.csnackbar-header.success {
+  background-color: var(--clr-success);
+}
+
+.csnackbar-header.info {
+  background-color: var(--clr-info);
+}
+
+.csnackbar-header.error {
+  background-color: var(--clr-error);
+}
+
+.csnackbar-header.warning {
+  background-color: var(--clr-warning);
+}
+
+.csnackbar-header * {
+  color: white;
+}
+
 
 .csnackbar-body {
   width: 100%;

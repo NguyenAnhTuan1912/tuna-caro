@@ -796,6 +796,26 @@ export class Game {
     return game._players!;
   }
 
+  /**
+   * Use this static method to update a player in game with `PlayerKey` and player's information.
+   * @param game 
+   * @param key 
+   * @param player 
+   * @returns 
+   */
+  static updatePlayer(game: GameType, player: PlayerType) {
+    if(!game._players) return;
+
+    // Set new player by key.
+    for(let key in game._players) {
+      if(game._players[key]?.id === player.id) {
+        game._players[key] = player;
+      }
+    }
+
+    return game;
+  }
+
   /*
     OTHER METHODS
   */

@@ -228,6 +228,20 @@ export class Game {
   }
 
   /**
+   * Use this method to update player in a game with new player.
+   * @param player 
+   */
+  updatePlayer(player: Player) {
+    if(!this._players) return;
+
+    let onum = this.getPlayerONumById(player.id);
+    delete this._players[onum];
+
+    // Update new player.
+    this.setPlayer(player);
+  }
+
+  /**
    * Use this method to remove player from game. Except host.
    * @param socket 
    * @param playerId 

@@ -18,29 +18,35 @@ export const EmitGameSELWrapperInfo = {
   name: MySocket.EventNames.emitGame,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
     return function __EMITGAME__(message: Message<EmitGameMessageDataType>) {
-      const { game, player } = message.data!;
-      const newGame = new Game(game);
+      try {
+        const { game, player } = message.data!;
+        const newGame = new Game(game);
 
-      // Set host
-      // Because this is the first player, this player will consider as host.
-      newGame.setPlayer(new Player(player));
+        console.log("EMITGAME ~ socket rooms: ", socket.rooms);
 
-      // Set password
-      if(game.password) newGame.setPassword(game.password);
+        // Set host
+        // Because this is the first player, this player will consider as host.
+        newGame.setPlayer(new Player(player));
 
-      // Add game.
-      // Room will be created in this stage.
-      o.gameList.addGame(socket, newGame.id, newGame);
+        // Set password
+        if(game.password) newGame.setPassword(game.password);
 
-      // After the game is added to list and create a socket room, message back to player.
-      socket.emit(
-        MySocket.EventNames.emitGame,
-        MySocket.createMessage(
+        // Add game.
+        // Room will be created in this stage.
+        o.gameList.addGame(socket, newGame.id, newGame);
+
+        // After the game is added to list and create a socket room, message back to player.
+        socket.emit(
           MySocket.EventNames.emitGame,
-          "Create game successfully.",
-          newGame
-        )
-      );
+          MySocket.createMessage(
+            MySocket.EventNames.emitGame,
+            "Create game successfully.",
+            newGame
+          )
+        );
+      } catch (error: any) {
+        console.log("Error ~ EmitGame SEvent: ", error);
+      }
     }
   })
 };

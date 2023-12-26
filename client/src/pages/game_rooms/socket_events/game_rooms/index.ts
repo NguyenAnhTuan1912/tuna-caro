@@ -10,6 +10,9 @@ import { Message } from "src/apis/socket";
 // Import from utils
 import { ROUTES } from "src/utils/constant";
 
+// Import from components
+import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
+
 // Locally Import
 import { GameRoomsStateConfigs } from "../../state/game_rooms";
 
@@ -23,7 +26,6 @@ type JoinGameListenerArgsType = ListenerArgsType;
 
 function getGetGamesListener(args: GetGamesListenerArgsType) {
   return function getGamesListener(m: Message<Array<GameRoomType>>) {
-    console.log("Message from `getGames`: ", m);
     args.getData(m.data!);
   }
 }
@@ -31,6 +33,11 @@ function getGetGamesListener(args: GetGamesListenerArgsType) {
 function getJoinGameListener(args: JoinGameListenerArgsType) {
   return function joinGameListener(m: Message<GameType>) {
     let game = m.data!;
+
+    if(m.isError) {
+      NotifiableSnackBars.warning(m.text!);
+      return;
+    }
         
     // Set new game.
     args.changeData!("game", function() {

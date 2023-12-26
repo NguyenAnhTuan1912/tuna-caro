@@ -13,20 +13,24 @@ export const StartNewRoundSELWrapperInfo = {
   name: MySocket.EventNames.startNewRound,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
     return function(message: Message<{ gameId: string }>) {
-      let data = message.data!;
+      try {
+        let data = message.data!;
 
-      // Send message to opposite player.
-      socket
-      .broadcast
-      .to(data.gameId)
-      .emit(
-        MySocket.EventNames.startNewRound,
-        MySocket.createMessage(
+        // Send message to opposite player.
+        socket
+        .broadcast
+        .to(data.gameId)
+        .emit(
           MySocket.EventNames.startNewRound,
-          undefined,
-          true
-        )
-      );
+          MySocket.createMessage(
+            MySocket.EventNames.startNewRound,
+            undefined,
+            true
+          )
+        );
+      } catch (error: any) {
+        console.log("Error ~ StartNewRound SEvent: ", error);
+      }
     }
   })
 };

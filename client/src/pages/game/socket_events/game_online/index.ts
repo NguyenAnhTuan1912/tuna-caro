@@ -11,8 +11,9 @@ import { Message } from "src/apis/socket";
 import { ROUTES } from "src/utils/constant";
 
 // Import from components
-import { openNotifiableSnackBar } from "src/components/snack_bar/SnackBar";
+import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
 
+// Import types.
 // Import from props.
 import {
   EmitMarkMessageDataType,
@@ -20,7 +21,7 @@ import {
   UseEffectCBArgsType
 } from "../../Game.props";
 
-// Import types
+// Import from types
 import { GameConnectionStatusMessageDataType } from "../../types";
 
 type ListenerArgsType = {
@@ -31,6 +32,10 @@ type EmitWinnerListener = ListenerArgsType;
 type JoinGameListenerArgsType = ListenerArgsType;
 type LeaveGameListenerArgsType = ListenerArgsType & {
   navigate: NavigateFunction;
+};
+type ReconnectGameListenerArgsType = ListenerArgsType & {
+  navigate: NavigateFunction;
+  player: PlayerType;
 };
 type GameConnectionStatusArgsType = {};
 type StartNewRoundListenerArgsType = ListenerArgsType;
@@ -57,7 +62,7 @@ function getJoinGameListener(args: JoinGameListenerArgsType) {
     let player = m.data!;
 
     // Announce to player.
-    openNotifiableSnackBar(m.text!);
+    NotifiableSnackBars.info(m.text!);
 
     // Add player to game.
     // Because first player always "X", so the second will be "O".
@@ -68,7 +73,7 @@ function getJoinGameListener(args: JoinGameListenerArgsType) {
 function getLeaveGameListener(args: LeaveGameListenerArgsType) {
   return function leaveGameListener(m: Message<{ playerId: string, isHostLeaved: boolean }>) {
     // Announce to player.
-    openNotifiableSnackBar(m.text!);
+    NotifiableSnackBars.info(m.text!);
 
     // If player leaves game is host. So the game will be removed from list in server.
     if(m.data?.isHostLeaved) {
@@ -86,12 +91,24 @@ function getGameConnectionStatusListener(args?: GameConnectionStatusArgsType) {
     let data = m.data!;
     if(data.isConnected) {
       // Show a snackbar.
-      openNotifiableSnackBar(data.player.name + " đã kết nối lại.");
+      NotifiableSnackBars.success(data.player.name + " đã kết nối lại.");
     }
     else {
       // Show a snackbar.
-      openNotifiableSnackBar(data.player.name + " đã mất kết nối.");
+      NotifiableSnackBars.warning(data.player.name + " đã mất kết nối.");
     }
+  }
+}
+
+function getReconnectGameListener(args: ReconnectGameListenerArgsType) {
+  return function reconnectGameListener(m: Message<any>) {
+    if(m.isError && m.text === "not_exist") {
+      args.navigate(ROUTES.Home);
+      return;
+    };
+
+    // Update player.
+    args.useEffectArgs.updatePlayer(args.player);
   }
 }
 
@@ -107,5 +124,6 @@ export const GameOnlineSocketEvents = {
   getJoinGameListener,
   getLeaveGameListener,
   getStartNewRoundListener,
-  getGameConnectionStatusListener
+  getGameConnectionStatusListener,
+  getReconnectGameListener
 };

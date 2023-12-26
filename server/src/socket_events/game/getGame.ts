@@ -18,32 +18,36 @@ export const GetGamesSELWrapperInfo = {
   name: MySocket.EventNames.getGames,
   wrapper: createSEListenerWrapper(function(io, socket, o) {
     return function __GETGAMES__(message: Message<GetGamesMessageDataType>) {
-      let { skip = 0, limit = 5 } = message.data!;
-      let from = skip;
-      let to = skip + limit;
+      try {
+        let { skip = 0, limit = 5 } = message.data!;
+        let from = skip;
+        let to = skip + limit;
 
-      let games = o.gameList.map<GameRoomType | undefined>(function(game, key, index) {
-        if(index >= from && index < to) {
-          return {
-            id: game?.id,
-            playerName: game?.host.name,
-            hasPassword: game?.hasPassword(),
-            name: game?.name,
-            status: game?.status
-          } as GameRoomType
-        }
-      });
+        let games = o.gameList.map<GameRoomType | undefined>(function(game, key, index) {
+          if(index >= from && index < to) {
+            return {
+              id: game?.id,
+              playerName: game?.host.name,
+              hasPassword: game?.hasPassword(),
+              name: game?.name,
+              status: game?.status
+            } as GameRoomType
+          }
+        });
 
-      // Send message to opposite player.
-      socket
-      .emit(
-        MySocket.EventNames.getGames,
-        MySocket.createMessage(
+        // Send message to opposite player.
+        socket
+        .emit(
           MySocket.EventNames.getGames,
-          undefined,
-          games
-        )
-      );
+          MySocket.createMessage(
+            MySocket.EventNames.getGames,
+            undefined,
+            games
+          )
+        );
+      } catch (error: any) {
+        console.log("Error ~ GetGame SEvent: ", error);
+      }
     }
   })
 };

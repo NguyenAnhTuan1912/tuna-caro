@@ -1,6 +1,5 @@
-export type InitialEventDataType = {
-  socketId: string;
-  configParams: {
+export type InitCallBackDataType = {
+  configParams?: {
     maxDisconnectionDuration: number;
   }
 };

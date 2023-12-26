@@ -35,6 +35,8 @@ function getStateFns(changeState: ChangeStateFnType<ReturnType<typeof getInitial
   }
 }
 
+export type GameRoomsStateFnsType = ReturnType<typeof getStateFns>;
+
 export const GameRoomsStateConfigs = {
   getInitialState,
   getStateFns

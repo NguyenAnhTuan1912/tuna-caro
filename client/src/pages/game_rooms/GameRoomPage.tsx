@@ -129,7 +129,7 @@ export default function GameRoomPage(props: GameRoomPageProps) {
   }, []);
 
   return (
-    <div className="game-room-page p-2">
+    <div className="game-rooms page p-2">
       <h1>Các phòng</h1>
       <DataTable
         data={gameRoomsState.data}

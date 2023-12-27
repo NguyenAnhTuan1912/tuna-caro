@@ -73,7 +73,7 @@ export function openGameJoiningDialog(gameName: string, host: string, hasPasswor
     name,
     {
       title: <h3>Phòng chơi</h3>,
-      notes: ["Phòng này có mật khẩu, vui lòng thêm mật khẩu!"],
+      notes: hasPassword ? ["Phòng này có mật khẩu, vui lòng thêm mật khẩu!"] : ["Phòng không có mật khẩu"],
       buttonLabel: "Vào phòng",
       inputs: hasPassword ? [
         { name: "password", placeholder: "Mật khẩu...", replaceClassName: "spe-outline w-100 p-1", type: "password" }

@@ -72,19 +72,21 @@ export default function DataTable<T>({
 
   return (
     <div className="data-table-container">
-      {/* Table */}
-      <table className="data-table">
-        <thead>
-          {
-            props.renderHeader()
-          }
-        </thead>
-        <tbody>
-          {
-            printableDataRows.map(props.renderRowData)
-          }
-        </tbody>
-      </table>
+      <div className="data-table-wrapper">
+        {/* Table */}
+        <table className="data-table">
+          <thead>
+            {
+              props.renderHeader()
+            }
+          </thead>
+          <tbody>
+            {
+              printableDataRows.map(props.renderRowData)
+            }
+          </tbody>
+        </table>
+      </div>
       {/* Buttons */}
       <div className="data-table-controller pt-2">
         { state.isFetching && <LoadingIndicator text="Đang tải..." /> }

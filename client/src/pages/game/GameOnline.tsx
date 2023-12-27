@@ -5,7 +5,7 @@
  * - Handle socket events (send and receive message).
 */
 import { Socket } from 'socket.io-client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 
 // Import from apis
 import { MySocket, mySocket } from 'src/apis/socket';
@@ -51,6 +51,17 @@ export default function GameOnline() {
   */
   const data = getData();
 
+  console.log("GPD in GameOnline: ", data);
+
+  /*
+    Game data is lost when player refreshs tab/page of browser. So when this component
+    computes for rendering, it will check the game data and navigate to `HomePage`.
+   */
+  if(!data.game) {
+    console.log("Navigate to home");
+    return <Navigate to={ROUTES.Home} />
+  };
+
   return (
     <GameCore
       useEffectCB={function(args) {
@@ -63,10 +74,18 @@ export default function GameOnline() {
             navigate(ROUTES.Home);
           }, data.maxDisconnectionDuration);
         };
+
         let handleOnlineOnWindow = function() {
           clearTimeout(timeoutFunc);
         };
-        let connectListener = function(socket: Socket) {
+
+        let handleBeforeUnloadOnWindow = function(e: BeforeUnloadEvent) {
+          // Ask user before reload the page.
+          e.preventDefault();
+        };
+
+        // Listen to `connect` event of socket.
+        let connectListener = mySocket.connect(function(socket: Socket) {
           // Try to reconnect to game.
           if(!socket.recovered)
             mySocket.emit(
@@ -80,7 +99,7 @@ export default function GameOnline() {
                 }
               )
             );
-        };
+        });
 
         // Set up `emit_mark` listener.
         let emitMarkListener = mySocket.addEventListener(
@@ -138,14 +157,7 @@ export default function GameOnline() {
           })
         );
 
-        // Listen to `connect` event of socket.
-        mySocket.connect(connectListener);
-
-        // Listen to `offline` event from `window`.
-        window.addEventListener("offline", handleOfflineOnWindow);
-        window.addEventListener("online", handleOnlineOnWindow);
-    
-        return function() {
+        const cleanUp = function() {
           console.log("Leave the game.");
           // Leave the game
           mySocket.emitVolatilely(
@@ -173,7 +185,17 @@ export default function GameOnline() {
           // Remove another event listener
           window.removeEventListener("offline", handleOfflineOnWindow);
           window.removeEventListener("online", handleOnlineOnWindow);
+          window.removeEventListener("beforeunload", handleBeforeUnloadOnWindow);
+          window.removeEventListener("unload", cleanUp);
         };
+
+        // Listen to `offline` event from `window`.
+        window.addEventListener("offline", handleOfflineOnWindow);
+        window.addEventListener("online", handleOnlineOnWindow);
+        window.addEventListener("beforeunload", handleBeforeUnloadOnWindow);
+        window.addEventListener("unload", cleanUp);
+    
+        return cleanUp;
       }}
 
       onResetClick={function() {

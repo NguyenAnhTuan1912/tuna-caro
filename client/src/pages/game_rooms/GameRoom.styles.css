@@ -1,4 +1,3 @@
-.game-room-page {
-  height: calc(100vh - (89px + 55px));
+.game-rooms {
   background-color: var(--clr-background);
 }

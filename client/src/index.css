@@ -13,14 +13,17 @@
   box-sizing: border-box;
   font-family: "Roboto Mono";
   color: var(--clr-onBackground);
-
-  -webkit-tap-highlight-color: transparent;
 }
 
 body,
 #root {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
+}
+
+.page {
+  max-width: 100%;
+  height: calc(100dvh - (89px + 55px));
 }
 
 button,

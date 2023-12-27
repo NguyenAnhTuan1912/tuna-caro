@@ -1,16 +1,24 @@
 .data-table-container {
   width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .data-table-controller,
+.data-table-wrapper,
 .data-table {
   width: 100%;
   max-width: 720px;
 }
 
+.data-table-wrapper {
+  overflow-x: auto;
+}
+
 .data-table {
   margin: 0 auto;
   border-collapse: collapse;
+  overflow-y: auto;
 }
 
 /* Set style for each tr */

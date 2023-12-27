@@ -30,9 +30,6 @@ export const ReconnectGameSELWrapperInfo = {
         clearTimeout(o.dataRemoveCBs.get(game.id));
         o.dataRemoveCBs.delete(game.id);
 
-        console.log("Reconnect Game");
-        console.log("CANCEL GAME REMOVING: ", o.dataRemoveCBs);
-
         // Modify something
         addedGame.updatePlayer(reconnectPlayer);
 

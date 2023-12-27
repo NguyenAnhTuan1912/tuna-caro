@@ -1,11 +1,9 @@
-.home-page {
-  max-width: 100%;
-  height: calc(100vh - (89px + 55px));
+.home {
   background-color: var(--clr-background);
   overflow: auto;
 }
 
-.home-page-menu {
+.home-menu {
   max-width: 370px;
   margin: 0 auto;
 }

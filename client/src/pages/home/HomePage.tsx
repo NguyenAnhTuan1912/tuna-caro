@@ -15,7 +15,6 @@ import { ROUTES } from 'src/utils/constant';
 
 // Import from components
 import { openGameFindingDialog, openGameCreatingDialog } from 'src/components/dialog/GameDialog';
-import { openNotifiableSnackBar } from 'src/components/snack_bar/SnackBar';
 import Button from 'src/components/button/Button';
 
 // Locally Import
@@ -69,9 +68,9 @@ export default function HomePage(props: HomePageProps) {
   }, []);
 
   return (
-    <div className="home-page p-2">
+    <div className="home page p-2">
       <h1 className="txt-center">Trang chủ</h1>
-      <div className="home-page-menu w-100 pt-4">
+      <div className="home-menu w-100 pt-4">
         <Button to={ROUTES.GameOffline} extendClassName="w-100">Chơi 2 người</Button>
 
         <hr className="my-4"></hr>

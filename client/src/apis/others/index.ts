@@ -28,6 +28,7 @@ async function getCharactersAsync(opt?: RequestOptions): Promise<HTTPResponse<Ar
   }
 
   let url = API_URL + "/characters" + queryStr;
+  console.log("URL: ", url);
   const response = await fetch(url);
   return response.json();
 }

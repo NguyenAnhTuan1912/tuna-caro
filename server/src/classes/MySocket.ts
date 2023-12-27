@@ -80,19 +80,27 @@ function prepareToRemoveGame(
 
   let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
-  let remainPlayer = game?.getPlayerByExceptedId(player?.id!);
-  let isHostLeaved = player!.id === game!.host.id;
 
   console.log("Disconnecting: ", socket.id);
   console.log("Rooms: ", socket.rooms);
-
+  
   // Create the `remove data` callback.
   let cb = setTimeout(function() {
+    let remainPlayer = game?.getPlayerByExceptedId(player?.id!);
+    let isHostLeaved = player!.id === game!.host.id;
     console.log("EXECUTE CLEAR FUNCTION.");
+    console.log("Remain player: ", remainPlayer);
     // Clear all the data here.
     // Before the game remove, remain player must be know this.
     // Send a message to remain player.
     if(remainPlayer) {
+      /*
+        Because the "disconnected player" cannot leave the game from client.
+        So server will perform this task.
+      */
+      game?.leaveGame(player?.id!);
+
+      // Emit message to remain player.
       socket
       .broadcast
       .to(gameId)
@@ -106,7 +114,7 @@ function prepareToRemoveGame(
             isHostLeaved
           }
         )
-      )
+      );
     } else {
       // If game has only host, remove game.
       // Remove game.
@@ -120,8 +128,6 @@ function prepareToRemoveGame(
 
   // Add the `remove data` callback to `_dataRemoveCBs`
   globalSocketManagerObject.dataRemoveCBs.set(gameId, cb);
-
-  console.log("PREPARE FOR GAME REMOVING: ", globalSocketManagerObject.dataRemoveCBs);
 
   // Emit a message to another player if player disconnect and in game.
   if(gameId)
@@ -275,7 +281,8 @@ export class MySocket {
      */
     getGames: "get_games"
   };
-  static MAX_DISCONNECTION_DURATION = 15 * 1000 // 5 minutes for production; any minutes or seconds for test.
+  static MAX_DISCONNECTION_DURATION = 15 * 1000; // 5 minutes for production; any minutes or seconds for test.
+  static MAX_GAME_IN_LIST_DURATION = 10 * 1000; // Max duration of when in list when player is disconnected.
 
   private _listeners: Array<ListenerInfo> | null;
   private _listenerWrapper: Array<ListenerWrapperInfo> | null;
@@ -343,7 +350,7 @@ export class MySocket {
       });
 
       // Set up `disconnecting` event for socket to handle some tasks for individual socket.
-      socket.on("disconnecting", () => {
+      socket.on("disconnecting", (reason) => {
         disconnectingListener(socket, this.__o__);
       });
 

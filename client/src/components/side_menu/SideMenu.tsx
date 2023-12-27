@@ -29,6 +29,7 @@ export default function SideMenu(props: CustomizedModalItemProps) {
       className="side-menu-container p-3"
       style={props.utils.getContainerStyle({
         width: "100%",
+        height: "100dvh",
         maxWidth: "475px",
         minWidth: "300px",
         background: "var(--clr-background)",

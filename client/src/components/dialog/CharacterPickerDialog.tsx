@@ -16,7 +16,6 @@ import Button from '../button/Button';
 import LazyList from '../list/LazyList';
 
 // Import from utils
-import { ObjectUtils } from 'src/utils/object';
 import { OtherUtils } from 'src/utils/other';
 
 // Import from types
@@ -46,6 +45,14 @@ type CharacterPickerType = {
   setChoice: (character: CharacterType) => void;
 };
 
+/**
+ * __For test__
+ * 
+ * Use this function to get characters asynchronously.
+ * @param from 
+ * @param to 
+ * @returns 
+ */
 async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
   await OtherUtils.wait(1000);
   let N = charactersData.data.length < to ? charactersData.data.length : to;
@@ -93,15 +100,7 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
   );
   const { setPlayer } = usePlayerActions();
 
-  const fetchCharacters = function(query?: { limit?: string, skip?: string }) {
-    query = ObjectUtils.setDefaultValues(query, { limit: "5", skip: "0" });
-
-    // Call API to get characters from server.
-    getCharactersAsync(0, 10)
-    .then(payload => {
-      setStateFns.addCharacters(payload);
-    })
-  };
+  const limit = 10;
 
   React.useEffect(() => {
     return function() {
@@ -138,8 +137,12 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
             maxHeight="300px"
             loadMoreBtnLabel='Xem thêm'
             limit={5}
-            getListDataAsync={(skip) => {
-              return getCharactersAsync(skip, skip + 5);
+            getListDataAsync={async (skip) => {
+              let res = await OtherAPIs.getCharactersAsync({ query: {
+                limit: limit.toString(),
+                skip: skip.toString()
+              }});
+              return res.data;
             }}
             renderItem={(item) => (
               <CharacterPicker

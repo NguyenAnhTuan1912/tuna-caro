@@ -125,9 +125,11 @@ export class MySocket {
   connect(cb: (socket: Socket) => void) {
     // Connection
     let that = this;
-    this._socket.on("connect", function() {
+    let listener = function() {
       cb(that._socket);
-    });
+    };
+    this._socket.on("connect", listener);
+    return listener;
   }
 
   /**
@@ -142,7 +144,7 @@ export class MySocket {
    */
   disconnect() {
     MySocket._canInit = true;
-    this._socket.removeListener(MySocket.EventNames.initial);
+    this._socket.removeAllListeners();
     this._socket.disconnect();
   }
 
@@ -163,6 +165,7 @@ export class MySocket {
    */
   removeEventListener(name?: string, listener?: (...args: Array<any>) => void) {
     this._socket.removeListener(name, listener);
+    this._socket.off(name, listener);
   }
 
   /**

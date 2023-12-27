@@ -19,7 +19,7 @@ export default function SettingsPage(props: SettingsPageProps) {
   const { settings, settingsDispatcher } = useSettings();
 
   return (
-    <div className="settings-page p-2">
+    <div className="settings page p-2">
       <h1 className="txt-center">Cài đặt</h1>
       <div className="settings">
         <h2>Hệ thống</h2>

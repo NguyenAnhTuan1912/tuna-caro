@@ -1,5 +1,4 @@
-.settings-page {
-  height: calc(100vh - (89px + 55px));
+.settings {
   background-color: var(--clr-background);
   overflow: auto;
 }

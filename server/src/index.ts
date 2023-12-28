@@ -23,6 +23,7 @@ import CaroGameDB from "db/carogame";
 
 // Import routers
 import CharacterRouter from "modules/characters";
+import GoogleDriveRouter from "modules/drive";
 
 // Import socket event listener wrappers
 import { EmitGameSELWrapperInfo } from "socket_events/game/emitGame";
@@ -60,6 +61,7 @@ builder.buildMiddleWare(bodyParser.urlencoded({ extended: true }));
 // http://localhost:3000/api/post?id=post_01
 // http://localhost:3000/api/posts
 builder.buildAPI(base, CharacterRouter);
+builder.buildAPI(base, GoogleDriveRouter);
 
 // Build Socket
 builder.buildSocketEventWrapper(EmitGameSELWrapperInfo.name, EmitGameSELWrapperInfo.wrapper);

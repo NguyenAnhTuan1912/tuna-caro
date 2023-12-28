@@ -1,25 +1,13 @@
 import { createHandler } from "templates/handler";
 
-const UpdateCharacterHandler = createHandler(
-  "/",
-  function({ DBs, Utils }) {
+const GetListFoldersHandler = createHandler(
+  "/folders",
+  function({ DBs, Utils, Services }) {
     return async function(req, res) {
       let statusCode = 500;
       try {
-        let { data = null, id } = req.body;
-        
-        if(!id) {
-          statusCode = 400;
-          throw new Error("Id must be knew.");
-        }
+        let result = await Services.Google.Drive.listFoldersInfoAysnc();
 
-        if(!data) {
-          statusCode = 400;
-          throw new Error("Data of charater is empty.");
-        }
-
-        let result = await DBs.CaroGameDB.Character.updateCharacter({ id }, data);
-        
         if("$$error" in result) {
           statusCode = 400;
           throw new Error(result.$$error);
@@ -28,7 +16,7 @@ const UpdateCharacterHandler = createHandler(
         return Utils.RM.responseJSON(
           res,
           200,
-          Utils.RM.getResponseMessage(false, result, "Character is updated successfully.")
+          Utils.RM.getResponseMessage(false, result.files, "Get list of folders successfully.")
         );
       } catch (error: any) {
         return Utils.RM.responseJSON(
@@ -41,4 +29,4 @@ const UpdateCharacterHandler = createHandler(
   }
 );
 
-export default UpdateCharacterHandler;
+export default GetListFoldersHandler;

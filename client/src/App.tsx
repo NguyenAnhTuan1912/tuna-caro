@@ -18,7 +18,7 @@ import BaseLayout from './layouts/base_layout/BaseLayout';
 import HomePage from './pages/home/HomePage';
 import SettingsPage from './pages/settings/SettingsPage';
 import GameRoomPage from './pages/game_rooms/GameRoomPage';
-import GamePage from './pages/game/components/GamePage';
+import GamePage from './pages/game/GamePage';
 
 // Import from components
 import SideMenu, { name as SMName } from './components/side_menu/SideMenu';
@@ -43,6 +43,10 @@ function App() {
 
   // Handle some global Socket Exception
   React.useEffect(() => {
+    fetch("http://localhost:5000/api/drive/files/1y6Vfpw6IB7dliiZwlLnkcWU0FGe7RjnL")
+    .then(res => res.json())
+    .then(console.log)
+
     const init = function() {
       let handleOfflineOnWindow = function() {
         openConnectionStatusSnackBar({ isConnected: false });

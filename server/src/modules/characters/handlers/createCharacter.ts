@@ -15,10 +15,10 @@ const CreateCharacterHandler = createHandler(
 
         let result = await DBs.CaroGameDB.Character.createCharacter(data);
         
-        if((result as any).$$error) {
+        if("$$error" in result) {
           statusCode = 400;
-          throw new Error((result as any).$$error);
-        }
+          throw new Error(result.$$error);
+        };
 
         return Utils.RM.responseJSON(
           res,

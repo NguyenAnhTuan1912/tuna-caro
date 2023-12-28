@@ -5,4 +5,5 @@ package-lock.json
 
 .vscode
 .env
+.env.wsms
 .VSCodeCounter

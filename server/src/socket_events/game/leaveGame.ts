@@ -1,3 +1,6 @@
+// Import ENV
+import { env } from "env";
+
 // Import from classes
 import { Message, MySocket } from "classes/MySocket";
 import { Player, PlayerType } from "classes/Player";
@@ -44,7 +47,7 @@ export const LeaveGameSELWrapperInfo = {
             MySocket.EventNames.leaveGame,
             MySocket.createMessage(
               MySocket.EventNames.leaveGame,
-              `${leavePlayer.name} đã rời trò chơi.`,
+              env.WS_MESSAGE_KEYS.LEAVE_GAME,
               {
                 playerId: leavePlayer.id,
                 isHostLeaved: leavePlayer.id === game.host.id
@@ -58,7 +61,7 @@ export const LeaveGameSELWrapperInfo = {
           MySocket.EventNames.leaveGame,
           MySocket.createMessage(
             MySocket.EventNames.leaveGame,
-            `Bạn đã rời trò chơi.`
+            env.WS_MESSAGE_KEYS.LEAVE_GAME
           )
         );
         console.log("Socket rooms (after leave): ", socket.rooms);

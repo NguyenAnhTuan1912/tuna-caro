@@ -6,7 +6,7 @@ import { usePlayer } from 'src/hooks/usePlayer';
 
 // Import from components
 import Layer from 'src/components/layer/Layer';
-import ProfileCard, { StaticProfileCard } from 'src/components/profile_card/ProfileCard';
+import { StaticProfileCard } from 'src/components/profile_card/ProfileCard';
 
 type WinnerLayerProps = {
   button: JSX.Element | undefined;

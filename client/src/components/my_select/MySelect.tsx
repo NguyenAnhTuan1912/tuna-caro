@@ -94,7 +94,7 @@ export default function MySelect(props: MySelectProps) {
   React.useEffect(() => {
     console.log("Is expand: ", selectState.isExpand);
     if(storedData.current.prevOptions !== selectState.option) {
-      if(selectState.option) props.onChangeValue(selectState.option?.value);
+      if(selectState.option &&  props.onChangeValue) props.onChangeValue(selectState.option?.value);
       storedData.current.prevOptions = selectState.option;
     }
   }, [selectState.isExpand, selectState.option]);

@@ -108,7 +108,7 @@ function prepareToRemoveGame(
         MySocket.EventNames.leaveGame,
         MySocket.createMessage(
           MySocket.EventNames.leaveGame,
-          MySocket.EventNames.leaveGame,
+          env.WS_MESSAGE_KEYS.LEAVE_GAME,
           {
             playerId: player!.id,
             isHostLeaved
@@ -118,7 +118,6 @@ function prepareToRemoveGame(
     } else {
       // If game has only host, remove game.
       // Remove game.
-      console.log("Remove game");
       globalSocketManagerObject.gameList.removeGame(gameId);
     };
 
@@ -138,7 +137,7 @@ function prepareToRemoveGame(
       MySocket.EventNames.gameConnectionStatus,
       MySocket.createMessage(
         MySocket.EventNames.gameConnectionStatus,
-        "Disconnected",
+        env.WS_MESSAGE_KEYS.DISCONNECTED,
         {
           isConnected: false,
           player
@@ -166,8 +165,8 @@ function cancelGameRemoving(
   let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
 
-  console.log("Old Connection: ", socketId);
-  console.log("Old Connection's Rooms: ", socket.rooms);
+  // console.log("Old Connection: ", socketId);
+  // console.log("Old Connection's Rooms: ", socket.rooms);
   
   // Cancel data removing by remove the `remove data` callback from `_dataRemoveCBs`.
   clearTimeout(globalSocketManagerObject.dataRemoveCBs.get(gameId));
@@ -184,7 +183,7 @@ function cancelGameRemoving(
       MySocket.EventNames.gameConnectionStatus,
       MySocket.createMessage(
         MySocket.EventNames.gameConnectionStatus,
-        "Reconnected",
+        env.WS_MESSAGE_KEYS.RECONNECTED,
         {
           isConnected: true,
           player
@@ -360,7 +359,7 @@ export class MySocket {
           MySocket.EventNames.initial,
           MySocket.createMessage(
             MySocket.EventNames.initial,
-            "Welcome to caro game by Tuna Nguyen",
+            env.WS_MESSAGE_KEYS.HANDSHAKE,
             {
               configParams: {
                 maxDisconnectionDuration: MySocket.MAX_DISCONNECTION_DURATION

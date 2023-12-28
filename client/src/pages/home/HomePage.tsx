@@ -76,7 +76,7 @@ export default function HomePage(props: HomePageProps) {
         <hr className="my-4"></hr>
         
         <Button
-          extendClassName="w-100 mb-1"
+          extendClassName="w-100 mb-1 txt-clr-primary fw-bold"
           onClick={() => {
             openGameCreatingDialog().then(result => {
               if(!result.isAgree) return;
@@ -97,10 +97,11 @@ export default function HomePage(props: HomePageProps) {
             })
           }}
         >
-          <strong className="txt-clr-primary">Tạo phòng chơi trực tuyến</strong>
+          Tạo phòng chơi trực tuyến
         </Button>
 
         <Button
+          extendClassName="w-100 mb-1"
           onClick={() => {
             openGameFindingDialog().then(result => {
               if(!result.isAgree) return;
@@ -120,7 +121,6 @@ export default function HomePage(props: HomePageProps) {
               );
             })
           }}
-          extendClassName="w-100 mb-1"
         >
           Tìm phòng
         </Button>

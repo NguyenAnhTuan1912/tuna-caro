@@ -1,7 +1,15 @@
 import { Request, Response, NextFunction } from "express";
+
+// Import databases
 import CaroGameDB from "db/carogame";
 
+// Import services
+import { GoogleService, GoogleServiceType } from "services/google";
+
+// Import utils
 import utils from "utils";
+
+// Import types
 import { APIHandler } from "types";
 
 // Internal Types
@@ -13,7 +21,10 @@ interface DBs {
 
 interface HandlerCBProps {
   DBs: DBs,
-  Utils: Utils
+  Utils: Utils,
+  Services: {
+    Google: GoogleServiceType
+  }
 };
 
 type CreateHandlerCallBack = (props: HandlerCBProps) => (req: Request, res: Response, next?: NextFunction) => Promise<any>
@@ -71,7 +82,10 @@ export function createHandler(
   // Declare props for call back.
   const callBackProps: HandlerCBProps = {
     DBs: DBs,
-    Utils: utils
+    Utils: utils,
+    Services: {
+      Google: GoogleService
+    }
   };
 
   return {
@@ -137,7 +151,10 @@ export function createExtraArgsHandler<T>(
   // Declare props for call back.
   const callBackProps: HandlerCBProps = {
     DBs: DBs,
-    Utils: utils
+    Utils: utils,
+    Services: {
+      Google: GoogleService
+    }
   };
 
   return {

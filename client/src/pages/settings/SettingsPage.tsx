@@ -69,8 +69,8 @@ export default function SettingsPage(props: SettingsPageProps) {
                     value: "vie"
                   },
                   {
-                    label: <span><i className="twa twa-flag-united-states"></i> <strong>US-ENG</strong></span>,
-                    value: "us-eng"
+                    label: <span><i className="twa twa-flag-united-states"></i> <strong>ENG</strong></span>,
+                    value: "eng"
                   }
                 ]}
               />

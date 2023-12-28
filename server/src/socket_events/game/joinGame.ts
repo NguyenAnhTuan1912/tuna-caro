@@ -1,3 +1,6 @@
+// Import ENV
+import { env } from "env";
+
 // Import from classes
 import { MySocket, Message } from "classes/MySocket";
 import { GameType } from "classes/Game";
@@ -25,17 +28,17 @@ export const JoinGameSELWrapperInfo = {
         let checkPassword = true;
 
         // Check if game is not exist
-        if(!addedGame) throw new Error("not_exist");
+        if(!addedGame) throw new Error(env.WS_MESSAGE_KEYS.NOT_EXIST_ROOM);
 
         // Check if room is full
-        if(addedGame?.isFull()) throw new Error("full_room");
+        if(addedGame?.isFull()) throw new Error(env.WS_MESSAGE_KEYS.FULL_ROOM);
 
         // Checkpassword
         if(addedGame?.hasPassword()) {
           checkPassword = await addedGame.comparePassword(game.password!);
         }
 
-        if(!checkPassword) throw new Error("wrong_password");
+        if(!checkPassword) throw new Error(env.WS_MESSAGE_KEYS.WRONG_PASSWORD);
 
         // Modify something
         addedGame.setPlayer(wannaJoinPlayer);
@@ -52,7 +55,7 @@ export const JoinGameSELWrapperInfo = {
           MySocket.EventNames.joinGame,
           MySocket.createMessage(
             MySocket.EventNames.joinGame,
-            `${wannaJoinPlayer.name} vừa mới vào game.`,
+            env.WS_MESSAGE_KEYS.JOIN_GAME,
             wannaJoinPlayer
           )
         );
@@ -62,7 +65,7 @@ export const JoinGameSELWrapperInfo = {
           MySocket.EventNames.joinGame,
           MySocket.createMessage(
             MySocket.EventNames.joinGame,
-            "Bạn vừa mới vào game.",
+            env.WS_MESSAGE_KEYS.JOIN_GAME,
             addedGame
           )
         );

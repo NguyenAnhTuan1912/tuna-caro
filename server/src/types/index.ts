@@ -2,6 +2,9 @@ import { Db, ObjectId } from "mongodb";
 import { Request, Response, NextFunction } from "express";
 import MyServer from "classes/MyServer";
 
+// Import from constant
+import { GoogleMimeTypesType } from "constant";
+
 // Union types
 export type HTTPMethods = "get" | "post" | "put" | "delete" | "patch";
 export type UserRoles = "admin" | "user";
@@ -36,3 +39,10 @@ export type SchemaTimeType = {
   createdAt?: number;
   updatedAt?: number;
 }
+
+export type GoogleDriveFileDataType = {
+  kind: string,
+  mimeType: GoogleMimeTypesType,
+  id: string,
+  name: string
+};

@@ -1,10 +1,14 @@
 import { useParams } from 'react-router-dom';
 
-import GameOffline from '../GameOffline';
-import GameOnline from '../GameOnline';
+// Import from layouts
+import BaseLayout from 'src/layouts/base_layout/BaseLayout';
+
+// Import components
+import GameOffline from './GameOffline';
+import GameOnline from './GameOnline';
 
 // Import types
-import { TypeOfGame } from '../Game.props';
+import { TypeOfGame } from './Game.props';
 
 /**
  * Use this component to render Game section.
@@ -20,6 +24,11 @@ export default function GamePage() {
     type: TypeOfGame
   }>();
 
-  if(type === "offline") return <GameOffline />
-  if(type === "online") return <GameOnline />
+  return (
+    <BaseLayout shownFooter={false} shownHeader={false}>
+      {
+        type === "offline" ? <GameOffline /> : <GameOnline />
+      }
+    </BaseLayout>
+  )
 }

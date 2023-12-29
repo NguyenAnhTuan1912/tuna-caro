@@ -3,11 +3,13 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 // Import slices
 import { PlayerSlice } from "./player";
 import { SettingsSlice } from "./settings";
+import { LangSlice } from "./lang";
 
 // Central Reducer.
 const reducers = combineReducers({
   [PlayerSlice.name]: PlayerSlice.reducer,
-  [SettingsSlice.name]: SettingsSlice.reducer
+  [SettingsSlice.name]: SettingsSlice.reducer,
+  [LangSlice.name]: LangSlice.reducer
 });
 
 /**

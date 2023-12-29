@@ -1,3 +1,6 @@
+// Import ENV
+import { env } from "env";
+
 // Import from classes
 import { MySocket, Message } from "classes/MySocket";
 import { Game, GameType } from "classes/Game";
@@ -40,7 +43,7 @@ export const EmitGameSELWrapperInfo = {
           MySocket.EventNames.emitGame,
           MySocket.createMessage(
             MySocket.EventNames.emitGame,
-            "Create game successfully.",
+            env.WS_MESSAGE_KEYS.CREATE_GAME_SUCCESSFULLY,
             newGame
           )
         );

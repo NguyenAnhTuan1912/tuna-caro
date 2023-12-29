@@ -2,9 +2,22 @@ import { API_ROOT } from 'src/utils/constant';
 
 const API_URL = API_ROOT + "/api";
 
+const ENDPOINTS = {
+  CHARACTER: API_URL + "/character",
+  CHARACTERS: API_URL + "/characters",
+  DRIVE_FILES: API_URL + "/drive/files",
+  DRIVE_FOLDERS: API_URL + "/drive/folders"
+};
+
+// Import callers
+import { configureGetCharacterAsync } from './characters/getCharacterAsync';
+import { configureGetCharactersAsync } from './characters/getCharactersAsync';
+import { configureListFilesAsync } from './drive/listFilesAsync';
+import { configureGetContentOfFileByIdAsync } from './drive/getContentOfFileByIdAsync';
+import { configureGetContentOfFileByNameAsync } from './drive/getContentOfFileByNameAsync';
+
 // Import types
-import { HTTPResponse, RequestOptions } from '../apis.types';
-import { CharacterType } from 'src/types/character.types';
+import { HTTPResponse } from '../apis.types';
 
 /**
  * Use this function to get random ID from server.
@@ -15,37 +28,11 @@ async function getRandomIDAsync(): Promise<HTTPResponse<{ id: string }>> {
   return response.json();
 }
 
-/**
- * Use this function to a list of character.
- * @param options 
- * @returns 
- */
-async function getCharactersAsync(opt?: RequestOptions): Promise<HTTPResponse<Array<CharacterType>>> {
-  let queryStr = "";
-
-  if(opt && opt.query) {
-    queryStr = "?" + new URLSearchParams(opt.query);;
-  }
-
-  let url = API_URL + "/characters" + queryStr;
-  console.log("URL: ", url);
-  const response = await fetch(url);
-  return response.json();
-}
-
-/**
- * Use this function to get information of a character.
- * @param opt 
- * @returns 
- */
-async function getCharacterAsync(opt: RequestOptions) {
-  let url = API_URL + "/character" +"?" + new URLSearchParams(opt.query);
-  const response = await fetch(url);
-  return response.json();
-}
-
 export const OtherAPIs = {
   getRandomIDAsync,
-  getCharactersAsync,
-  getCharacterAsync
+  getCharactersAsync: configureGetCharactersAsync(ENDPOINTS.CHARACTERS),
+  getCharacterAsync: configureGetCharacterAsync(ENDPOINTS.CHARACTER),
+  listFilesAsync: configureListFilesAsync(ENDPOINTS.DRIVE_FILES),
+  getContentOfFileByIdAsync: configureGetContentOfFileByIdAsync(ENDPOINTS.DRIVE_FILES),
+  getContentOfFileByNameAsync: configureGetContentOfFileByNameAsync(ENDPOINTS.DRIVE_FOLDERS)
 };

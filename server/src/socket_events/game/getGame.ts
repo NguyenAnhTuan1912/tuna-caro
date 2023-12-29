@@ -35,7 +35,7 @@ export const GetGamesSELWrapperInfo = {
           }
         });
 
-        // Send message to opposite player.
+        // Send message to player.
         socket
         .emit(
           MySocket.EventNames.getGames,

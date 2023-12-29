@@ -63,6 +63,15 @@ export const SettingsSlice = createSlice({
       } else {
         ColorTheme.unableTheme();
       }
+    },
+
+    /**
+     * Use this action to update lang of settings.
+     * @param state 
+     * @param action 
+     */
+    updateLangAction: function(state, action: ReduxAction<string>) {
+      Settings.updateLang(state.self, action.payload);
     }
   }
 });

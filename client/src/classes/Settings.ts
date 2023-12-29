@@ -5,11 +5,13 @@ import { defaultDarkTheme, ColorTheme } from "./ColorTheme";
 
 // Import from objects
 
-// Import utils
+// Import from utils
+import { LANG_CODES } from "src/utils/constant";
 import { LocalStorageUtils } from "src/utils/localstorage";
 import { OtherUtils } from "src/utils/other";
 
-export type LanguagesType = "vie" | "us";
+// Import types
+import { LangCode } from "src/state/lang";
 
 export interface SFXSettingsType {
   hasSoundWhenClickTable: boolean;
@@ -19,7 +21,7 @@ export interface SFXSettingsType {
 export interface SettingsType {
   isDarkMode: boolean;
   sfx: SFXSettingsType;
-  lang: LanguagesType;
+  lang: LangCode;
 }
 
 export type SFXSettingKeysType = keyof SFXSettingsType;
@@ -48,7 +50,7 @@ export class Settings {
         hasSoundWhenClickTable:
           hasSoundWhenClickTable === undefined ||  hasSoundWhenClickTable === null ? true : hasSoundWhenClickTable
       },
-      lang: "vie"
+      lang: LANG_CODES[0]
     }
   }
 
@@ -62,7 +64,7 @@ export class Settings {
         hasSoundWhenClickButton: true,
         hasSoundWhenClickTable: true
       },
-      lang: "vie"
+      lang: LANG_CODES[0]
     }
   }
 
@@ -122,7 +124,7 @@ export class Settings {
   }
 
   /**
-   * Use this method to toggle table click sound settings.
+   * Use this static method to toggle table click sound settings.
    * @param st 
    */
   static toggleTableClickSound(st: SettingsType) {
@@ -134,5 +136,14 @@ export class Settings {
         LocalStorageUtils.setItem("hasSoundWhenClickTable", status);
       }
     );
+  }
+
+  /**
+   * Use this static method to update lang in settings.
+   * @param st 
+   * @param langCode 
+   */
+  static updateLang(st: SettingsType, langCode: string) {
+    st.lang = langCode;
   }
 }

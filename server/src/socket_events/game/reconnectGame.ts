@@ -1,3 +1,6 @@
+// Import ENV
+import { env } from "env";
+
 // Import from classes
 import { MySocket, Message } from "classes/MySocket";
 import { GameType } from "classes/Game";
@@ -24,7 +27,7 @@ export const ReconnectGameSELWrapperInfo = {
         const reconnectPlayer = new Player(player);
 
         // Check if game is not exist
-        if(!addedGame) throw new Error("not_exist");
+        if(!addedGame) throw new Error(env.WS_MESSAGE_KEYS.NOT_EXIST_ROOM);
 
         // Remove the game removing timeout
         clearTimeout(o.dataRemoveCBs.get(game.id));
@@ -32,9 +35,6 @@ export const ReconnectGameSELWrapperInfo = {
 
         // Modify something
         addedGame.updatePlayer(reconnectPlayer);
-
-        // After reconnect.
-        console.log("After reconnect: ", addedGame);
 
         // Add to socket room
         socket.join(addedGame.id);
@@ -44,7 +44,7 @@ export const ReconnectGameSELWrapperInfo = {
           MySocket.EventNames.reconnectGame,
           MySocket.createMessage(
             MySocket.EventNames.reconnectGame,
-            MySocket.EventNames.reconnectGame
+            env.WS_MESSAGE_KEYS.RECONNECTED_GAME_SUCCESSFULLY
           )
         );
       } catch (error: any) {

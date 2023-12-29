@@ -22,14 +22,14 @@ export const {
   const createActions = function(dispatch: AppDispatch) {
     return {
       /**
-       * Use this action to change dark mode status.
+       * Use this dispatcher to change dark mode status.
        */
       toggleDarkMode: function() {
         dispatch(toggleDarkModeAction());
       },
 
       /**
-       * Use this action to change SFX Settings status.
+       * Use this dispatcher to change SFX Settings status.
        * @param soundName 
        * @param status 
        */

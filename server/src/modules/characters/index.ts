@@ -5,6 +5,11 @@
 
 import { createRouter } from "templates/router";
 
+const bases = {
+  characters: "/characters",
+  character: "/character"
+};
+
 // Import handlers
 import GetCharacterHandler from "./handlers/getCharacter";
 import GetCharactersHandler from "./handlers/getCharacters";
@@ -16,30 +21,30 @@ const CharacterRouter = createRouter({
   handlers: [
     // GET
     {
-      path: "/characters" + GetCharacterHandler.path,
+      path: bases.characters + GetCharacterHandler.path,
       method: "get",
       fns: [GetCharacterHandler.handler]
     },
     {
-      path: "/characters" + GetCharactersHandler.path,
+      path: bases.characters + GetCharactersHandler.path,
       method: "get",
       fns: [GetCharactersHandler.handler]
     },
     // CREATE (POST)
     {
-      path: "/character" + CreateCharacterHandler.path,
+      path: bases.character + CreateCharacterHandler.path,
       method: "post",
       fns: [CreateCharacterHandler.handler]
     },
     // UPDATE (PUT)
     {
-      path: "/character" + UpdateCharacterHandler.path,
+      path: bases.character + UpdateCharacterHandler.path,
       method: "put",
       fns: [UpdateCharacterHandler.handler]
     },
     // DELETE
     {
-      path: "/character" + DeleteCharacterHandler.path,
+      path: bases.character + DeleteCharacterHandler.path,
       method: "delete",
       fns: [DeleteCharacterHandler.handler]
     }

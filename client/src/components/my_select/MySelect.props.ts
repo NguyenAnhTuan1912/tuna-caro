@@ -13,5 +13,5 @@ export type MySelectProps = {
   placeHolder?: string | JSX.Element | (() => string | JSX.Element),
   options: Array<MySelectOption>,
   defaultValue?: string,
-  onChangeValue: (value: string) => void
+  onChangeValue?: (value: string) => void
 }

@@ -1,7 +1,9 @@
-import React from 'react'
-
 // Import hooks
+import { useLang } from 'src/hooks/useLang';
 import { useSettings } from 'src/hooks/useSettings';
+
+// Import layouts
+import BaseLayout from 'src/layouts/base_layout/BaseLayout';
 
 // Import components
 import Article from 'src/components/article/Article';
@@ -17,79 +19,84 @@ import './SettingsPage.styles.css';
 
 export default function SettingsPage(props: SettingsPageProps) {
   const { settings, settingsDispatcher } = useSettings();
+  const { lang, langTextJSON, langDispatcher } = useLang();
 
   return (
-    <div className="settings page p-2">
-      <h1 className="txt-center">Cài đặt</h1>
-      <div className="settings">
-        <h2>Hệ thống</h2>
-        <div className="pt-1">
-          {/* Sound Effect Setting */}
-          <Article title="Âm thanh" hasHorizontalLine>
-            <div className="setting mb-1">
-              <p>Âm thanh khi ấn nút</p>
-              <Switch
-                initialStatus={settings.sfx.hasSoundWhenClickButton}
-                onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickButton", status)}
-              />
-            </div>
+    <BaseLayout
+      headerTitle={langTextJSON.settingsPage.headerTitle}
+    >
+      <div className="settings page p-2">
+        <h1 className="txt-center">{langTextJSON.settingsPage.pageTitle}</h1>
+        <div className="settings">
+          <h2>{langTextJSON.settingsPage.systemSettingsLabel}</h2>
+          <div className="pt-1">
+            {/* Sound Effect Setting */}
+            <Article title={langTextJSON.settingsPage.soundSettingsLabel} hasHorizontalLine>
+              <div className="setting mb-1">
+                <p>{langTextJSON.settingsPage.playSoundWhenClickButtonSettingsLabel}</p>
+                <Switch
+                  initialStatus={settings.sfx.hasSoundWhenClickButton}
+                  onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickButton", status)}
+                />
+              </div>
 
-            <div className="setting mb-1">
-              <p>Âm thanh khi ấn vào bàn cờ</p>
-              <Switch
-                initialStatus={settings.sfx.hasSoundWhenClickTable}
-                onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickTable", status)}
-              />
-            </div>
-          </Article>
+              <div className="setting mb-1">
+                <p>{langTextJSON.settingsPage.playSoundWhenClickTableSettingsLabel}</p>
+                <Switch
+                  initialStatus={settings.sfx.hasSoundWhenClickTable}
+                  onChange={status => settingsDispatcher.setSFXStatus("hasSoundWhenClickTable", status)}
+                />
+              </div>
+            </Article>
 
-          {/* Theme Setting */}
-          <Article title="Chủ đề" hasHorizontalLine>
-            <div className="setting mb-1">
-              <p>Màu tối</p>
-              <Switch
-                initialStatus={settings.isDarkMode}
-                onChange={status => {
-                  settingsDispatcher.toggleDarkMode()
-                }}
-              />
-            </div>
-          </Article>
+            {/* Theme Setting */}
+            <Article title={langTextJSON.settingsPage.colorThemeSettingsLabel} hasHorizontalLine>
+              <div className="setting mb-1">
+                <p>{langTextJSON.settingsPage.darkThemeSettingsLabel}</p>
+                <Switch
+                  initialStatus={settings.isDarkMode}
+                  onChange={status => {
+                    settingsDispatcher.toggleDarkMode()
+                  }}
+                />
+              </div>
+            </Article>
 
-          {/* Language Setting */}
-          <Article title="Ngôn ngữ" hasHorizontalLine>
-            <div className="setting mb-1">
-              <p>Ngôn ngữ</p>
-              <MySelect
-                defaultValue="vie"
-                onChangeValue={(value) => console.log("Selected value: ", value)}
-                options={[
-                  {
-                    label: <span><i className="twa twa-flag-vietnam"></i> <strong>VIE</strong></span>,
-                    value: "vie"
-                  },
-                  {
-                    label: <span><i className="twa twa-flag-united-states"></i> <strong>US-ENG</strong></span>,
-                    value: "us-eng"
-                  }
-                ]}
-              />
-            </div>
-          </Article>
+            {/* Language Setting */}
+            <Article title={langTextJSON.settingsPage.languageSettingsLabel} hasHorizontalLine>
+              <div className="setting mb-1">
+                <p>{langTextJSON.settingsPage.languageSettingsLabel}</p>
+                <MySelect
+                  defaultValue={lang.currentLang}
+                  onChangeValue={(value) => langDispatcher.getLanguagesAsync(value)}
+                  options={[
+                    {
+                      label: <span><i className="twa twa-flag-vietnam"></i> <strong>VIE</strong></span>,
+                      value: "vie"
+                    },
+                    {
+                      label: <span><i className="twa twa-flag-united-states"></i> <strong>ENG</strong></span>,
+                      value: "eng"
+                    }
+                  ]}
+                />
+              </div>
+            </Article>
+          </div>
+          
+          <h2>{langTextJSON.settingsPage.otherInformationsLabel}</h2>
+          <MyDetails
+            label={<p>{langTextJSON.settingsPage.aboutMeLabel}</p>}
+            content={"Xin chào, mình là Nguyen Anh Tuan"}
+          />
+
+          {/* About app */}
+          <MyDetails
+            label={<p>{langTextJSON.settingsPage.aboutApplicationLabel}</p>}
+            content={"Xin chào, mình là Nguyen Anh Tuan"}
+          />
         </div>
-        
-        <h2>Thông tin khác</h2>
-        <MyDetails
-          label={<p>Về tôi</p>}
-          content={"Xin chào, mình là Nguyen Anh Tuan"}
-        />
-
-        {/* About app */}
-        <MyDetails
-          label={<p>Về ứng dụng</p>}
-          content={"Xin chào, mình là Nguyen Anh Tuan"}
-        />
       </div>
-    </div>
+    </BaseLayout>
   )
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import { TunangnModal, snackbar } from 'tunangn-react-modal';
-import { useNavigate } from 'react-router-dom';
+import { TunangnModal } from 'tunangn-react-modal';
 
 // Import from classes
 
@@ -9,22 +8,24 @@ import { useNavigate } from 'react-router-dom';
 import { mySocket } from 'src/apis/socket';
 
 // Import from hooks
-import { useSettingsActions } from './hooks/useSettings';
+import { useSettings } from './hooks/useSettings';
 import { usePlayerActions } from './hooks/usePlayer';
 import { useGlobalData } from './hooks/useGlobalData';
+import { useLang, getLangTextJSON } from './hooks/useLang';
 
 // Import from layout and pages
 import BaseLayout from './layouts/base_layout/BaseLayout';
 import HomePage from './pages/home/HomePage';
 import SettingsPage from './pages/settings/SettingsPage';
 import GameRoomPage from './pages/game_rooms/GameRoomPage';
-import GamePage from './pages/game/components/GamePage';
+import GamePage from './pages/game/GamePage';
 
 // Import from components
+import LoadingIndicator from './components/loading_indicator/LoadingIndicator';
 import SideMenu, { name as SMName } from './components/side_menu/SideMenu';
 import GameDialog, { name as GDName } from './components/dialog/GameDialog';
 import CharacterPickerDialog, { name as CPDName } from './components/dialog/CharacterPickerDialog';
-import SnackBar, { name as SBName, NotifiableSnackBars } from './components/snack_bar/SnackBar';
+import SnackBar, { name as SBName } from './components/snack_bar/SnackBar';
 import ConnectionStatusSnackBar, { name as CSSBName, openConnectionStatusSnackBar } from './components/snack_bar/ConnectionStatusSnackBar';
 
 // Import from utils
@@ -36,10 +37,12 @@ import { ROUTES } from './utils/constant';
  */
 function App() {
   const playerDispatcher = usePlayerActions();
-  const settingsDispatcher = useSettingsActions();
+  const { settings, settingsDispatcher } = useSettings();
+  const { lang, langDispatcher } = useLang();
+
+  const langTextJSON = getLangTextJSON(lang.text, lang.currentLang);
+
   const gpd = useGlobalData();
-  
-  const navigate = useNavigate();
 
   // Handle some global Socket Exception
   React.useEffect(() => {
@@ -66,10 +69,8 @@ function App() {
 
         if(socket.recovered) {
           // Old connection is recovered.
-          console.log("Old connection: ", socketId);
         } else {
           // New connection is established.
-          console.log("New connection: ", socketId);
           /*
             Whenever a new connection is established, this playerDispatcher will dispatch
             a payload to Redux Store to update socketId of player.
@@ -93,6 +94,9 @@ function App() {
       // Listen to `offline` event from `window`.
       window.addEventListener("offline", handleOfflineOnWindow);
 
+      // Fetch text data
+      langDispatcher.getLanguagesAsync(settings.lang);
+
       return function() {
         console.log("Disconnect socket");
         window.removeEventListener("offline", handleOfflineOnWindow);
@@ -104,6 +108,16 @@ function App() {
     return init();
   }, []);
 
+  if(!lang.loaded[lang.currentLang]) {
+    return (
+      <div className="container flex-box ait-center jc-center">
+        <LoadingIndicator
+          text="Đang tải dữ liệu..."
+        />
+      </div>
+    );
+  };
+
   return (
     <>
       <Routes>
@@ -113,41 +127,25 @@ function App() {
         {/* Home Page */}
         <Route
           path={ROUTES.Home}
-          element={
-            <BaseLayout headerTitle={"Trang chủ"}>
-              <HomePage />
-            </BaseLayout>
-          }
+          element={<HomePage />}
         />
 
         {/* Settings Page */}
         <Route
           path={ROUTES.Settings}
-          element={
-            <BaseLayout headerTitle={"Cài đặt"}>
-              <SettingsPage />
-            </BaseLayout>
-          }
+          element={<SettingsPage />}
         />
 
         {/* GameRoomPage */}
         <Route
           path={ROUTES.GameRooms}
-          element={
-            <BaseLayout headerTitle={"Phòng"}>
-              <GameRoomPage />
-            </BaseLayout>
-          }
+          element={<GameRoomPage />}
         />
 
         {/* Game Page */}
         <Route
           path={ROUTES.Game + "/:type"}
-          element={
-            <BaseLayout headerTitle={"Game"} shownFooter={false} shownHeader={false}>
-              <GamePage />
-            </BaseLayout>
-          }
+          element={<GamePage />}
         />
       </Routes>
 

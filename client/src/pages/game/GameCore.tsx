@@ -116,9 +116,7 @@ export default function GameCore(props: GameCoreProps) {
         */ 
         state.game.status === "Waiting"
         && (
-          <PauseGameLayer
-            text="Đang chờ người chơi khác..."
-          />
+          <PauseGameLayer />
         )
       }
       {

@@ -5,7 +5,7 @@ import { PlayerType } from 'src/classes/Player';
 
 // Import from state
 import { AppDispatch } from 'src/state';
-import { getPlayerIDAsyncThunk } from "src/state/player/thunks";
+import { getPlayerIDAsyncThunk } from "src/state/player/thunks/getPlayerIDAsyncThunk";
 
 // Import actions
 import {
@@ -20,20 +20,35 @@ export const {
   usePlayerState,
   usePlayerActions
 } = (function() {
-  const createPlayerActionFns = function(dispatch: AppDispatch) {
+  const createPlayerDispatchers = function(dispatch: AppDispatch) {
     return {
+      /**
+       * Use this dispatcher to get ID for player.
+       */
       getPlayerIDAsync: function() {
         dispatch(getPlayerIDAsyncThunk());
       },
 
+      /**
+       * Use this dispatcher to set or update id for player.
+       * @param id 
+       */
       setPlayerId: function(id: string) {
         dispatch(setPlayerIDAction(id));
       },
 
+      /**
+       * Use this dispatcher to set or update name for player.
+       * @param name 
+       */
       setPlayerName: function(name: string) {
         dispatch(setPlayerNameAction(name));
       },
 
+      /**
+       * Use this dispatcher to set or update player.
+       * @param player 
+       */
       setPlayer: function(player: Partial<PlayerType>) {
         dispatch(setPlayerAction(player));
       }
@@ -43,6 +58,7 @@ export const {
   return {
     /**
      * Use this hook to get and trace player's state and use player's action.
+     * @returns
      */
     usePlayer: function() {
       const player = useSelector(playerSelector);
@@ -50,12 +66,13 @@ export const {
 
       return {
         player,
-        playerDispatcher: createPlayerActionFns(dispatch)
+        playerDispatcher: createPlayerDispatchers(dispatch)
       }
     },
 
     /**
      * Use this hook to get and trace player's state.
+     * @returns
      */
     usePlayerState: function() {
       const player = useSelector(playerSelector);
@@ -65,11 +82,12 @@ export const {
 
     /**
      * Use this hook to use player's action.
+     * @returns
      */
     usePlayerActions: function() {
       const dispatch = useDispatch();
 
-      return createPlayerActionFns(dispatch);
+      return createPlayerDispatchers(dispatch);
     }
   }
 })();

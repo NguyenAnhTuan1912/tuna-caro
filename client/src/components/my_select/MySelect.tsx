@@ -92,7 +92,6 @@ export default function MySelect(props: MySelectProps) {
   }, [selectState.placeHolder, selectState.option]);
 
   React.useEffect(() => {
-    console.log("Is expand: ", selectState.isExpand);
     if(storedData.current.prevOptions !== selectState.option) {
       if(selectState.option &&  props.onChangeValue) props.onChangeValue(selectState.option?.value);
       storedData.current.prevOptions = selectState.option;
@@ -101,7 +100,7 @@ export default function MySelect(props: MySelectProps) {
 
   return (
     <div
-      onClick={() => { console.log("Click select"); setSelectState(prevState => ({ ...prevState, isExpand: !prevState.isExpand })) }}
+      onClick={() => { setSelectState(prevState => ({ ...prevState, isExpand: !prevState.isExpand })) }}
       className="select-container outline btn-transparent p-1"
     >
       <div className="select-placeholder">

@@ -1,5 +1,9 @@
 import { useParams } from 'react-router-dom';
 
+// Import from layouts
+import BaseLayout from 'src/layouts/base_layout/BaseLayout';
+
+// Import components
 import GameOffline from './GameOffline';
 import GameOnline from './GameOnline';
 
@@ -20,6 +24,11 @@ export default function GamePage() {
     type: TypeOfGame
   }>();
 
-  if(type === "offline") return <GameOffline />
-  if(type === "online") return <GameOnline />
+  return (
+    <BaseLayout shownFooter={false} shownHeader={false}>
+      {
+        type === "offline" ? <GameOffline /> : <GameOnline />
+      }
+    </BaseLayout>
+  )
 }

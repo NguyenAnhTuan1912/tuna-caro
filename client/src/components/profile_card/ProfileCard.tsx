@@ -1,6 +1,7 @@
 import React from 'react'
 
 // Import hooks
+import { useLangState } from 'src/hooks/useLang';
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { usePlayer } from 'src/hooks/usePlayer';
 
@@ -53,6 +54,7 @@ export function StaticProfileCard(props: StaticProfileCardProps) {
  */
 export default function ProfileCard(props: ProfileCardProps) {
   const { player, playerDispatcher } = usePlayer();
+  const { langTextJSON } = useLangState();
   const [ profileState, profileStateFns ] = useStateWESSFns(
     ProfileCardStateConfigs.getInitialState(),
     ProfileCardStateConfigs.getStateFns
@@ -122,7 +124,7 @@ export default function ProfileCard(props: ProfileCardProps) {
               }}
               className="btn-transparent no-outline py-1 rounded-4"
             >
-              <span className="txt-clr-primary fs-4">Đồng ý</span>
+              <span className="txt-clr-primary fs-4">{langTextJSON.sideMenu.agreeChangeNameBtnLabel}</span>
             </Button>
           )
         }
@@ -135,10 +137,10 @@ export default function ProfileCard(props: ProfileCardProps) {
               {
                 profileState.canChangeName
                   ? (
-                    <span className="txt-clr-error fs-4">Hủy</span>
+                    <span className="txt-clr-error fs-4">{langTextJSON.sideMenu.cancelChangeNameBtnLabel}</span>
                   )
                   : (
-                    <span className="txt-clr-primary fs-4">Đổi tên</span>
+                    <span className="txt-clr-primary fs-4">{langTextJSON.sideMenu.changeNameBtnLabel}</span>
                   )
               }
             </Button>

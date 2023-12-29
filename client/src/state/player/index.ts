@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Player, PlayerType } from "src/classes/Player";
 
 // Import thunks
-import { getPlayerIDAsyncThunk } from "./thunks";
+import { getPlayerIDAsyncThunk } from "./thunks/getPlayerIDAsyncThunk";
 
 // Import utils
 import { LocalStorageUtils } from "src/utils/localstorage";
@@ -18,15 +18,13 @@ import { ReduxAction } from "../state.types";
  */
 export const PlayerSlice = createSlice({
   name: "player",
-  initialState: {
-    self: Player.createPlayer(
-      {
-        id: (LocalStorageUtils.getItem("playerId") ?? "") as string,
-        name: (LocalStorageUtils.getItem("playerName") ?? "") as string,
-        img: (LocalStorageUtils.getItem("playerImg") ?? "") as string
-      }
-    )
-  },
+  initialState: Player.createPlayer(
+    {
+      id: (LocalStorageUtils.getItem("playerId") ?? "") as string,
+      name: (LocalStorageUtils.getItem("playerName") ?? "") as string,
+      img: (LocalStorageUtils.getItem("playerImg") ?? "") as string
+    }
+  ),
   reducers: {
     /**
      * Use this action to set player's ID.
@@ -34,7 +32,7 @@ export const PlayerSlice = createSlice({
      * @param payload 
      */
     setPlayerIDAction: function(state, action: ReduxAction<string>) {
-      state.self.id = action.payload;
+      state.id = action.payload;
     },
 
     /**
@@ -44,7 +42,7 @@ export const PlayerSlice = createSlice({
      */
     setPlayerNameAction: function(state, action: ReduxAction<string>) {
       LocalStorageUtils.setItem("playerName", action.payload);
-      state.self.name = action.payload;
+      state.name = action.payload;
     },
 
     /**
@@ -55,13 +53,13 @@ export const PlayerSlice = createSlice({
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
       if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
       if(action.payload.img) LocalStorageUtils.setItem("playerImg", action.payload.img);
-      Player.setPlayer(state.self, action.payload);
+      Player.setPlayer(state, action.payload);
     }
   },
   
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
-      state.self.id = action.payload;
+      state.id = action.payload;
     });
   }
 });
@@ -72,7 +70,7 @@ export const PlayerSlice = createSlice({
  * @returns 
  */
 export function playerSelector(state: any): PlayerType {
-  return state.player.self;
+  return state.player;
 }
 
 export const {

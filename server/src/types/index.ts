@@ -40,7 +40,7 @@ export type SchemaTimeType = {
   updatedAt?: number;
 }
 
-export type GoogleDriveDataType = {
+export type GoogleDriveFileDataType = {
   kind: string,
   mimeType: GoogleMimeTypesType,
   id: string,

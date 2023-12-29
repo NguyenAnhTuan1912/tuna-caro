@@ -1,6 +1,6 @@
 import { createHandler } from "templates/handler";
 
-const GetContentOfFileHandler = createHandler(
+const GetContentOfFileByIdHandler = createHandler(
   "/files/:id",
   function({ DBs, Utils, Services }) {
     return async function(req, res) {
@@ -8,7 +8,7 @@ const GetContentOfFileHandler = createHandler(
       try {
         let { id } = req.params;
 
-        let file = await Services.Google.Drive.getFileInfoByIdAsync(id, "media");
+        let file = await Services.Google.Drive.getFileByIdAsync(id, "media");
 
         if("$$error" in file) {
           statusCode = 400;
@@ -27,4 +27,4 @@ const GetContentOfFileHandler = createHandler(
   }
 );
 
-export default GetContentOfFileHandler;
+export default GetContentOfFileByIdHandler;

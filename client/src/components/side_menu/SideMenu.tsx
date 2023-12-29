@@ -1,6 +1,9 @@
 import React from 'react';
 import { CustomizedModalItemProps } from 'tunangn-react-modal';
 
+// Import hooks
+import { useLangState } from 'src/hooks/useLang';
+
 // Import from layouts
 import CloseButton from 'src/layouts/modal_items/CloseButton';
 
@@ -17,6 +20,8 @@ export const name = "mySideMenu";
  * @returns 
  */
 export default function SideMenu(props: CustomizedModalItemProps) {
+  const { langTextJSON } = useLangState();
+
   const sideMenuRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -62,40 +67,31 @@ export default function SideMenu(props: CustomizedModalItemProps) {
           <ProfileCard isVertical canEdit />
         </div>
         <Article
-          title="Hướng dẫn"
+          title={langTextJSON.sideMenu.guideLabel}
           hasHorizontalLine
         >
           <div className="mb-4">
-            <h3>Chung</h3>
-            <p className="mb-1">Nếu như bạn muốn thay đổi ngôn ngữ, màu chủ đề và các cài đặt khác thì vào phần "Cài đặt".</p>
+            <h3>{langTextJSON.sideMenu.generalGuideLabel}</h3>
+            <p className="mb-1">{langTextJSON.sideMenu.generalGuideText}</p>
           </div>
           <div className="mb-4">
-            <h3>Trò chơi</h3>
-            <KeyGuide
-              extendClassName='mb-1'
-              title='Di chuyển: giữ'
-              keys='Space + LMB'
-            />
-            <KeyGuide
-              extendClassName='mb-1'
-              title='Đánh dấu:'
-              keys='LMB'
-            />
-            <KeyGuide
-              extendClassName='mb-1'
-              title='Phóng to: ấn'
-              keys={<span className="material-symbols-outlined">add</span>}
-            />
-            <KeyGuide
-              extendClassName='mb-1'
-              title='Thu nhỏ:'
-              keys={<span className="material-symbols-outlined">remove</span>}
-            />
-            <KeyGuide
-              extendClassName='mb-1'
-              title='Chơi lại:'
-              keys={<span className="material-symbols-outlined">restart_alt</span>}
-            />
+            <h3>{langTextJSON.sideMenu.gameGuideLabel}</h3>
+            {
+              langTextJSON.sideMenu.keyGuides.map((keyGuide, index) => {
+                let keyContent = keyGuide.googleIconKey
+                  ? <span className="material-symbols-outlined">{keyGuide.googleIconKey}</span>
+                  : keyGuide.textKey!
+
+                return (
+                  <KeyGuide
+                    key={keyGuide.text}
+                    extendClassName='mb-1'
+                    title={keyGuide.text}
+                    keys={keyContent}
+                  />
+                )
+              })
+            }
           </div>
         </Article>
     </div>

@@ -37,7 +37,7 @@ export function getDriveAPICallers(oauth2Client: any, drive?: drive_v3.Drive) {
      * @param alt 
      * @returns 
      */
-    async getFileInfoByIdAsync<T extends string = "json" | "media">(id: string, alt?: T) {
+    async getFileByIdAsync<T extends string = "json" | "media">(id: string, alt?: T) {
       try {
         if(!id) throw new Error("Get file's information require file's id.");
 

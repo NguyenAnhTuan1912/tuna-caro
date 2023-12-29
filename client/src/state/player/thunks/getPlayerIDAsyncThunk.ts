@@ -11,7 +11,7 @@ import { LocalStorageUtils } from 'src/utils/localstorage';
  */
 export const getPlayerIDAsyncThunk = createAsyncThunk(
   "/getPlayerIDAsyncThunk",
-  async function(state, api) {
+  async function() {
     let id = LocalStorageUtils.getItem<string>("playerId");
 
     if(!id) {

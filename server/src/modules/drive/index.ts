@@ -4,8 +4,9 @@ const base = "/drive";
 
 // Import handlers
 import GetListFilesHandler from "./handlers/getListFiles";
-import GetContentOfFileHandler from "./handlers/getContentOfFile";
+import GetContentOfFileByIdHandler from "./handlers/getContentOfFileById";
 import GetListFoldersHandler from "./handlers/getListFolders";
+import GetContentOfFileByNameHandler from "./handlers/getContentOfFileByName";
 
 const GoogleDriveRouter = createRouter({
   handlers: [
@@ -16,13 +17,18 @@ const GoogleDriveRouter = createRouter({
     },
     {
       method: "get",
-      path: base + GetContentOfFileHandler.path,
-      fns: [GetContentOfFileHandler.handler]
+      path: base + GetContentOfFileByIdHandler.path,
+      fns: [GetContentOfFileByIdHandler.handler]
     },
     {
       method: "get",
       path: base + GetListFoldersHandler.path,
       fns: [GetListFoldersHandler.handler]
+    },
+    {
+      method: "get",
+      path: base + GetContentOfFileByNameHandler.path,
+      fns: [GetContentOfFileByNameHandler.handler]
     }
   ]
 });

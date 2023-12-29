@@ -2,6 +2,9 @@
 import Button from 'src/components/button/Button';
 import Layer from 'src/components/layer/Layer';
 
+// Import hooks
+import { useLangState } from 'src/hooks/useLang';
+
 // Locally Import
 import { PauseGameLayerProps } from '../Game.props';
 
@@ -11,6 +14,8 @@ import { PauseGameLayerProps } from '../Game.props';
  * @returns 
  */
 export default function PauseGameLayer(props: PauseGameLayerProps) {
+  const { langTextJSON } = useLangState();
+
   return (
     <Layer>
       <Button
@@ -25,7 +30,7 @@ export default function PauseGameLayer(props: PauseGameLayerProps) {
       </Button>
       <p className="fs-xl txt-clr-background ms-2">
         {
-          props.text ? props.text : "Tạm dừng"
+          props.text ? props.text : langTextJSON.global.pauseGameText
         }
       </p>
     </Layer>

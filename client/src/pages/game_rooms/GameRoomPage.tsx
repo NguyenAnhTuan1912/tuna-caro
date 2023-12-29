@@ -8,12 +8,16 @@ import { GameRoomType } from 'src/classes/Game';
 import { mySocket, MySocket } from 'src/apis/socket';
 
 // Import hooks
+import { useLangState, getLangTextJSON } from 'src/hooks/useLang';
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import utils
 // import { OtherUtils } from 'src/utils/other';
+
+// Import from layouts
+import BaseLayout from 'src/layouts/base_layout/BaseLayout';
 
 // Import from components
 import DataTable from 'src/components/data_table/DataTable';
@@ -40,6 +44,8 @@ import './GameRoom.styles.css';
  */
 export default function GameRoomPage(props: GameRoomPageProps) {
   const { player } = usePlayer();
+  const { langTextJSON } = useLangState();
+
   const [ gameRoomsState, gameRoomsStateFns ] = useStateWESSFns(
     GameRoomsStateConfigs.getInitialState(),
     GameRoomsStateConfigs.getStateFns
@@ -129,29 +135,33 @@ export default function GameRoomPage(props: GameRoomPageProps) {
   }, []);
 
   return (
-    <div className="game-rooms page p-2">
-      <h1>Các phòng</h1>
-      <DataTable
-        data={gameRoomsState.data}
-        renderHeader={() => (
-          <tr>
-            <td><strong>No</strong></td>
-            <td><strong>Tên phòng</strong></td>
-            <td><strong>Người chơi</strong></td>
-            <td><strong>Mật khẩu</strong></td>
-            <td><strong>Trạng thái</strong></td>
-          </tr>
-        )}
-        getDataAsync={getGamesAsync}
-        renderRowData={(item, index) => (
-          <GameRow
-            key={item.id}
-            data={item}
-            index={index}
-            player={player}
-          />
-        )}
-      />
-    </div>
+    <BaseLayout
+      headerTitle={langTextJSON.gameRoomsPage.headerTitle}
+    >
+      <div className="game-rooms page p-2">
+        <h1>{langTextJSON.gameRoomsPage.pageTitle}</h1>
+        <DataTable
+          data={gameRoomsState.data}
+          renderHeader={() => (
+            <tr>
+              <td><strong>No</strong></td>
+              <td><strong>{langTextJSON.gameRoomsPage.tableHeaderRoomNameLabel}</strong></td>
+              <td><strong>{langTextJSON.gameRoomsPage.tableHeaderHostLabel}</strong></td>
+              <td><strong>{langTextJSON.gameRoomsPage.tableHeaderHasPasswordLabel}</strong></td>
+              <td><strong>{langTextJSON.gameRoomsPage.tableHeaderStatusLabel}</strong></td>
+            </tr>
+          )}
+          getDataAsync={getGamesAsync}
+          renderRowData={(item, index) => (
+            <GameRow
+              key={item.id}
+              data={item}
+              index={index}
+              player={player}
+            />
+          )}
+        />
+      </div>
+    </BaseLayout>
   )
 }

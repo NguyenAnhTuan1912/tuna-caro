@@ -68,7 +68,10 @@ export default function SettingsPage(props: SettingsPageProps) {
                 <p>{langTextJSON.settingsPage.languageSettingsLabel}</p>
                 <MySelect
                   defaultValue={lang.currentLang}
-                  onChangeValue={(value) => langDispatcher.getLanguagesAsync(value)}
+                  onChangeValue={(value) => {
+                    settingsDispatcher.updateLang(value);
+                    langDispatcher.getLanguagesAsync(value);
+                  }}
                   options={[
                     {
                       label: <span><i className="twa twa-flag-vietnam"></i> <strong>VIE</strong></span>,

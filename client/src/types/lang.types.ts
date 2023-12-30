@@ -3,7 +3,8 @@ export type LangTextJSONType = {
     "footTitle": string,
     "authorName": string,
     "noteLabel": string,
-    "pauseGameText": "string"
+    "pauseGameText": string,
+    "dataLoadingText": string
   },
 
   "homePage": {

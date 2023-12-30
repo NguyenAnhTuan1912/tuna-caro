@@ -79,7 +79,8 @@ export const SettingsSlice = createSlice({
 export const {
   setSFXStatusAction,
   toggleDarkModeAction,
-  performTasksRequireSettingsAction
+  performTasksRequireSettingsAction,
+  updateLangAction
 } = SettingsSlice.actions;
 
 /**

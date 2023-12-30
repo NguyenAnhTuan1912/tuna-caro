@@ -8,3 +8,11 @@ export type ToStringOptions = {
    */
   seperator: string;
 };
+
+export type UpdateObjectOptionsType = {
+  /**
+   * If `canOverrideValues` is true, all item's values will be assigned to new one. Otherwise,
+   * only falsy value of item will be assigned (default is "true").
+   */
+  canOverrideValues: boolean;
+};

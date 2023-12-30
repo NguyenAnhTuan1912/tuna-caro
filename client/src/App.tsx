@@ -13,8 +13,10 @@ import { usePlayerActions } from './hooks/usePlayer';
 import { useGlobalData } from './hooks/useGlobalData';
 import { useLang, getLangTextJSON } from './hooks/useLang';
 
+// Import utils
+import { BrowserStorageUtils } from './utils/browser_storage';
+
 // Import from layout and pages
-import BaseLayout from './layouts/base_layout/BaseLayout';
 import HomePage from './pages/home/HomePage';
 import SettingsPage from './pages/settings/SettingsPage';
 import GameRoomPage from './pages/game_rooms/GameRoomPage';
@@ -40,13 +42,12 @@ function App() {
   const { settings, settingsDispatcher } = useSettings();
   const { lang, langDispatcher } = useLang();
 
-  const langTextJSON = getLangTextJSON(lang.text, lang.currentLang);
-
   const gpd = useGlobalData();
 
   // Handle some global Socket Exception
   React.useEffect(() => {
     const init = function() {
+
       let handleOfflineOnWindow = function() {
         openConnectionStatusSnackBar({ isConnected: false });
       };
@@ -110,9 +111,9 @@ function App() {
 
   if(!lang.loaded[lang.currentLang]) {
     return (
-      <div className="container flex-box ait-center jc-center">
+      <div className="global-loading container flex-box ait-center jc-center">
         <LoadingIndicator
-          text="Đang tải dữ liệu..."
+          text={"tunanguyen caro game"}
         />
       </div>
     );

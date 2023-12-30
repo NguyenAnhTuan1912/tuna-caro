@@ -7,10 +7,13 @@ import { Player, PlayerType } from "src/classes/Player";
 import { getPlayerIDAsyncThunk } from "./thunks/getPlayerIDAsyncThunk";
 
 // Import utils
-import { LocalStorageUtils } from "src/utils/localstorage";
+import { BrowserStorageUtils, LocalStorageKeys } from "src/utils/browser_storage";
 
 // Import types
 import { ReduxAction } from "../state.types";
+
+let initialState = BrowserStorageUtils.getItem<PlayerType>(LocalStorageKeys.player);
+initialState = initialState ? initialState : Player.createPlayer();
 
 /**
  * State of player. This slice store only the main player, another player will
@@ -18,13 +21,7 @@ import { ReduxAction } from "../state.types";
  */
 export const PlayerSlice = createSlice({
   name: "player",
-  initialState: Player.createPlayer(
-    {
-      id: (LocalStorageUtils.getItem("playerId") ?? "") as string,
-      name: (LocalStorageUtils.getItem("playerName") ?? "") as string,
-      img: (LocalStorageUtils.getItem("playerImg") ?? "") as string
-    }
-  ),
+  initialState,
   reducers: {
     /**
      * Use this action to set player's ID.
@@ -33,6 +30,7 @@ export const PlayerSlice = createSlice({
      */
     setPlayerIDAction: function(state, action: ReduxAction<string>) {
       state.id = action.payload;
+      BrowserStorageUtils.updateItem(LocalStorageKeys.player, { id: state.id }, { canOverrideValues: false });
     },
 
     /**
@@ -41,8 +39,8 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerNameAction: function(state, action: ReduxAction<string>) {
-      LocalStorageUtils.setItem("playerName", action.payload);
       state.name = action.payload;
+      BrowserStorageUtils.updateItem(LocalStorageKeys.player, { name: state.name });
     },
 
     /**
@@ -51,15 +49,15 @@ export const PlayerSlice = createSlice({
      * @param action 
      */
     setPlayerAction: function(state, action: ReduxAction<Partial<PlayerType>>) {
-      if(action.payload.name) LocalStorageUtils.setItem("playerName", action.payload.name);
-      if(action.payload.img) LocalStorageUtils.setItem("playerImg", action.payload.img);
       Player.setPlayer(state, action.payload);
+      BrowserStorageUtils.updateItem(LocalStorageKeys.player, state);
     }
   },
   
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
       state.id = action.payload;
+      BrowserStorageUtils.updateItem(LocalStorageKeys.player, { id: state.id }, { canOverrideValues: false });
     });
   }
 });

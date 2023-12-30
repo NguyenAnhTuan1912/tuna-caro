@@ -11,6 +11,7 @@ import {
   toggleDarkModeAction,
   setSFXStatusAction,
   performTasksRequireSettingsAction,
+  updateLangAction,
   settingsSelector
 } from 'src/state/settings';
 
@@ -35,6 +36,14 @@ export const {
        */
       setSFXStatus: function(soundName: SFXSettingKeysType, status?: boolean) {
         dispatch(setSFXStatusAction({ sound: soundName, status }));
+      },
+
+      /**
+       * Use this function to update lang settings in app.
+       * @param langCode 
+       */
+      updateLang: function(langCode: string) {
+        dispatch(updateLangAction(langCode))
       },
 
       performTasksRequireSettings: function() {

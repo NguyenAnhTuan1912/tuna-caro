@@ -7,7 +7,7 @@ import { defaultDarkTheme, ColorTheme } from "./ColorTheme";
 
 // Import from utils
 import { LANG_CODES } from "src/utils/constant";
-import { LocalStorageUtils } from "src/utils/localstorage";
+import { BrowserStorageUtils, LocalStorageKeys } from "src/utils/browser_storage";
 import { OtherUtils } from "src/utils/other";
 
 // Import types
@@ -39,18 +39,19 @@ export class Settings {
    * the data in localStorage.
    */
   static createSettings(): SettingsType {
-    let hasSoundWhenClickButton = LocalStorageUtils.getItem<boolean | undefined>("hasSoundWhenClickButton");
-    let hasSoundWhenClickTable = LocalStorageUtils.getItem<boolean | undefined>("hasSoundWhenClickTable");
+    let storedSettings = BrowserStorageUtils.getItem<SettingsType>(LocalStorageKeys.settings);
+    let hasSoundWhenClickButton = storedSettings?.sfx?.hasSoundWhenClickButton;
+    let hasSoundWhenClickTable = storedSettings?.sfx?.hasSoundWhenClickTable;
 
     return {
-      isDarkMode: Boolean(LocalStorageUtils.getItem("isDarkMode")),
+      isDarkMode: Boolean(storedSettings?.isDarkMode),
       sfx: {
         hasSoundWhenClickButton:
           hasSoundWhenClickButton === undefined ||  hasSoundWhenClickButton === null ? true : hasSoundWhenClickButton,
         hasSoundWhenClickTable:
           hasSoundWhenClickTable === undefined ||  hasSoundWhenClickTable === null ? true : hasSoundWhenClickTable
       },
-      lang: LANG_CODES[0]
+      lang: storedSettings?.lang ? storedSettings?.lang : LANG_CODES[0]
     }
   }
 
@@ -75,7 +76,7 @@ export class Settings {
   static setTheme(isDark: boolean) {
     if(isDark) ColorTheme.enableTheme(defaultDarkTheme);
     else ColorTheme.unableTheme();
-    LocalStorageUtils.setItem("isDarkMode", isDark);
+    BrowserStorageUtils.setItem("isDarkMode", isDark);
   }
 
   /**
@@ -85,7 +86,7 @@ export class Settings {
    */
   static setSFX(st: SettingsType, soundSettingKey: SFXSettingKeysType, status: boolean) {
     st.sfx[soundSettingKey] = status;
-    LocalStorageUtils.setItem(soundSettingKey, st.sfx[soundSettingKey]);
+    BrowserStorageUtils.updateItem<SettingsType>(LocalStorageKeys.settings, { sfx: st.sfx });
   }
 
   /**
@@ -98,7 +99,10 @@ export class Settings {
       st, "isDarkMode",
       function(status) {
         // Save to localstorage.
-        LocalStorageUtils.setItem("isDarkMode", status);
+        BrowserStorageUtils
+        .updateItem<SettingsType>(LocalStorageKeys.settings, {
+          isDarkMode: status
+        });
         if(status) {
           ColorTheme.enableTheme(defaultDarkTheme);
         } else {
@@ -118,7 +122,13 @@ export class Settings {
       st.sfx, "hasSoundWhenClickButton",
       function(status) {
         // Save to localstorage.
-        LocalStorageUtils.setItem("hasSoundWhenClickButton", status);
+        BrowserStorageUtils
+        .updateItem<SettingsType>(LocalStorageKeys.settings, {
+          sfx: {
+            hasSoundWhenClickButton: status,
+            hasSoundWhenClickTable: st.sfx.hasSoundWhenClickTable
+          }
+        });
       }
     );
   }
@@ -133,7 +143,13 @@ export class Settings {
       st.sfx, "hasSoundWhenClickTable",
       function(status) {
         // Save to localstorage.
-        LocalStorageUtils.setItem("hasSoundWhenClickTable", status);
+        BrowserStorageUtils
+        .updateItem<SettingsType>(LocalStorageKeys.settings, {
+          sfx: {
+            hasSoundWhenClickButton: st.sfx.hasSoundWhenClickButton,
+            hasSoundWhenClickTable: status
+          }
+        });
       }
     );
   }
@@ -145,5 +161,9 @@ export class Settings {
    */
   static updateLang(st: SettingsType, langCode: string) {
     st.lang = langCode;
+    BrowserStorageUtils
+    .updateItem<SettingsType>(LocalStorageKeys.settings, {
+      lang: langCode
+    });
   }
 }

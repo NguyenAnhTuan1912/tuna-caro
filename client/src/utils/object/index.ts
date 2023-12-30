@@ -1,5 +1,5 @@
 // Import types
-import { ToStringOptions } from "./index.types";
+import { ToStringOptions, UpdateObjectOptionsType } from "./index.types";
 
 /**
  * Use this function to set default values for `o` using `ext`.
@@ -9,7 +9,7 @@ import { ToStringOptions } from "./index.types";
 function setDefaultValues<T>(o: T, ext: T) {
   if(!Boolean(o)) return ext!;
   for(let key in ext) {
-    if(!o[key]) {
+    if(o[key] === undefined) {
       o[key] = ext[key]!;
     }
   }
@@ -38,7 +38,7 @@ function toString(o: {[key: string]: any}, opt?:ToStringOptions) {
   opt = setDefaultValues(opt, { kvSeperator: "=", seperator: "&" });
 
   for(let key in o) {
-    if(Boolean(o[key]) && typeof o[key] !== "object" && typeof o[key] !== "object" && typeof o[key] !== "symbol") {
+    if(Boolean(o[key]) && typeof o[key] !== "object" && typeof o[key] !== "function" && typeof o[key] !== "symbol") {
       let propStr = key + opt?.kvSeperator + o[key];
       str += propStr + opt?.seperator;
     } 
@@ -46,7 +46,31 @@ function toString(o: {[key: string]: any}, opt?:ToStringOptions) {
   return str;
 }
 
+/**
+ * Use this function to update deeply a object.
+ * @param o 
+ * @param data 
+ * @param opt 
+ * @returns 
+ */
+function updateObject(o: any, data: any, opt: UpdateObjectOptionsType) {
+  for(let key in data) {
+    if(typeof data[key] === "object" && typeof o[key] === "object") {
+      updateObject(o[key], data[key], opt);
+      continue;
+    }
+
+    if(opt.canOverrideValues === true) o[key] = data[key];
+    else if(!(o[key])) {
+      o[key] = data[key];
+    };
+  };
+
+  return o;
+}
+
 export const ObjectUtils = {
   toString,
-  setDefaultValues
+  setDefaultValues,
+  updateObject
 };

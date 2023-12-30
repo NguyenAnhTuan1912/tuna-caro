@@ -16,9 +16,14 @@
 }
 
 body,
-#root {
+#root,
+.global-loading {
   width: 100%;
   height: 100dvh;
+}
+
+.global-loading {
+  background-color: var(--clr-background);
 }
 
 .page {

@@ -3,6 +3,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 // Import APIs
 import { OtherAPIs } from 'src/apis/others';
 
+// Import utils
+import { BrowserStorageUtils, SessionStorageKeys } from 'src/utils/browser_storage';
+
 // Import types
 import { RootState } from 'src/state';
 import { LangTextJSONType } from 'src/types/lang.types';

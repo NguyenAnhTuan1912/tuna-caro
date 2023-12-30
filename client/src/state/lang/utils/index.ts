@@ -6,6 +6,14 @@ import { LangTextJSONType } from "src/types/lang.types";
  */
 export function createEmptyLangText(): LangTextJSONType {
   return {
+    "global": {
+      "footTitle": "",
+      "authorName": "",
+      "noteLabel": "",
+      "pauseGameText": "",
+      "dataLoadingText": ""
+    },
+
     "homePage": {
       "headerTitle": "",
       "pageTitle": "",
@@ -20,8 +28,10 @@ export function createEmptyLangText(): LangTextJSONType {
       "headerTitle": "",
       "pageTitle": "",
       "systemSettingsLabel": "",
+      "soundSettingsLabel": "",
       "playSoundWhenClickButtonSettingsLabel": "",
       "playSoundWhenClickTableSettingsLabel": "",
+      "colorThemeSettingsLabel": "",
       "darkThemeSettingsLabel": "",
       "languageSettingsLabel": "",
       "languageVieSelectLabel": "",
@@ -46,6 +56,56 @@ export function createEmptyLangText(): LangTextJSONType {
       "pauseGameLayerLabel": "",
       "lostConnectionLabel": ""
     },
+
+    "gameCreatingDialog": {
+      "headerTitle": "",
+      "notes": [],
+      "closeBtnLabel": "",
+      "inputPlaceHolders": {
+        "gameName": "",
+        "password": ""
+      }
+    },
+  
+    "gameFindingDialog": {
+      "headerTitle": "",
+      "notes": [],
+      "closeBtnLabel": "",
+      "inputPlaceHolders": {
+        "gameName": "",
+        "password": ""
+      }
+    },
+  
+    "gameJoiningDialog": {
+      "headerTitle": "",
+      "notes": {
+        "hasPassword": [],
+        "nonPassword": []
+      },
+      "closeBtnLabel": "",
+      "inputPlaceHolders": {
+        "password": ""
+      },
+      "content": {
+        "subheading": "",
+        "heading": "",
+        "hostInfoLabel": "",
+        "passwordInfoLabel": "",
+        "passwordInfoValueLabels": []
+      }
+    },
+  
+    "sideMenu": {
+      "guideLabel": "",
+      "generalGuideLabel": "",
+      "generalGuideText": "",
+      "gameGuideLabel": "",
+      "changeNameBtnLabel": "",
+      "agreeChangeNameBtnLabel": "",
+      "cancelChangeNameBtnLabel": "",
+      "keyGuides": []
+    },
   
     "socketMessages": {
       "notExistRoom": "",
@@ -67,11 +127,12 @@ export function createEmptyLangText(): LangTextJSONType {
  * @param langCodes 
  * @returns 
  */
-export function createLoadedLangStatus(langCodes: Array<string>) {
+export function createLoadedLangStatus(langCodes: Array<string>, langTexts: any) {
   const obj: {[key: string]: boolean} = {};
 
   for(let langCode of langCodes) {
-    obj[langCode] = false;
+    if(langTexts[langCode]) obj[langCode] = true;
+    else obj[langCode] = false;
   }
 
   return obj;

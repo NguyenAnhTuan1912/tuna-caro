@@ -10,12 +10,18 @@ import { Message } from "src/apis/socket";
 // Import from utils.
 import { ROUTES } from "src/utils/constant";
 
+// Import from components
+import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
+
+// Import types
+import { LangTextJSONType } from "src/types/lang.types";
+
 type ListenerArgsType = {
   changeData: ChangeDataFnType,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
+  langText: LangTextJSONType
 };
 type EmitGameListenerArgsType = ListenerArgsType;
-type JoinGameListenerArgsType = ListenerArgsType;
 
 export function getEmitGameListener(args: EmitGameListenerArgsType) {
   return function emitGameListener(m: Message<GameType>) {
@@ -28,26 +34,13 @@ export function getEmitGameListener(args: EmitGameListenerArgsType) {
       return game;
     });
 
+    NotifiableSnackBars.success(args.langText.socketMessages.createGameSuccessfully);
+
     // After change the data, navigate to /game/online
     args.navigate(ROUTES.GameOnline);
   }
 }
 
-export function getJoinGameListener(args: JoinGameListenerArgsType) {
-  return function joinGameListener(m: Message<GameType>) {
-    let game = m.data!;
-        
-    // Set new game.
-    args.changeData("game", function() {
-      return game;
-    });
-
-    // After set new game, navigato /game/online
-    args.navigate(ROUTES.GameOnline);
-  }
-}
-
 export const HomePageSocketEvents = {
-  getEmitGameListener,
-  getJoinGameListener
+  getEmitGameListener
 };

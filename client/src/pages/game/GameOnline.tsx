@@ -14,6 +14,9 @@ import { MySocket, mySocket } from 'src/apis/socket';
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
+// Import from hooks
+import { useLangState } from 'src/hooks/useLang';
+
 // Import from utils
 import { ROUTES } from 'src/utils/constant';
 
@@ -42,6 +45,7 @@ export default function GameOnline() {
   */
   const { player } = usePlayer();
   const { getData } = useGlobalData();
+  const { langTextJSON } = useLangState();
   const navigate = useNavigate();
   // Game game data here.
   /*
@@ -51,16 +55,11 @@ export default function GameOnline() {
   */
   const data = getData();
 
-  console.log("GPD in GameOnline: ", data);
-
   /*
     Game data is lost when player refreshs tab/page of browser. So when this component
     computes for rendering, it will check the game data and navigate to `HomePage`.
    */
-  if(!data.game) {
-    console.log("Navigate to home");
-    return <Navigate to={ROUTES.Home} />
-  };
+  if(!data.game) return <Navigate to={ROUTES.Home} />;
 
   return (
     <GameCore
@@ -113,7 +112,8 @@ export default function GameOnline() {
         let joinGameListener = mySocket.addEventListener(
           MySocket.EventNames.joinGame,
           GameOnlineSocketEvents.getJoinGameListener({
-            useEffectArgs: args
+            useEffectArgs: args,
+            langText: langTextJSON
           })
         );
     
@@ -122,7 +122,8 @@ export default function GameOnline() {
           MySocket.EventNames.leaveGame,
           GameOnlineSocketEvents.getLeaveGameListener({
             useEffectArgs: args,
-            navigate: navigate
+            navigate: navigate,
+            langText: langTextJSON
           })
         );
 
@@ -131,7 +132,8 @@ export default function GameOnline() {
           GameOnlineSocketEvents.getReconnectGameListener({
             useEffectArgs: args,
             navigate: navigate,
-            player
+            player,
+            langText: langTextJSON
           })
         );
 
@@ -146,7 +148,9 @@ export default function GameOnline() {
         // Set up `lost_game_connection`.
         let gameConnectionStatusListener = mySocket.addEventListener(
           MySocket.EventNames.gameConnectionStatus,
-          GameOnlineSocketEvents.getGameConnectionStatusListener()
+          GameOnlineSocketEvents.getGameConnectionStatusListener({
+            langText: langTextJSON
+          })
         );
 
         // Set up `start_new_round`.

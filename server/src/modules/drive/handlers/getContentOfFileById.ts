@@ -10,7 +10,7 @@ const GetContentOfFileByIdHandler = createHandler(
 
         let file = await Services.Google.Drive.getFileByIdAsync(id, "media");
 
-        if("$$error" in file) {
+        if(typeof file === "object" && "$$error" in file) {
           statusCode = 400;
           throw new Error(file.$$error);
         };

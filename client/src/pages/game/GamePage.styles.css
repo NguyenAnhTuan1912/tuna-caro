@@ -11,8 +11,15 @@
 
 .grid-controller {
   position: fixed;
-  right: 0;
   bottom: 0;
+}
+
+.grid-controller.left {
+  left: 0;
+}
+
+.grid-controller.right {
+  right: 0;
 }
 
 .game-info {

@@ -5,13 +5,14 @@ import { Game } from 'src/classes/Game';
 import { Player } from 'src/classes/Player';
 
 // Import hooks
+import { useLangState } from 'src/hooks/useLang';
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { useSFX } from 'src/hooks/useSFX';
 
-// Import components
+// Import from components
+import { NotifiableSnackBars } from 'src/components/snack_bar/SnackBar';
 import Grid from 'src/components/grid/Grid';
 import ScoreBoard from './components/ScoreBoard';
-import Button from 'src/components/button/Button';
 
 // Locally Import
 // Import functions.
@@ -19,7 +20,6 @@ import { GameCoreStateConfigs } from './state/game_core';
 
 // Import components
 import PauseGameLayer from './components/PauseGameLayer';
-import WinnerLayer from './components/WinnerLayer';
 
 // Import types
 import { GameCoreProps } from './Game.props';
@@ -44,6 +44,7 @@ export default function GameCore(props: GameCoreProps) {
     }
   );
   const sfx = useSFX();
+  const { langTextJSON } = useLangState();
 
   const elementRefs = React.useRef<GamePageElements>({
     page: null
@@ -191,16 +192,23 @@ export default function GameCore(props: GameCoreProps) {
                   }
                 </h3> */}
                 <ScoreBoard game={state.game} />
-                {/* <p className="flex-box ait-center">
+              </div>
+              <div className="grid-controller left p-1 m-3 flex-box flex-col">
+                <p className="flex-box ait-center">
                   {state.game.id}
                   <span
-                    className="material-symbols-outlined btn-transparent rounded-4 ms-1"
+                    onClick={() => {
+                      navigator.clipboard.writeText(state.game.id).then(() => {
+                        NotifiableSnackBars.success(langTextJSON.global.copyContentText + " Game ID.");
+                      })
+                    }}
+                    className="material-symbols-outlined btn-transparent float-bubble rounded-4 ms-1"
                   >
                     content_copy
                   </span>
-                </p> */}
+                </p>
               </div>
-              <div className="grid-controller p-1 m-3 flex-box flex-col">
+              <div className="grid-controller right p-1 m-3 flex-box flex-col">
                 {
                   canResetBtnShown && (
                     <span

@@ -14,6 +14,8 @@ import { ROUTES } from "src/utils/constant";
 import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
 
 // Import types.
+import { LangTextJSONType } from "src/types/lang.types";
+
 // Import from props.
 import {
   EmitMarkMessageDataType,
@@ -29,15 +31,21 @@ type ListenerArgsType = {
 }
 type EmitMarkListenerArgsType = ListenerArgsType;
 type EmitWinnerListener = ListenerArgsType;
-type JoinGameListenerArgsType = ListenerArgsType;
+type JoinGameListenerArgsType = ListenerArgsType & {
+  langText: LangTextJSONType;
+};
 type LeaveGameListenerArgsType = ListenerArgsType & {
   navigate: NavigateFunction;
+  langText: LangTextJSONType;
 };
 type ReconnectGameListenerArgsType = ListenerArgsType & {
   navigate: NavigateFunction;
   player: PlayerType;
+  langText: LangTextJSONType;
 };
-type GameConnectionStatusArgsType = {};
+type GameConnectionStatusArgsType = {
+  langText: LangTextJSONType;
+};
 type StartNewRoundListenerArgsType = ListenerArgsType;
 
 function getEmitMarkListener(args: EmitMarkListenerArgsType) {
@@ -60,9 +68,10 @@ function getEmitWinnerListener(args: EmitWinnerListener) {
 function getJoinGameListener(args: JoinGameListenerArgsType) {
   return function joinGameListener(m: Message<PlayerType>) {
     let player = m.data!;
+    let message = player.name + " " + args.langText.socketMessages.joinGame;
 
     // Announce to player.
-    NotifiableSnackBars.info(m.text!);
+    NotifiableSnackBars.info(message);
 
     // Add player to game.
     // Because first player always "X", so the second will be "O".
@@ -71,31 +80,36 @@ function getJoinGameListener(args: JoinGameListenerArgsType) {
 }
 
 function getLeaveGameListener(args: LeaveGameListenerArgsType) {
-  return function leaveGameListener(m: Message<{ playerId: string, isHostLeaved: boolean }>) {
+  return function leaveGameListener(m: Message<{ playerId: string, playerName: string, isHostLeaved: boolean }>) {
     // Announce to player.
-    NotifiableSnackBars.info(m.text!);
-
+    let message = m.data?.playerName + " " + args.langText.socketMessages.leaveGame;
+    
     // If player leaves game is host. So the game will be removed from list in server.
     if(m.data?.isHostLeaved) {
+      NotifiableSnackBars.info(message);
       args.navigate(ROUTES.Home);
       return;
-    }
-
+    };
+    
+    NotifiableSnackBars.info(message);
     // When receive a message that player is leave the game, remove them from game.
     args.useEffectArgs.removePlayer(m.data?.playerId!);
   }
 }
 
-function getGameConnectionStatusListener(args?: GameConnectionStatusArgsType) {
+function getGameConnectionStatusListener(args: GameConnectionStatusArgsType) {
   return function gameConnectionStastusListener(m: Message<GameConnectionStatusMessageDataType>) {
     let data = m.data!;
+    let message = "";
     if(data.isConnected) {
       // Show a snackbar.
-      NotifiableSnackBars.success(data.player.name + " đã kết nối lại.");
+      message = data.player.name + " has " + args.langText.socketMessages.reconnected;
+      NotifiableSnackBars.success(message);
     }
     else {
       // Show a snackbar.
-      NotifiableSnackBars.warning(data.player.name + " đã mất kết nối.");
+      message = data.player.name + " has " + args.langText.socketMessages.disconnected;
+      NotifiableSnackBars.warning(message);
     }
   }
 }
@@ -106,6 +120,8 @@ function getReconnectGameListener(args: ReconnectGameListenerArgsType) {
       args.navigate(ROUTES.Home);
       return;
     };
+
+    NotifiableSnackBars.success(args.langText.socketMessages.reconnectGameSuccessfully);
 
     // Update player.
     args.useEffectArgs.updatePlayer(args.player);

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom';
 
 // Import from classes
@@ -7,20 +7,25 @@ import { GameRoomType } from 'src/classes/Game';
 // Import from api/soket
 import { mySocket, MySocket } from 'src/apis/socket';
 
+// Import from ws_event_listeners
+import { WSEventListeners } from 'src/ws_event_listeners';
+
 // Import hooks
-import { useLangState, getLangTextJSON } from 'src/hooks/useLang';
+import { useLangState } from 'src/hooks/useLang';
 import { usePlayer } from 'src/hooks/usePlayer';
 import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 import { useGlobalData } from 'src/hooks/useGlobalData';
 
 // Import utils
 // import { OtherUtils } from 'src/utils/other';
+import { ROUTES } from 'src/utils/constant';
 
 // Import from layouts
 import BaseLayout from 'src/layouts/base_layout/BaseLayout';
 
 // Import from components
 import DataTable from 'src/components/data_table/DataTable';
+import Button from 'src/components/button/Button';
 
 // Import data for testing
 // import gameRoomsTestData from 'src/assets/data/game_rooms.json';
@@ -122,21 +127,35 @@ export default function GameRoomPage(props: GameRoomPageProps) {
     */
     let joinGameListener = mySocket.addEventListener(
       MySocket.EventNames.joinGame,
-      GameRoomsSocketEventListeners.getJoinGameListener({
+      WSEventListeners.getJoinGameListener({
         changeData,
-        navigate
+        navigate,
+        langText: langTextJSON
       })
     );
 
     // Unsubscribe events
     return function() {
-      mySocket.removeEventListener(MySocket.EventNames.emitGame, joinGameListener);
+      mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
     }
   }, []);
 
   return (
     <BaseLayout
-      headerTitle={langTextJSON.gameRoomsPage.headerTitle}
+      headerOptions={{
+        title: langTextJSON.gameRoomsPage.headerTitle,
+        backButton: (navigate) => (
+          <Button
+            isTransparent
+            hasPadding={false}
+            hasBorder={false}
+            onClick={() => { navigate(ROUTES.Home) }}
+            extendClassName="rounded-4 p-1 me-1"
+          >
+            <span className="material-symbols-outlined">arrow_back_ios_new</span>
+          </Button>
+        )
+      }}
     >
       <div className="game-rooms page p-2">
         <h1>{langTextJSON.gameRoomsPage.pageTitle}</h1>

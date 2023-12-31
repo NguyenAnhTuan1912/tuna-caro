@@ -5,11 +5,15 @@ import { useSettings } from 'src/hooks/useSettings';
 // Import layouts
 import BaseLayout from 'src/layouts/base_layout/BaseLayout';
 
+// Import from utils
+import { ROUTES } from 'src/utils/constant';
+
 // Import components
 import Article from 'src/components/article/Article';
 import Switch from 'src/components/switch/Switch';
 import MySelect from 'src/components/my_select/MySelect';
 import MyDetails from 'src/components/my_details/MyDetails';
+import Button from 'src/components/button/Button';
 
 // Import types
 import { SettingsPageProps } from './SettingsPage.props';
@@ -23,7 +27,20 @@ export default function SettingsPage(props: SettingsPageProps) {
 
   return (
     <BaseLayout
-      headerTitle={langTextJSON.settingsPage.headerTitle}
+      headerOptions={{
+        title: langTextJSON.settingsPage.headerTitle,
+        backButton: (navigate) => (
+          <Button
+            isTransparent
+            hasPadding={false}
+            hasBorder={false}
+            onClick={() => { navigate(ROUTES.Home) }}
+            extendClassName="rounded-4 p-1 me-1"
+          >
+            <span className="material-symbols-outlined">arrow_back_ios_new</span>
+          </Button>
+        )
+      }}
     >
       <div className="settings page p-2">
         <h1 className="txt-center">{langTextJSON.settingsPage.pageTitle}</h1>

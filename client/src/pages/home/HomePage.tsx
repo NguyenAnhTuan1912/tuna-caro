@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 // Import from api/soket
 import { mySocket, MySocket } from 'src/apis/socket';
 
+// Import from ws_event_listeners
+import { WSEventListeners } from 'src/ws_event_listeners';
+
 // Import from hooks
 import { useLangState } from 'src/hooks/useLang';
 import { useGlobalData } from 'src/hooks/useGlobalData';
@@ -49,7 +52,8 @@ export default function HomePage(props: HomePageProps) {
       MySocket.EventNames.emitGame,
       HomePageSocketEvents.getEmitGameListener({
         changeData,
-        navigate
+        navigate,
+        langText: langTextJSON
       })
     );
 
@@ -60,9 +64,10 @@ export default function HomePage(props: HomePageProps) {
     */
     let joinGameListener = mySocket.addEventListener(
       MySocket.EventNames.joinGame,
-      HomePageSocketEvents.getJoinGameListener({
+      WSEventListeners.getJoinGameListener({
         changeData,
-        navigate
+        navigate,
+        langText: langTextJSON
       })
     );
 
@@ -72,9 +77,13 @@ export default function HomePage(props: HomePageProps) {
     }
   }, []);
 
+  console.log("LANG: ", langTextJSON);
+
   return (
     <BaseLayout
-      headerTitle={langTextJSON.homePage.headerTitle}
+      headerOptions={{
+        title: langTextJSON.homePage.headerTitle
+      }}
     >
       <div className="home page p-2">
         <h1 className="txt-center">{langTextJSON.homePage.pageTitle}</h1>

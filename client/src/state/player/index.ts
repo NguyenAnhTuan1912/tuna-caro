@@ -57,7 +57,8 @@ export const PlayerSlice = createSlice({
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
       state.id = action.payload;
-      BrowserStorageUtils.updateItem(LocalStorageKeys.player, { id: state.id }, { canOverrideValues: false });
+      state.name = `Player[${state.id}]`;
+      BrowserStorageUtils.updateItem(LocalStorageKeys.player, { id: state.id, name: state.name }, { canOverrideValues: false });
     });
   }
 });

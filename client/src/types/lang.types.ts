@@ -4,7 +4,9 @@ export type LangTextJSONType = {
     "authorName": string,
     "noteLabel": string,
     "pauseGameText": string,
-    "dataLoadingText": string
+    "dataLoadingText": string,
+    "toPlayerPronoun": string,
+    "copyContentText": string
   },
 
   "homePage": {

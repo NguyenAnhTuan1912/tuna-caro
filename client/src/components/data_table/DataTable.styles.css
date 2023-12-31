@@ -32,13 +32,13 @@
   content: "";
   width: 100%;
   height: 100%;
-  top: -4px;
-  left: -4px;
+  top: 0px;
+  left: 0px;
   z-index: 1;
 }
 
 .data-table tbody > tr:hover::after {
-  border: 4px solid var(--clr-primary);
+  background-color: rgba(var(--clr-rgb-primary), .4);
 }
 
 /* Set style for first tr */

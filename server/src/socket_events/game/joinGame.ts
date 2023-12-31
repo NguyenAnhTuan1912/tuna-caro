@@ -70,8 +70,6 @@ export const JoinGameSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ JOINGAME SEvent: ", error);
-
         socket.emit(
           MySocket.EventNames.joinGame,
           MySocket.createMessage(

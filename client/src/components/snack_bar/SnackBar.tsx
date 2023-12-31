@@ -120,8 +120,6 @@ export default function SnackBar(props: CustomizedModalItemProps) {
   let titleContainerClassName = "csnackbar-header flex-box ait-center jc-center p-1";
   titleContainerClassName += data.notification ? " " + data.notification.type : "";
 
-  console.log("Title Container ClassName: ", titleContainerClassName);
-
   return (
     <SnackBarLayout
       ref={ref => elementRefs.current.container = ref}

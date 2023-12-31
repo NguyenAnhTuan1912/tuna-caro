@@ -14,17 +14,9 @@ export default function Header(props: HeaderProps) {
     <div className="app-header p-2" id="app-header">
       <div className="flex-box ait-center">
         {
-          history.state !== null && history.state.idx > 0 && (
-            <Button
-              isTransparent
-              hasPadding={false}
-              hasBorder={false}
-              onClick={() => { navigate(-1) }}
-              extendClassName="rounded-4 p-1 me-1"
-            >
-              <span className="material-symbols-outlined">arrow_back_ios_new</span>
-            </Button>
-          )
+          typeof props.backButton === "function"
+            ? props.backButton(navigate)
+            : props.backButton
         }
         {
           (typeof props.title === "string" || !props.title)

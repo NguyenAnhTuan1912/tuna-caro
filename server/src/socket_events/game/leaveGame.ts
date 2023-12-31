@@ -50,6 +50,7 @@ export const LeaveGameSELWrapperInfo = {
               env.WS_MESSAGE_KEYS.LEAVE_GAME,
               {
                 playerId: leavePlayer.id,
+                playerName: player.name,
                 isHostLeaved: leavePlayer.id === game.host.id
               }
             )
@@ -64,8 +65,6 @@ export const LeaveGameSELWrapperInfo = {
             env.WS_MESSAGE_KEYS.LEAVE_GAME
           )
         );
-        console.log("Socket rooms (after leave): ", socket.rooms);
-        console.log("Players: ", game.getPlayers(true));
 
         // Check if there are no players in this room, then remove this game from list.
         if(game.isEmpty()) o.gameList.removeGame(game.id);

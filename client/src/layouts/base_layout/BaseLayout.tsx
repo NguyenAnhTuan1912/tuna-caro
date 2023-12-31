@@ -17,7 +17,7 @@ export default function BaseLayout(props: BaseLayoutProps) {
         (props.shownHeader === true || props.shownHeader === undefined)
         && (
           <Header
-            title={props.headerTitle}
+            {...props.headerOptions}
           />
         )
       }

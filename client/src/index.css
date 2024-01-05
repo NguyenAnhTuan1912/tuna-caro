@@ -48,6 +48,10 @@ a {
   z-index: 999;
 }
 
+.app-header-logo {
+  width: 32px;
+}
+
 /* width */
 ::-webkit-scrollbar {
   cursor: pointer;

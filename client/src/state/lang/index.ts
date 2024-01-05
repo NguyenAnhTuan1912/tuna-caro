@@ -13,7 +13,7 @@ import {
   LocalStorageKeys
 } from "src/utils/browser_storage";
 import {
-  createEmptyLangText,
+  getLangData,
   createLoadedLangStatus
 } from "./utils";
 
@@ -22,33 +22,15 @@ import { getLanguageAsyncThunk } from "./thunks/getLanguageAsyncThunk";
 
 // Import types
 import { RootState } from "..";
-import { LangTextJSONType } from "src/types/lang.types";
+import { LangTextJSONType, LangAboutJSONType } from "src/types/lang.types";
 
 const langeCodes = LANG_CODES;
 export type LangCode = typeof langeCodes[number];
 export type LangTexts = { [Key in LangCode]: LangTextJSONType };
+export type LangAbouts = { [Key in LangCode]: LangAboutJSONType }
 
-/**
- * Use this function to create LangText for each lang code.
- * @param langCodes 
- * @returns 
- */
-function getLangTexts(langCodes: Array<string>): LangTexts {
-  let obj: {[key: string]: any} = {};
-  let langTexts = BrowserStorageUtils.getTempItem<LangTexts>(SessionStorageKeys.lang);
-
-  for(let langCode of langCodes) {
-    if(langTexts && langTexts[langCode]) {
-      obj[langCode as string] = langTexts[langCode];
-    } else {
-      obj[langCode as string] = undefined;
-    }
-  };
-
-  return obj;
-};
-
-const initialLangTexts = getLangTexts(langeCodes);
+const initialLangTexts = getLangData<LangTexts>(langeCodes, SessionStorageKeys.langText);
+const initialLangAbouts = getLangData<LangAbouts>(langeCodes, SessionStorageKeys.langAbout);
 const settings = BrowserStorageUtils.getItem<SettingsType>(LocalStorageKeys.settings);
 
 export const LangSlice = createSlice({
@@ -57,6 +39,7 @@ export const LangSlice = createSlice({
     defaultLang: langeCodes[0],
     currentLang:  (settings && settings.lang) ? settings.lang : langeCodes[0],
     text: initialLangTexts,
+    about: initialLangAbouts,
     loaded: createLoadedLangStatus(langeCodes, initialLangTexts)
   },
   reducers: {
@@ -75,7 +58,12 @@ export const LangSlice = createSlice({
       let { payload } = action;
       
       // Update lang text.
-      state.text[payload.langCode] = payload.data;
+      state.text[payload.langCode] = payload.text;
+      
+      // Update lang about.
+      state.about[payload.langCode] = payload.about;
+      
+      // Update loading status.
       state.loaded[payload.langCode] = true;
 
       // Update lang code.
@@ -83,7 +71,9 @@ export const LangSlice = createSlice({
 
       // Save lang to session storage.
       BrowserStorageUtils
-      .updateTempItem(SessionStorageKeys.lang, { [state.currentLang]: state.text[state.currentLang] }, { canOverrideValues: false })
+      .updateTempItem(SessionStorageKeys.langText, {[state.currentLang]: state.text[state.currentLang]}, { canOverrideValues: false })
+      BrowserStorageUtils
+      .updateTempItem(SessionStorageKeys.langAbout, {[state.currentLang]: state.about[state.currentLang]}, { canOverrideValues: false })
     });
   }
 });

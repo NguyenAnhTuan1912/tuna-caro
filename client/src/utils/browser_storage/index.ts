@@ -13,7 +13,8 @@ export const LocalStorageKeys = {
 };
 
 export const SessionStorageKeys = {
-  "lang": `_${sessionStorageKey}$_lg`
+  "langText": `_${sessionStorageKey}$_lgtxt`,
+  "langAbout": `_${sessionStorageKey}$_lgabt`
 };
 
 type UpdateItemOptionsType = UpdateObjectOptionsType;

@@ -51,8 +51,6 @@ export default function DataTable<T>({
     return d;
   }, [state.currentPage, state.data, maxRows]);
 
-  // console.log("State: ", state);
-
   React.useEffect(() => {
     /*
       This useEffect can be triggered by:

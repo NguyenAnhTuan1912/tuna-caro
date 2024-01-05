@@ -46,7 +46,7 @@ export const GetGamesSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ GetGame SEvent: ", error);
+        return;
       }
     }
   })

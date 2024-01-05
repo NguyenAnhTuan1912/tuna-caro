@@ -9,8 +9,6 @@ function isScrollable<T extends HTMLElement>(element: T) {
   let cssStyles = window.getComputedStyle(element);
   let overflowValue = cssStyles.getPropertyValue("overflow");
   let check = element.scrollHeight > element.clientHeight;
-  console.log("[isScrollable] Scroll height: ", element.scrollHeight);
-  console.log("[isScrollable] Client height: ", element.clientHeight);
   return check && (overflowValue === "scroll" || overflowValue === "auto");
 }
 

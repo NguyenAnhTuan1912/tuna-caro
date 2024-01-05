@@ -23,7 +23,7 @@ import './SettingsPage.styles.css';
 
 export default function SettingsPage(props: SettingsPageProps) {
   const { settings, settingsDispatcher } = useSettings();
-  const { lang, langTextJSON, langDispatcher } = useLang();
+  const { lang, langTextJSON, langAboutJSON, langDispatcher } = useLang();
 
   return (
     <BaseLayout
@@ -107,13 +107,13 @@ export default function SettingsPage(props: SettingsPageProps) {
           <h2>{langTextJSON.settingsPage.otherInformationsLabel}</h2>
           <MyDetails
             label={<p>{langTextJSON.settingsPage.aboutMeLabel}</p>}
-            content={"Xin chào, mình là Nguyen Anh Tuan"}
+            content={langAboutJSON.aboutMe}
           />
 
           {/* About app */}
           <MyDetails
             label={<p>{langTextJSON.settingsPage.aboutApplicationLabel}</p>}
-            content={"Xin chào, mình là Nguyen Anh Tuan"}
+            content={langAboutJSON.aboutApplication}
           />
         </div>
       </div>

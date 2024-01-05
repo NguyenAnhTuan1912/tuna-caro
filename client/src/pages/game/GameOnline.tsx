@@ -69,7 +69,6 @@ export default function GameOnline() {
           // If the disconnect is lost too long, navigate to home.
           timeoutFunc = setTimeout(() => {
             // Navigate to Home Page.
-            console.log("Navigate to Home Page");
             navigate(ROUTES.Home);
           }, data.maxDisconnectionDuration);
         };
@@ -162,7 +161,6 @@ export default function GameOnline() {
         );
 
         const cleanUp = function() {
-          console.log("Leave the game.");
           // Leave the game
           mySocket.emitVolatilely(
             MySocket.EventNames.leaveGame,

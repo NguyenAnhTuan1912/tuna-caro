@@ -9,23 +9,21 @@ Follow [https://learnplaywin.net/caro/](https://learnplaywin.net/caro/):
 
 *Caro (the Vietnamese name) is a a board game based on the popular Japanese strategy board game called Gomoku. It is also known in other versions as Five in a Row or Gobang. The game is played on a 15 x 15 grid or sometimes on a 19 x 19 grid, depending on the version. Caro is somewhat similar to Tic Tac Toe except that the former requires the player to be able to create an unbroken row of five symbols whereas Tic Tac Toe is played on a 3 x 3 grid and only requires the player to create an unbroken row of three symbols to win.*
 
+Caro Game is a web game that I planned for more than a year, it is on 10/2022 at this time. The idea at this time is a basic tic-tac-toe web game with support for online playing, but the idea was interrupted because I had other team projects to do. On 10/10/2023, I actually had free time to continuously build the idea of a tic-tac-toe game, but I had a better idea at this time that I would build a caro game instead of a tic-tac-toe game. The entire game is a system with two applications: client applications and server applications. The client application was built with React and Typescript, and the server application was built with ExpressJS, NodeJS, and Typescript. I use Socket.IO in both of them to implement websockets. After development and idea building by myself, I completed the Caro game.
+
 So I want to make my own caro game with React, Express and SocketIO and learn from it as the same time!
 
-### The codebase
-This project is the first time I use OOP in Javascript App, especially React App.
-So weird, right? But I want to try to combine the React Architecture with OOP, and
-watch the difference.
+### Experience from the latest project
+I have learned some experiences from the latest project (this is a team project) such as hook, hocs, composite component, utils, code structure. So I want to apply something new on this project.
 
-State in React is an non-functional object, that mean it doesn't contains any methods. If
-I want to change the state, I need to change directly on its properties.
-So I want to defined methods for state for easier state updating. The result is my expected,
-it work quite perfectly and there are some pros and cons:
+### What I learned?
+I learned more experience in Front End Development, especially React Development and implement Websocket into React Application with Socket.IO. Furthermore, I successfully tested the structure of codebase of Back End Application as well as use Socket.IO to implement Websocket in server-side.
 
-__Pros__
-- Make the state updating is clearer.
-- Can collect state updatings in one method.
-- Control state updateings better.
+## How to play?
+Caro game look like tic-tac-toe but bigger. If you want to win the game, you must have 5 in a row or in a column or in a diagonal, that's all.
 
-__Cons__
-- That mean the state can be change outside the `setState` function. You know what does it mean!
-- Redux cannot catch the state update. If I want to change a state in redux, components subscribe to this state won't re-render. I catch everything well at this time, so there aren't any problems.
+## Objective
+I build this web game to update my CV (Resume) for application.
+
+## Try out
+You can play game through the link is bound in the project introduction partition of this page or (here)[https://caro-game.vercel.app]

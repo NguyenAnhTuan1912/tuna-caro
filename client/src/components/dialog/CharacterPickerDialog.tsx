@@ -58,8 +58,6 @@ async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Arr
   let N = charactersData.data.length < to ? charactersData.data.length : to;
   let data = [];
 
-  console.log("From, to: ", from, to);
-
   for(let i = from; i < N; i++) {
     data.push(charactersData.data[i]);
   };

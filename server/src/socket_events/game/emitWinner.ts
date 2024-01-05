@@ -40,7 +40,7 @@ export const EmitWinnerSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ EmitWinner SEvent: ", error);
+        return;
       }
     }
   })

@@ -29,7 +29,7 @@ export const StartNewRoundSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ StartNewRound SEvent: ", error);
+        return;
       }
     }
   })

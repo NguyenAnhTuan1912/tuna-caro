@@ -1,125 +1,25 @@
-import { LangTextJSONType } from "src/types/lang.types";
+// Import from utils
+import { BrowserStorageUtils, SessionStorageKeys } from "src/utils/browser_storage";
 
 /**
- * Use this function to create empty lang text.
+ * Use this function to get data from with lang codes and key.
+ * @param langCodes 
+ * @param key 
  * @returns 
  */
-export function createEmptyLangText(): LangTextJSONType {
-  return {
-    "global": {
-      "footTitle": "",
-      "authorName": "",
-      "noteLabel": "",
-      "pauseGameText": "",
-      "dataLoadingText": ""
-    },
+export function getLangData<T>(langCodes: Array<string>, key: string): T {
+  let obj: {[key: string]: any} = {};
+  let langTexts = BrowserStorageUtils.getTempItem<T>(key);
 
-    "homePage": {
-      "headerTitle": "",
-      "pageTitle": "",
-      "twoPlayerBtnLabel": "",
-      "createGameBtnLabel": "",
-      "findGameBtnLabel": "",
-      "exploreGamesBtnLabel": "",
-      "settingsBtnLabel": ""
-    },
-  
-    "settingsPage": {
-      "headerTitle": "",
-      "pageTitle": "",
-      "systemSettingsLabel": "",
-      "soundSettingsLabel": "",
-      "playSoundWhenClickButtonSettingsLabel": "",
-      "playSoundWhenClickTableSettingsLabel": "",
-      "colorThemeSettingsLabel": "",
-      "darkThemeSettingsLabel": "",
-      "languageSettingsLabel": "",
-      "languageVieSelectLabel": "",
-      "languageEngSelectLabel": "",
-      "otherInformationsLabel": "",
-      "aboutMeLabel": "",
-      "aboutApplicationLabel": ""
-    },
-  
-    "gameRoomsPage": {
-      "headerTitle": "",
-      "pageTitle": "",
-      "tableHeaderRoomNameLabel": "",
-      "tableHeaderHostLabel": "",
-      "tableHeaderHasPasswordLabel": "",
-      "tableHeaderStatusLabel": "",
-      "tableRowHasPasswordLabel": [],
-      "tableRowStatusLabel": []
-    },
-  
-    "gamePages": {
-      "pauseGameLayerLabel": "",
-      "lostConnectionLabel": ""
-    },
-
-    "gameCreatingDialog": {
-      "headerTitle": "",
-      "notes": [],
-      "closeBtnLabel": "",
-      "inputPlaceHolders": {
-        "gameName": "",
-        "password": ""
-      }
-    },
-  
-    "gameFindingDialog": {
-      "headerTitle": "",
-      "notes": [],
-      "closeBtnLabel": "",
-      "inputPlaceHolders": {
-        "gameName": "",
-        "password": ""
-      }
-    },
-  
-    "gameJoiningDialog": {
-      "headerTitle": "",
-      "notes": {
-        "hasPassword": [],
-        "nonPassword": []
-      },
-      "closeBtnLabel": "",
-      "inputPlaceHolders": {
-        "password": ""
-      },
-      "content": {
-        "subheading": "",
-        "heading": "",
-        "hostInfoLabel": "",
-        "passwordInfoLabel": "",
-        "passwordInfoValueLabels": []
-      }
-    },
-  
-    "sideMenu": {
-      "guideLabel": "",
-      "generalGuideLabel": "",
-      "generalGuideText": "",
-      "gameGuideLabel": "",
-      "changeNameBtnLabel": "",
-      "agreeChangeNameBtnLabel": "",
-      "cancelChangeNameBtnLabel": "",
-      "keyGuides": []
-    },
-  
-    "socketMessages": {
-      "notExistRoom": "",
-      "fullRoom": "",
-      "wrongPassword": "",
-      "createGameSuccessfully": "",
-      "disconnected": "",
-      "reconnected": "",
-      "leaveGame": "",
-      "reconnectGameSuccessfully": "",
-      "handshake": "",
-      "joinGame": ""
+  for(let langCode of langCodes) {
+    if(langTexts && (langTexts as any)[langCode]) {
+      obj[langCode as string] = (langTexts as any)[langCode];
+    } else {
+      obj[langCode as string] = undefined;
     }
-  }
+  };
+
+  return obj as T;
 };
 
 /**

@@ -266,7 +266,7 @@ export class Game {
   leaveGame(playerId: string) {
     if(!this._players) return;
     let onum = this.getPlayerONumById(playerId);
-    console.log("Remove index: ", onum);
+
     // Delete this player.
     delete this._players[onum];
   }

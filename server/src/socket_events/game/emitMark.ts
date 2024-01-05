@@ -42,7 +42,7 @@ export const EmitMarkSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ EmitMark SEvent: ", error);
+        return;
       }
     }
   })

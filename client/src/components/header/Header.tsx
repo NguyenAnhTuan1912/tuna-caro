@@ -18,13 +18,16 @@ export default function Header(props: HeaderProps) {
             ? props.backButton(navigate)
             : props.backButton
         }
-        {
-          (typeof props.title === "string" || !props.title)
-            ? <h4>{"Caro - " + props.title || "Caro"}</h4>
-            : (typeof props.title === "function")
-              ? props.title()
-              : props.title
-        }
+        <div className="flex-box ait-center">
+          <img className="app-header-logo me-2" src="Logo - Tuna Caro_64 x 64.png" />
+          {
+            (typeof props.title === "string" || !props.title)
+              ? <h4>{"Caro - " + props.title || "Caro"}</h4>
+              : (typeof props.title === "function")
+                ? props.title()
+                : props.title
+          }
+        </div>
       </div>
       <div className="flex-box ait-center">
         <Button

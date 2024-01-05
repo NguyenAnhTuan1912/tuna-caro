@@ -115,3 +115,8 @@ export type LangTextJSONType = {
     "joinGame": string
   }
 };
+
+export type LangAboutJSONType = {
+  "aboutMe": string,
+  "aboutApplication": string
+};

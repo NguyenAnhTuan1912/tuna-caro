@@ -3,12 +3,12 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 // Import APIs
 import { OtherAPIs } from 'src/apis/others';
 
-// Import utils
-import { BrowserStorageUtils, SessionStorageKeys } from 'src/utils/browser_storage';
+// Import from utils
+import { GDRIVE_FOLDERS } from 'src/utils/constant';
 
 // Import types
 import { RootState } from 'src/state';
-import { LangTextJSONType } from 'src/types/lang.types';
+import { LangTextJSONType, LangAboutJSONType } from 'src/types/lang.types';
 
 /**
  * Use this async thunk to get ID for user.
@@ -20,11 +20,16 @@ export const getLanguageAsyncThunk = createAsyncThunk(
     
     // If the requesting lang exist, the return it.
     if(lang.loaded[payload]) {
-      return { langCode: payload, data: lang.text[payload] };
+      return { langCode: payload, text: lang.text[payload], about: lang.about[payload] as LangAboutJSONType };
     };
 
-    let responses = await OtherAPIs.getContentOfFileByNameAsync("text", payload + ".json");
+    let responses = await Promise.all([
+      OtherAPIs.getContentOfFileByNameAsync(GDRIVE_FOLDERS.VITE_GDRIVE_TEXT, payload + ".json"),
+      OtherAPIs.getContentOfFileByNameAsync(GDRIVE_FOLDERS.VITE_GDRIVE_ABOUT, payload + ".json")
+    ]);
 
-    return { langCode: payload, data: responses as LangTextJSONType };
+    let [text, about] = responses;
+
+    return { langCode: payload, text: text as LangTextJSONType, about: about as LangAboutJSONType };
   }
 );

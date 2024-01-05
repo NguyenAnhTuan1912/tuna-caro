@@ -80,16 +80,12 @@ function prepareToRemoveGame(
 
   let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
-
-  console.log("Disconnecting: ", socket.id);
-  console.log("Rooms: ", socket.rooms);
   
   // Create the `remove data` callback.
   let cb = setTimeout(function() {
     let remainPlayer = game?.getPlayerByExceptedId(player?.id!);
     let isHostLeaved = player!.id === game!.host.id;
-    console.log("EXECUTE CLEAR FUNCTION.");
-    console.log("Remain player: ", remainPlayer);
+
     // Clear all the data here.
     // Before the game remove, remain player must be know this.
     // Send a message to remain player.
@@ -164,9 +160,6 @@ function cancelGameRemoving(
 
   let socketId = socket.id;
   let player = game?.getPlayerBySocketId(socketId);
-
-  // console.log("Old Connection: ", socketId);
-  // console.log("Old Connection's Rooms: ", socket.rooms);
   
   // Cancel data removing by remove the `remove data` callback from `_dataRemoveCBs`.
   clearTimeout(globalSocketManagerObject.dataRemoveCBs.get(gameId));
@@ -335,10 +328,6 @@ export class MySocket {
     let that = this;
 
     this._io.on("connection", (socket) => {
-      console.log("New connection: ", socket.id);
-      console.log("New connection's rooms: ", socket.rooms);
-      console.log("Game in list: ", this.__o__.gameList);
-      
       if(socket.recovered) {
         executeWhenSocketIsRecovered(socket, this.__o__);
       };

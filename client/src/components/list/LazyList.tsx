@@ -108,7 +108,6 @@ export default function LazyList<T>(props: LazyListProps<T>) {
         maxHeight={props.maxHeight ? props.maxHeight : "100vh"}
         data={state.list}
         renderItem={(item, index) => {
-          console.log("Render Item: ", index + 1);
           return props.renderItem(item, index);
         }}
         onReachBottom={() => {
@@ -129,7 +128,6 @@ export default function LazyList<T>(props: LazyListProps<T>) {
               props
               .getListDataAsync(state.skip)
               .then(data => {
-                console.log("Get async data done: ", data);
                 setStateFns.appendToList(data);
               });
             }}

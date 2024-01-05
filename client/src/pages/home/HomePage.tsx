@@ -35,7 +35,7 @@ import "./HomePage.styles.css";
 
 export default function HomePage(props: HomePageProps) {
   const { player } = usePlayer();
-  const { langTextJSON } = useLangState();
+  const { langTextJSON, langAboutJSON } = useLangState();
   
   const navigate = useNavigate();
   const { changeData } = useGlobalData();
@@ -76,8 +76,6 @@ export default function HomePage(props: HomePageProps) {
       mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
     }
   }, []);
-
-  console.log("LANG: ", langTextJSON);
 
   return (
     <BaseLayout

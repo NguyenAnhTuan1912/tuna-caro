@@ -11,7 +11,7 @@ import { mySocket } from 'src/apis/socket';
 import { useSettings } from './hooks/useSettings';
 import { usePlayerActions } from './hooks/usePlayer';
 import { useGlobalData } from './hooks/useGlobalData';
-import { useLang, getLangTextJSON } from './hooks/useLang';
+import { useLang } from './hooks/useLang';
 
 // Import utils
 import { BrowserStorageUtils } from './utils/browser_storage';
@@ -99,7 +99,6 @@ function App() {
       langDispatcher.getLanguagesAsync(settings.lang);
 
       return function() {
-        console.log("Disconnect socket");
         window.removeEventListener("offline", handleOfflineOnWindow);
         mySocket.disconnect();
       }

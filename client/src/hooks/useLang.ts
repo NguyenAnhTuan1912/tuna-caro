@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 // Import from state
 import { AppDispatch } from 'src/state';
 import { getLanguageAsyncThunk } from "src/state/lang/thunks/getLanguageAsyncThunk";
-import { LangTexts, langSelector } from "src/state/lang";
+import { LangTexts, LangAbouts, langSelector } from "src/state/lang";
 
 /**
  * Use this function to get LangTextJSON from text.
@@ -11,9 +11,19 @@ import { LangTexts, langSelector } from "src/state/lang";
  * @param langCode 
  * @returns 
  */
-export function getLangTextJSON(text: LangTexts, langCode: string) {
+function getLangTextJSON(text: LangTexts, langCode: string) {
   return text[langCode];
-}
+};
+
+/**
+ * Use this function to get LangAboutJSON from about.
+ * @param about 
+ * @param langCode 
+ * @returns 
+ */
+function getLangAboutJSON(about: LangAbouts, langCode: string) {
+  return about[langCode];
+};
 
 export const {
   useLang,
@@ -46,6 +56,7 @@ export const {
       return {
         lang,
         langTextJSON: getLangTextJSON(lang.text, lang.currentLang),
+        langAboutJSON: getLangAboutJSON(lang.about, lang.currentLang),
         langDispatcher
       }
     },
@@ -70,6 +81,7 @@ export const {
       return {
         lang,
         langTextJSON: getLangTextJSON(lang.text, lang.currentLang),
+        langAboutJSON: getLangAboutJSON(lang.about, lang.currentLang),
       }
     }
   }

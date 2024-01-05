@@ -69,7 +69,7 @@ export const LeaveGameSELWrapperInfo = {
         // Check if there are no players in this room, then remove this game from list.
         if(game.isEmpty()) o.gameList.removeGame(game.id);
       } catch (error: any) {
-        console.log("Error ~ LeaveGame SEvent: ", error);
+        return;
       }
     }
   })

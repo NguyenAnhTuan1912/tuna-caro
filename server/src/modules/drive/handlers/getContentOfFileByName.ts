@@ -25,7 +25,7 @@ const GetContentOfFileByNameHandler = createHandler(
 
         let file = fileList.files[0];
         let contentOfFile = await Services.Google.Drive.getFileByIdAsync(file.id!, "media");
-        console.log("Type of File: ", typeof contentOfFile);
+
         if(typeof contentOfFile === "object" && "$$error" in contentOfFile) {
           statusCode = 400;
           throw new Error(contentOfFile.$$error);

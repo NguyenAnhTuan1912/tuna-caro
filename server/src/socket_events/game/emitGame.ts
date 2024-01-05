@@ -25,8 +25,6 @@ export const EmitGameSELWrapperInfo = {
         const { game, player } = message.data!;
         const newGame = new Game(game);
 
-        console.log("EMITGAME ~ socket rooms: ", socket.rooms);
-
         // Set host
         // Because this is the first player, this player will consider as host.
         newGame.setPlayer(new Player(player));
@@ -48,7 +46,7 @@ export const EmitGameSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ EmitGame SEvent: ", error);
+        return;
       }
     }
   })

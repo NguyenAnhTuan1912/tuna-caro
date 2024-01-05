@@ -48,8 +48,6 @@ export const ReconnectGameSELWrapperInfo = {
           )
         );
       } catch (error: any) {
-        console.log("Error ~ RECONNECTGAME SEvent: ", error);
-
         socket.emit(
           MySocket.EventNames.reconnectGame,
           MySocket.createMessage(

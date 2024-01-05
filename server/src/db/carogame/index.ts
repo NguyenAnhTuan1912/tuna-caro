@@ -29,9 +29,9 @@ export default class CaroGameDB {
   static async connect() {
     try {
       if(CaroGameDB.isConnected) return true;
-      console.log("Connecting to CaroGame DB...");
+      console.log(`Connecting to ${CaroGameDB.Name} DB...`);
       await CaroGameDB.client.connect();
-      console.log("Connect to CaroGame DB successfully!!!");
+      console.log(`Connect to ${CaroGameDB.Name} DB successfully!!!`);
       return true; 
     } catch (error: any) {
       console.error(error.message);

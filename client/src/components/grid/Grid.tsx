@@ -365,6 +365,7 @@ export default function Grid({
             let coorY = NumberUtils.roundTo((clientY + scrolledY!) / gridData.current.currentScaleValue);
             let unitCoorX = Math.floor(coorX / gridData.current.t);
             let unitCoorY = Math.floor(coorY / gridData.current.t);
+            let gbBoudingRect = elementRefs.current.gridBase?.getBoundingClientRect();
 
             props.emitCoordinate(unitCoorX, unitCoorY, gridData.current.t);
           }}

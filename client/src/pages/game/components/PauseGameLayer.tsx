@@ -1,5 +1,5 @@
 // Import from components
-import Button from 'src/components/button/Button';
+import LoadingIndicator from 'src/components/loading_indicator/LoadingIndicator';
 import Layer from 'src/components/layer/Layer';
 
 // Import hooks
@@ -18,21 +18,9 @@ export default function PauseGameLayer(props: PauseGameLayerProps) {
 
   return (
     <Layer>
-      <Button
-        isTransparent
-        hasBorder={false}
-        hasPadding={false}
-        onClick={() => {
-          if(!props.canResume) return;
-        }}
-      >
-        <span className="material-symbols-outlined fs-xl txt-clr-background">play_arrow</span>
-      </Button>
-      <p className="fs-xl txt-clr-background ms-2">
-        {
-          props.text ? props.text : langTextJSON.global.pauseGameText
-        }
-      </p>
+      <LoadingIndicator
+        text={props.text ? props.text : langTextJSON.global.pauseGameText}
+      />
     </Layer>
   )
 }

@@ -73,11 +73,37 @@
 }
 
 /* ScoreBoard */
+.score-board {
+  max-width: 280px;
+  min-width: 100px;
+}
+
+.score-board-part {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.score-board-part.left {
+  align-items: flex-start;
+}
+
+.score-board-part.right {
+  align-items: flex-end;
+}
+
 .score-board-avatar,
 .empty-avatar {
   display: block;
   width: 28px;
   height: 28px;
+}
+
+.score-board-player-name {
+  display: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .empty-avatar {

@@ -183,7 +183,7 @@ export default function GameCore(props: GameCoreProps) {
 
           renderItem={(beh) => (
             <>
-              <div className="game-info p-4">
+              <div className="game-info p-1">
                 {/* <h3 className="flex-box ait-center">LƯỢT
                   {
                     state.game.currentTurn === "X"
@@ -193,7 +193,7 @@ export default function GameCore(props: GameCoreProps) {
                 </h3> */}
                 <ScoreBoard game={state.game} />
               </div>
-              <div className="grid-controller left p-1 m-3 flex-box flex-col">
+              <div className="grid-controller left m-1 flex-box flex-col">
                 <p className="flex-box ait-center">
                   {state.game.id}
                   <span
@@ -208,7 +208,7 @@ export default function GameCore(props: GameCoreProps) {
                   </span>
                 </p>
               </div>
-              <div className="grid-controller right p-1 m-3 flex-box flex-col">
+              <div className="grid-controller right m-1 flex-box flex-col">
                 {
                   canResetBtnShown && (
                     <span

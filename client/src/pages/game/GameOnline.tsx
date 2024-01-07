@@ -178,9 +178,9 @@ export default function GameOnline() {
           mySocket.removeEventListener(MySocket.EventNames.emitMark, emitMarkListener);
           mySocket.removeEventListener(MySocket.EventNames.joinGame, joinGameListener);
           mySocket.removeEventListener(MySocket.EventNames.leaveGame, leaveGameListener);
-          mySocket.removeEventListener(MySocket.EventNames.leaveGame, reconnectGameListener);
+          mySocket.removeEventListener(MySocket.EventNames.reconnectGame, reconnectGameListener);
           mySocket.removeEventListener(MySocket.EventNames.emitWinner, emitWinnerListener);
-          mySocket.removeEventListener(MySocket.EventNames.emitWinner, gameConnectionStatusListener);
+          mySocket.removeEventListener(MySocket.EventNames.gameConnectionStatus, gameConnectionStatusListener);
           mySocket.removeEventListener(MySocket.EventNames.startNewRound, startNewRoundListener);
           mySocket.removeEventListener("connect", connectListener);
 

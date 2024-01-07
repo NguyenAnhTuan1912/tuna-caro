@@ -134,12 +134,12 @@ export default function CharacterPickerDialog(props: CustomizedModalItemProps) {
           <LazyList
             maxHeight="300px"
             loadMoreBtnLabel='Xem thêm'
-            limit={5}
             getListDataAsync={async (skip) => {
               let res = await OtherAPIs.getCharactersAsync({ query: {
                 limit: limit.toString(),
                 skip: skip.toString()
               }});
+
               return res.data;
             }}
             renderItem={(item) => (

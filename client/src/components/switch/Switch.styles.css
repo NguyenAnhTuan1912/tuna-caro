@@ -1,6 +1,8 @@
 .switch-container {
   position: relative;
+  display: inline-block;
   width: 5rem;
+  flex-shrink: 0;
 }
 
 .switch-container::before {

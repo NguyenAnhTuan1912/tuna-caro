@@ -57,18 +57,18 @@ export default function ScoreBoard(props: ScoreBoardProps) {
     <div className={"score-board" + (props.extendClassName ? " " + props.extendClassName : "")}>
       <div className="flex-box">
         {/* First player information */}
-        <div>
+        <div className="score-board-part left">
           <div className="flex-box flex-row ait-center">
             {
               firstPlayer?.img
               ? ( 
-                <img className="score-board-avatar me-2" src={firstPlayer?.img} alt="representation image of first player" />
+                <img className="score-board-avatar me-1" src={firstPlayer?.img} alt="representation image of first player" />
               ) : (
-                <div className="empty-avatar circle me-2"></div>
+                <div className="empty-avatar circle me-1"></div>
               )
             }
-            <p>
-              <span>{fpName}</span>
+            <p className="flex-box flex-row ait-center">
+              <span className="score-board-player-name">{fpName}</span>
               <strong className="mx-1 x-mark">{fpScore}</strong>
             </p>
           </div>
@@ -81,18 +81,18 @@ export default function ScoreBoard(props: ScoreBoardProps) {
         </div>
 
         {/* Second player information */}
-        <div>
+        <div className="score-board-part right">
           <div className="flex-box flex-row ait-center">
-            <p>
+            <p className="flex-box flex-row ait-center">
               <strong className="mx-1 o-mark">{spScore}</strong>
-              <span>{spName}</span>
+              <span className="score-board-player-name">{spName}</span>
             </p>
             {
               secondPlayer?.img
               ? (
-                <img className="score-board-avatar ms-2" src={secondPlayer?.img} alt="representation image of first player" />
+                <img className="score-board-avatar ms-1" src={secondPlayer?.img} alt="representation image of first player" />
               ) : (
-                <div className="empty-avatar circle ms-2"></div>
+                <div className="empty-avatar circle ms-1"></div>
               )
             }
           </div>

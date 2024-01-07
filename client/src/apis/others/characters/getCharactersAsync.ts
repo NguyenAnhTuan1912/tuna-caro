@@ -14,7 +14,7 @@ export function configureGetCharactersAsync(endpoint: string) {
     if(opt && opt.query) {
       queryStr = "?" + new URLSearchParams(opt.query);;
     }
-  
+
     let url = endpoint + queryStr;
 
     const response = await fetch(url);

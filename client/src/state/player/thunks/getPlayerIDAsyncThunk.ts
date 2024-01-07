@@ -17,7 +17,6 @@ export const getPlayerIDAsyncThunk = createAsyncThunk(
   async function() {
     let player = BrowserStorageUtils.getItem<PlayerType>(LocalStorageKeys.player);
     let id = player?.id;
-
     if(!id) {
       id = (await OtherAPIs.getRandomIDAsync()).data.id;
     };

@@ -17,7 +17,7 @@ export class Player {
     _: Partial<PlayerType>
   ) {
     o.id = _.id ? _.id : "";
-    o.name = _.name ? _.name : `Player[${_.id}]`;
+    o.name = _.name ? _.name : _.id ? _.id : "Unknown";
     o.img = _.img ? _.img : "";
     for(let key in _) {
       if((_ as any)[key] && typeof (_ as any)[key] !== "function") (o as any)[key] = (_ as any)[key];

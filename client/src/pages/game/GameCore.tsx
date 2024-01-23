@@ -200,7 +200,7 @@ export default function GameCore(props: GameCoreProps) {
                     onClick={() => {
                       navigator.clipboard.writeText(state.game.id).then(() => {
                         NotifiableSnackBars.success(langTextJSON.global.copyContentText + " Game ID.");
-                      })
+                      });
                     }}
                     className="material-symbols-outlined btn-transparent float-bubble rounded-4 ms-1"
                   >

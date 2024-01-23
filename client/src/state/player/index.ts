@@ -13,7 +13,7 @@ import { BrowserStorageUtils, LocalStorageKeys } from "src/utils/browser_storage
 import { ReduxAction } from "../state.types";
 
 let initialState = BrowserStorageUtils.getItem<PlayerType>(LocalStorageKeys.player);
-initialState = Player.createPlayer(initialState!);
+initialState = initialState ? Player.createPlayer(initialState) : Player.createDefault();
 
 /**
  * State of player. This slice store only the main player, another player will
@@ -57,7 +57,7 @@ export const PlayerSlice = createSlice({
   extraReducers: function(builder) {
     builder.addCase(getPlayerIDAsyncThunk.fulfilled, function(state, action) {
       state.id = action.payload;
-      if(!state.name) state.name = `Player[${state.id}]`;
+      if(!state.name) state.name = state.id;
       BrowserStorageUtils.updateItem(LocalStorageKeys.player, { id: state.id, name: state.name }, { canOverrideValues: false });
     });
   }

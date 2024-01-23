@@ -6,7 +6,7 @@ import { PlayerType } from 'src/classes/Player';
 import { mySocket, MySocket } from 'src/apis/socket';
 
 // Import hooks
-import { useLangState, getLangTextJSON } from 'src/hooks/useLang';
+import { useLangState } from 'src/hooks/useLang';
 
 // Import from components
 import { openGameJoiningDialog } from 'src/components/dialog/GameDialog';

@@ -1,26 +1,19 @@
-import { NavigateFunction } from "react-router-dom";
-import { ChangeDataFnType } from "src/classes/GlobalPrivateData";
-
 // Import from classes
 import { GameType } from "src/classes/Game";
 
-// Import from apis
+// Import from apis/socket
 import { Message } from "src/apis/socket";
 
-// Import from utils
+// Import from utils.
 import { ROUTES, WS_MESSAGE_KEYS } from "src/utils/constant";
 
 // Import from components
 import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
 
 // Import types
-import { LangTextJSONType } from "src/types/lang.types";
+import { ListenerArgsType } from "src/types/socket.types";
 
-type JoinGameListenerArgsType = {
-  changeData?: ChangeDataFnType;
-  navigate?: NavigateFunction;
-  langText: LangTextJSONType;
-};
+type JoinGameListenerArgsType = ListenerArgsType;
 
 /**
  * Get `join_game` listener.
@@ -54,4 +47,4 @@ export function getJoinGameListener(args: JoinGameListenerArgsType) {
 
     NotifiableSnackBars.warning(message);
   }
-}
+};

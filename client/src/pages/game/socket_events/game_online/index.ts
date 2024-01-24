@@ -1,5 +1,3 @@
-import { NavigateFunction } from "react-router-dom";
-
 // Import from classes
 import { Game } from "src/classes/Game";
 import { PlayerType } from "src/classes/Player";
@@ -13,9 +11,6 @@ import { ROUTES } from "src/utils/constant";
 // Import from components
 import { NotifiableSnackBars } from "src/components/snack_bar/SnackBar";
 
-// Import types.
-import { LangTextJSONType } from "src/types/lang.types";
-
 // Import from props.
 import {
   EmitMarkMessageDataType,
@@ -25,28 +20,20 @@ import {
 
 // Import from types
 import { GameConnectionStatusMessageDataType } from "../../types";
+import { ListenerArgsType } from "src/types/socket.types";
 
-type ListenerArgsType = {
-  useEffectArgs: UseEffectCBArgsType
-}
-type EmitMarkListenerArgsType = ListenerArgsType;
-type EmitWinnerListener = ListenerArgsType;
-type JoinGameListenerArgsType = ListenerArgsType & {
-  langText: LangTextJSONType;
+type _ListenerArgsType_ = ListenerArgsType & {
+  useEffectArgs: UseEffectCBArgsType;
 };
-type LeaveGameListenerArgsType = ListenerArgsType & {
-  navigate: NavigateFunction;
-  langText: LangTextJSONType;
-};
-type ReconnectGameListenerArgsType = ListenerArgsType & {
-  navigate: NavigateFunction;
+type EmitMarkListenerArgsType = _ListenerArgsType_;
+type EmitWinnerListener = _ListenerArgsType_;
+type JoinGameListenerArgsType = _ListenerArgsType_;
+type LeaveGameListenerArgsType = _ListenerArgsType_;
+type ReconnectGameListenerArgsType = _ListenerArgsType_ & {
   player: PlayerType;
-  langText: LangTextJSONType;
 };
-type GameConnectionStatusArgsType = {
-  langText: LangTextJSONType;
-};
-type StartNewRoundListenerArgsType = ListenerArgsType;
+type GameConnectionStatusArgsType = _ListenerArgsType_;
+type StartNewRoundListenerArgsType = _ListenerArgsType_;
 
 function getEmitMarkListener(args: EmitMarkListenerArgsType) {
   return function emitMarkListener(m: Message<EmitMarkMessageDataType>) {

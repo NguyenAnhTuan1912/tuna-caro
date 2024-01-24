@@ -357,12 +357,13 @@ export default function Grid({
           onClick={(e) => {
             if(gridData.current.isSpaceDown) return;
             // let headerHeight = document.getElementById("app-header")?.offsetHeight!;
+            let gridBaseBCRect = elementRefs.current.gridBase?.getBoundingClientRect()!;
             let clientX = e.clientX;
             let clientY = e.clientY;
             let scrolledX = elementRefs.current.gridBase?.scrollLeft;
             let scrolledY = elementRefs.current.gridBase?.scrollTop;
-            let coorX = NumberUtils.roundTo((clientX + scrolledX!) / gridData.current.currentScaleValue);
-            let coorY = NumberUtils.roundTo((clientY + scrolledY!) / gridData.current.currentScaleValue);
+            let coorX = NumberUtils.roundTo((clientX + scrolledX! - gridBaseBCRect.x) / gridData.current.currentScaleValue);
+            let coorY = NumberUtils.roundTo((clientY + scrolledY! - gridBaseBCRect.y) / gridData.current.currentScaleValue);
             let unitCoorX = Math.floor(coorX / gridData.current.t);
             let unitCoorY = Math.floor(coorY / gridData.current.t);
 

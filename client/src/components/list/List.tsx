@@ -21,13 +21,13 @@ const List = React.forwardRef(function(props, ref) {
     content: null
   });
 
-  const handleScrollOnList = React.useCallback(function(e: React.UIEvent) {
+  const handleScrollOnList = function(e: React.UIEvent) {
     let target = e.target as HTMLElement;
-    let threshold = elementRefs.current.content?.offsetHeight! - (elementRefs.current.list?.offsetHeight! + 0);
-    
+    let threshold = elementRefs.current.content?.offsetHeight! - (elementRefs.current.list?.offsetHeight! + 10);
+
     // If element reaches the threshold, the trigger the if statement.
     if(target.scrollTop >= threshold && props.onReachBottom) props.onReachBottom(target.scrollTop);
-  }, []);
+  };
 
   // Sync the outer ref `ref` with inner ref `elementRefs.current.list`.
   // React.useImperativeHandle(ref, () => elementRefs.current.list!, []);

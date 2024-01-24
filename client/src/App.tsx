@@ -13,9 +13,6 @@ import { usePlayerActions } from './hooks/usePlayer';
 import { useGlobalData } from './hooks/useGlobalData';
 import { useLang } from './hooks/useLang';
 
-// Import utils
-import { BrowserStorageUtils } from './utils/browser_storage';
-
 // Import from layout and pages
 import HomePage from './pages/home/HomePage';
 import SettingsPage from './pages/settings/SettingsPage';
@@ -48,6 +45,7 @@ function App() {
   React.useEffect(() => {
     const init = function() {
 
+      // Define some handlers for window event.
       let handleOfflineOnWindow = function() {
         openConnectionStatusSnackBar({ isConnected: false });
       };
@@ -92,6 +90,7 @@ function App() {
       // Theme.
       settingsDispatcher.performTasksRequireSettings();
 
+      // Some window event
       // Listen to `offline` event from `window`.
       window.addEventListener("offline", handleOfflineOnWindow);
 

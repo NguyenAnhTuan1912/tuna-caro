@@ -18,7 +18,6 @@ export type ListProps<T> = {
 };
 
 export type LazyListProps<T> = {
-  limit: number;
   loadMoreBtnLabel: string;
   maxHeight: string | number;
   getListDataAsync: (skip: number) => Promise<Array<T>>;

@@ -75,6 +75,15 @@ export default function LazyList<T>(props: LazyListProps<T>) {
   );
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  let getDataAsync = function() {
+    props
+    .getListDataAsync(state.skip)
+    .then(data => {
+      // Append `data` to list.
+      setStateFns.appendToList(data);
+    });
+  };
+
   React.useEffect(() => {
     // Call API to get data for the first time.
     props
@@ -101,6 +110,8 @@ export default function LazyList<T>(props: LazyListProps<T>) {
       setStateFns.updateLoadMoreButtonVisibility(false);
   }, [state.list.length]);
 
+  console.log("LazyList's State: ", state);
+
   return (
     <>
       <List
@@ -110,27 +121,14 @@ export default function LazyList<T>(props: LazyListProps<T>) {
         renderItem={(item, index) => {
           return props.renderItem(item, index);
         }}
-        onReachBottom={() => {
-          props
-          .getListDataAsync(state.skip)
-          .then(data => {
-            // Append `data` to list.
-            setStateFns.appendToList(data);
-          })
-        }}
+        onReachBottom={getDataAsync}
       />
       {
         state.isLoadMoreButtonVisible && (
           <Button
             hasBorder={false}
             extendClassName="txt-clr-primary mx-auto"
-            onClick={() => {
-              props
-              .getListDataAsync(state.skip)
-              .then(data => {
-                setStateFns.appendToList(data);
-              });
-            }}
+            onClick={getDataAsync}
           >
             { props.loadMoreBtnLabel }
           </Button>

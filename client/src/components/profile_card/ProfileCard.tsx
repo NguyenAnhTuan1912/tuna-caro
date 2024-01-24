@@ -15,7 +15,7 @@ import { openCPDialog } from '../dialog/CharacterPickerDialog';
 import { ProfileCardStateConfigs } from './state/profile_card';
 
 // Import styles
-import './ProfileCard.stlyes.css';
+import './ProfileCard.styles.css';
 
 // Import types
 import { ProfileCardProps, StaticProfileCardProps } from './ProfileCard.props';
@@ -68,9 +68,13 @@ export default function ProfileCard(props: ProfileCardProps) {
    * Use this function to change name for player.
    * It change the state in redux (Global state).
    */
-  const changeName = function() {
-    let newName = elementRefs.current.playerName!.value;
+  const handleSubmitOnProfileForm = function(e: React.FormEvent<HTMLFormElement>) {
+    // Prevent default
+    e.preventDefault();
+
+    let newName = (e.target as any)["player-name"].value;
     playerDispatcher.setPlayerName(newName);
+    profileStateFns.toggleChangeName(false);
   }
 
   // Handle when click to change name button
@@ -105,28 +109,29 @@ export default function ProfileCard(props: ProfileCardProps) {
         {
           profileState.canChangeName
             ? (
-              <MyInput
-                ref={ref => elementRefs.current.playerName = ref}
-                className="fw-bold p-1 txt-center fs-2"
-                defaultValue={player.name}
-              />
+              <form
+                className="profile-form"
+                onSubmit={handleSubmitOnProfileForm}
+              >
+                <MyInput
+                  ref={ref => elementRefs.current.playerName = ref}
+                  required
+                  className="fw-bold p-1 txt-center fs-2"
+                  maxLength={20}
+                  minLength={5}
+                  defaultValue={player.name}
+                  name="player-name"
+                />
+                <Button
+                  extendClassName="btn-transparent no-outline py-1 rounded-4 w-100"
+                >
+                  <span className="txt-clr-primary fs-4">{langTextJSON.sideMenu.agreeChangeNameBtnLabel}</span>
+                </Button>
+              </form>
             )
             : (
               <h2 className="player-name txt-center p-1">{player.name}</h2>
             )
-        }
-        {
-          profileState.canChangeName && (
-            <Button
-              onClick={() => {
-                changeName()
-                profileStateFns.toggleChangeName(false)
-              }}
-              className="btn-transparent no-outline py-1 rounded-4"
-            >
-              <span className="txt-clr-primary fs-4">{langTextJSON.sideMenu.agreeChangeNameBtnLabel}</span>
-            </Button>
-          )
         }
         {
           props.canEdit && (

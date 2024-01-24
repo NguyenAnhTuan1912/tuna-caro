@@ -13,6 +13,7 @@
   height: 15%;
   margin: 2.5%;
   min-width: 92px;
+  flex-grow: 1;
 }
 
 .character-img.choice {

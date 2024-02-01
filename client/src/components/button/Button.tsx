@@ -7,10 +7,6 @@ import { SFXPathsType } from 'src/classes/SoundEffects';
 // Import from hooks
 import { useSFX } from 'src/hooks/useSFX';
 
-// Import from utils
-import { OtherUtils } from 'src/utils/other';
-import { StringUtils } from 'src/utils/string';
-
 interface ButtonPropsType extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   to?: string;
   soundName?: SFXPathsType;

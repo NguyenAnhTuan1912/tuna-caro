@@ -1,4 +1,4 @@
-import { GameType, Coordinate, MarkType, PlayersKeyType, ResultType } from "src/classes/Game";
+import { GameType, Coordinate, MarkType, ResultType } from "src/classes/Game";
 import { PlayerType } from "src/classes/Player";
 
 import { GameCoreStateFnsType } from "./state/game_core";

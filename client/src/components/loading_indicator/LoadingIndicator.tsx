@@ -9,7 +9,6 @@ import "./LoadingIndicator.styles.css"
  * @returns 
  */
 export default function LoadingIndicator(props: LoadingIndicatorProps) {
-  let color = props.color ? props.color : "#262626";
   let strokeWidth = props.strokeWidth ? props.strokeWidth : 15;
   let isTextPlaceBeforeIndicator = props.isTextPlaceBeforeIndicator ? props.isTextPlaceBeforeIndicator : false;
   let containerSize = 100;

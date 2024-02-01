@@ -2,9 +2,9 @@
 import { useLangState } from 'src/hooks/useLang';
 
 // Import types
-import { FooterProps } from './Footer.props';
+// import { FooterProps } from './Footer.props';
 
-export default function Footer(props: FooterProps) {
+export default function Footer() {
   const { langTextJSON } = useLangState();
 
   return (

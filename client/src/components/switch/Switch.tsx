@@ -14,9 +14,6 @@ import { SwitchProps } from './Switch.props';
 export default function Switch(props: SwitchProps) {
   const [status, setStatus] = React.useState(Boolean(props.initialStatus));
   const switchRef = React.useRef<HTMLDivElement>(null);
-  const switchData = React.useRef({
-    prevStatus: !Boolean(props.initialStatus)
-  });
   
   const animationData = React.useMemo(() => {
     return {

@@ -16,12 +16,12 @@ import MyDetails from 'src/components/my_details/MyDetails';
 import Button from 'src/components/button/Button';
 
 // Import types
-import { SettingsPageProps } from './SettingsPage.props';
+// import { SettingsPageProps } from './SettingsPage.props';
 
 // Import styles
 import './SettingsPage.styles.css';
 
-export default function SettingsPage(props: SettingsPageProps) {
+export default function SettingsPage() {
   const { settings, settingsDispatcher } = useSettings();
   const { lang, langTextJSON, langAboutJSON, langDispatcher } = useLang();
 
@@ -72,7 +72,7 @@ export default function SettingsPage(props: SettingsPageProps) {
                 <p>{langTextJSON.settingsPage.darkThemeSettingsLabel}</p>
                 <Switch
                   initialStatus={settings.isDarkMode}
-                  onChange={status => {
+                  onChange={() => {
                     settingsDispatcher.toggleDarkMode()
                   }}
                 />

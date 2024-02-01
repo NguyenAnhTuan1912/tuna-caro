@@ -115,14 +115,14 @@ function __updateItem<T>(
   return storedData;
 }
 
-/**
- * Give `index` to this function and receive the `index`-th item's name.
- * @param index 
- * @returns 
- */
-function __keyName(storage: Storage, index: number) {
-  return storage.key(index);
-}
+// /**
+//  * Give `index` to this function and receive the `index`-th item's name.
+//  * @param index 
+//  * @returns 
+//  */
+// function __keyName(storage: Storage, index: number) {
+//   return storage.key(index);
+// }
 
 /**
  * Use this function to clear all items in storage.

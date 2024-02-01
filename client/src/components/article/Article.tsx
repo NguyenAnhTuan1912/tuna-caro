@@ -1,5 +1,3 @@
-import React from 'react'
-
 // Import types
 import { AriticleProps } from './Article.props'
 

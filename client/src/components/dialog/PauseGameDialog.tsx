@@ -1,4 +1,3 @@
-import React from 'react'
 import { CustomizedModalItemProps, openTMI } from 'tunangn-react-modal';
 
 // Import components

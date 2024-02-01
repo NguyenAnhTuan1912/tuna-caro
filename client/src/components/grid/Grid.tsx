@@ -23,23 +23,6 @@ interface GridElementsType {
   gridWrapper: HTMLDivElement | null
 }
 
-interface ZoomOptions {
-  behavior: "in" | "out";
-  step?: number;
-}
-
-/**
- * Use to get necessary information of grid elements
- * @param elements 
- * @returns 
- */
-function getGridElementsAttr(elements: GridElementsType) {
-  const squareSize = parseInt(elements.square!.getAttribute("width")!);
-  const bigSquareSize = parseInt(elements.bigSquare!.getAttribute("width")!);
-
-  return { squareSize, bigSquareSize }
-}
-
 /**
  * Use to get coordinate to draw a simple path.
  * @param a 
@@ -47,40 +30,6 @@ function getGridElementsAttr(elements: GridElementsType) {
  */
 function getCoordinateForSimplePath(a: number) {
   return `M ${a} 0 L 0 0 0 ${a}`;
-}
-
-/**
- * __Old Solution__
- * 
- * Use to zoom a grid. This function only need `squareSize` because it's a root variable that can
- * change other parameters like bigSquareSize, path coordinate of square and big square.
- * @param elements 
- * @param squareSize 
- * @param s
- * @param options
- */
-function zoom(elements: GridElementsType, squareSize: number, s: number, options?: ZoomOptions) {
-  options = Object.assign({
-    step: 10
-  }, options);
-
-  let newSquareSize = options.behavior === "in"
-    ? squareSize + options.step!
-    : squareSize - options.step!;
-  let newBigSquareSize = newSquareSize * s;
-
-  elements.square?.setAttribute("width", `${newSquareSize}`);
-  elements.square?.setAttribute("height", `${newSquareSize}`);
-
-  elements.bigSquare?.setAttribute("width", `${newBigSquareSize}`);
-  elements.bigSquare?.setAttribute("height", `${newBigSquareSize}`);
-
-  elements.squarePath?.setAttribute("d", getCoordinateForSimplePath(newSquareSize));
-
-  elements.bigSquarePath?.setAttribute("d", getCoordinateForSimplePath(newBigSquareSize));
-
-  elements.bigSquareRect?.setAttribute("width", `${newBigSquareSize}`);
-  elements.bigSquareRect?.setAttribute("height", `${newBigSquareSize}`);
 }
 
 /**
@@ -241,7 +190,7 @@ export default function Grid({
        * This function will process the `mouse down` event. When the LMB is down, operate something.
        * @param e 
        */
-      handleMouseDownOnGridBase: function(e: MouseEvent) {
+      handleMouseDownOnGridBase: function() {
         gridData.current.isMouseDown = true;
       },
 
@@ -249,7 +198,7 @@ export default function Grid({
        * This function will process the `mouse up` event. When the LMB is up, operate something.
        * @param e 
        */
-      handleMouseUpOnGridBase: function(e: MouseEvent) {
+      handleMouseUpOnGridBase: function() {
         // Set the root X and Y to 0 respectively when LMB is up.
         gridData.current.rootX = 0;
         gridData.current.rootY = 0;

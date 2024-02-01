@@ -28,14 +28,14 @@ import Button from 'src/components/button/Button';
 import { HomePageSocketEvents } from './socket_events/home_page';
 
 // Import types
-import { HomePageProps } from './HomePage.props';
+// import { HomePageProps } from './HomePage.props';
 
 // Import styles
 import "./HomePage.styles.css";
 
-export default function HomePage(props: HomePageProps) {
+export default function HomePage() {
   const { player } = usePlayer();
-  const { langTextJSON, langAboutJSON } = useLangState();
+  const { langTextJSON } = useLangState();
   
   const navigate = useNavigate();
   const { changeData } = useGlobalData();

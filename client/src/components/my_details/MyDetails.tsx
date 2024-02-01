@@ -10,7 +10,7 @@ import { MyDetailsProps } from './MyDetails.props';
 import './MyDetails.styles.css';
 
 export default function MyDetails(props: MyDetailsProps) {
-  const [detailsState, setDetailsState] = React.useState({
+  const [detailsState] = React.useState({
     isExpand: false
   });
   const elementRefs = React.useRef<{

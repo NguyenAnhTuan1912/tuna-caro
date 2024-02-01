@@ -16,12 +16,12 @@ import Button from '../button/Button';
 import LazyList from '../list/LazyList';
 
 // Import from utils
-import { OtherUtils } from 'src/utils/other';
+// import { OtherUtils } from 'src/utils/other';
 
 // Import from types
 import { CharacterType } from 'src/types/character.types';
 
-import charactersData from "src/assets/data/characters.json";
+// import charactersData from "src/assets/data/characters.json";
 
 // Locally Import
 // Import functions
@@ -45,25 +45,25 @@ type CharacterPickerType = {
   setChoice: (character: CharacterType) => void;
 };
 
-/**
- * __For test__
- * 
- * Use this function to get characters asynchronously.
- * @param from 
- * @param to 
- * @returns 
- */
-async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
-  await OtherUtils.wait(1000);
-  let N = charactersData.data.length < to ? charactersData.data.length : to;
-  let data = [];
+// /**
+//  * __For test__
+//  * 
+//  * Use this function to get characters asynchronously.
+//  * @param from 
+//  * @param to 
+//  * @returns 
+//  */
+// async function getCharactersAsync(from: number = 0, to: number = 5): Promise<Array<CharacterType>> {
+//   await OtherUtils.wait(1000);
+//   let N = charactersData.data.length < to ? charactersData.data.length : to;
+//   let data = [];
 
-  for(let i = from; i < N; i++) {
-    data.push(charactersData.data[i]);
-  };
+//   for(let i = from; i < N; i++) {
+//     data.push(charactersData.data[i]);
+//   };
 
-  return data;
-}
+//   return data;
+// }
 
 /**
  * Component renders a button that player can click/press to choose character.

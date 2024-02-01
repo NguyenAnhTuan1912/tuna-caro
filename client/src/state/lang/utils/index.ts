@@ -1,5 +1,5 @@
 // Import from utils
-import { BrowserStorageUtils, SessionStorageKeys } from "src/utils/browser_storage";
+import { BrowserStorageUtils } from "src/utils/browser_storage";
 
 /**
  * Use this function to get data from with lang codes and key.

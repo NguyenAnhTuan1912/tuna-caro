@@ -77,7 +77,7 @@ export default function SideMenu(props: CustomizedModalItemProps) {
           <div className="mb-4">
             <h3>{langTextJSON.sideMenu.gameGuideLabel}</h3>
             {
-              langTextJSON.sideMenu.keyGuides.map((keyGuide, index) => {
+              langTextJSON.sideMenu.keyGuides.map((keyGuide) => {
                 let keyContent = keyGuide.googleIconKey
                   ? <span className="material-symbols-outlined">{keyGuide.googleIconKey}</span>
                   : keyGuide.textKey!

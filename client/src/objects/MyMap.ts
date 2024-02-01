@@ -1,9 +1,3 @@
-type ValueType<Name, T> = {
-  "value": T;
-  "key": string;
-  "both": [string, T]
-};
-
 /**
  * This my is same as Map of Javascript, but has more convenient methods
  */

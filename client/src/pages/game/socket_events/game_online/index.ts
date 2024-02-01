@@ -22,7 +22,7 @@ import {
 import { GameConnectionStatusMessageDataType } from "../../types";
 import { ListenerArgsType } from "src/types/socket.types";
 
-type _ListenerArgsType_ = ListenerArgsType & {
+type _ListenerArgsType_ = Partial<ListenerArgsType> & {
   useEffectArgs: UseEffectCBArgsType;
 };
 type EmitMarkListenerArgsType = _ListenerArgsType_;
@@ -32,7 +32,7 @@ type LeaveGameListenerArgsType = _ListenerArgsType_;
 type ReconnectGameListenerArgsType = _ListenerArgsType_ & {
   player: PlayerType;
 };
-type GameConnectionStatusArgsType = _ListenerArgsType_;
+type GameConnectionStatusArgsType = Partial<ListenerArgsType>;
 type StartNewRoundListenerArgsType = _ListenerArgsType_;
 
 function getEmitMarkListener(args: EmitMarkListenerArgsType) {
@@ -55,7 +55,7 @@ function getEmitWinnerListener(args: EmitWinnerListener) {
 function getJoinGameListener(args: JoinGameListenerArgsType) {
   return function joinGameListener(m: Message<PlayerType>) {
     let player = m.data!;
-    let message = player.name + " " + args.langText.socketMessages.joinGame;
+    let message = player.name + " " + args.langText!.socketMessages.joinGame;
 
     // Announce to player.
     NotifiableSnackBars.info(message);
@@ -69,12 +69,12 @@ function getJoinGameListener(args: JoinGameListenerArgsType) {
 function getLeaveGameListener(args: LeaveGameListenerArgsType) {
   return function leaveGameListener(m: Message<{ playerId: string, playerName: string, isHostLeaved: boolean }>) {
     // Announce to player.
-    let message = m.data?.playerName + " " + args.langText.socketMessages.leaveGame;
+    let message = m.data?.playerName + " " + args.langText!.socketMessages.leaveGame;
     
     // If player leaves game is host. So the game will be removed from list in server.
     if(m.data?.isHostLeaved) {
       NotifiableSnackBars.info(message);
-      args.navigate(ROUTES.Home);
+      args.navigate!(ROUTES.Home);
       return;
     };
     
@@ -90,12 +90,12 @@ function getGameConnectionStatusListener(args: GameConnectionStatusArgsType) {
     let message = "";
     if(data.isConnected) {
       // Show a snackbar.
-      message = data.player.name + " has " + args.langText.socketMessages.reconnected;
+      message = data.player.name + " has " + args.langText!.socketMessages.reconnected;
       NotifiableSnackBars.success(message);
     }
     else {
       // Show a snackbar.
-      message = data.player.name + " has " + args.langText.socketMessages.disconnected;
+      message = data.player.name + " has " + args.langText!.socketMessages.disconnected;
       NotifiableSnackBars.warning(message);
     }
   }
@@ -104,11 +104,11 @@ function getGameConnectionStatusListener(args: GameConnectionStatusArgsType) {
 function getReconnectGameListener(args: ReconnectGameListenerArgsType) {
   return function reconnectGameListener(m: Message<any>) {
     if(m.isError && m.text === "not_exist") {
-      args.navigate(ROUTES.Home);
+      args.navigate!(ROUTES.Home);
       return;
     };
 
-    NotifiableSnackBars.success(args.langText.socketMessages.reconnectGameSuccessfully);
+    NotifiableSnackBars.success(args.langText!.socketMessages.reconnectGameSuccessfully);
 
     // Update player.
     args.useEffectArgs.updatePlayer(args.player);

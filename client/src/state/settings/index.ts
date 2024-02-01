@@ -37,7 +37,7 @@ export const SettingsSlice = createSlice({
      * @param state 
      * @param action 
      */
-    toggleDarkModeAction: function(state, action: ReduxAction<undefined>) {
+    toggleDarkModeAction: function(state) {
       Settings.toggleTheme(state.self);
     },
 
@@ -48,7 +48,7 @@ export const SettingsSlice = createSlice({
      * @param state 
      * @param action 
      */
-    performTasksRequireSettingsAction: function(state, action: ReduxAction<undefined>) {
+    performTasksRequireSettingsAction: function(state) {
       /*
         There are 2 tasks:
         - Theme

@@ -37,7 +37,7 @@ import { GameRoomsSocketEventListeners } from './socket_events/game_rooms';
 import GameRow from './GameRow';
 
 // Import types
-import { GameRoomPageProps } from './GameRoomPage.props';
+// import { GameRoomPageProps } from './GameRoomPage.props';
 
 // Import styles
 import './GameRoom.styles.css';
@@ -47,7 +47,7 @@ import './GameRoom.styles.css';
  * @param props 
  * @returns 
  */
-export default function GameRoomPage(props: GameRoomPageProps) {
+export default function GameRoomPage() {
   const { player } = usePlayer();
   const { langTextJSON } = useLangState();
 

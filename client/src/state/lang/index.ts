@@ -50,7 +50,7 @@ export const LangSlice = createSlice({
       state.currentLang = action.meta.arg;
     });
 
-    build.addCase(getLanguageAsyncThunk.rejected, function(state, action) {
+    build.addCase(getLanguageAsyncThunk.rejected, function(state) {
       state.currentLang = state.defaultLang;
     });
 

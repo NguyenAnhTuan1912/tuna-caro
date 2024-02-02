@@ -1,15 +1,6 @@
 import bcrypt from "bcrypt";
-import fs from "fs";
-import path from "path";
 
-import { Time } from "utils/time";
 import { NumberUtils } from "utils/number";
-
-import { EncodeOptions } from "types";
-
-const privateKeys = {
-  jwt: fs.readFileSync(path.resolve("src/utils/security/jwt_private.key")).toString()
-}
 
 /**
  * Use this method to create random ID.

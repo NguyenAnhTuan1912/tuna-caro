@@ -33,4 +33,4 @@ Caro game look like tic-tac-toe but bigger. If you want to win the game, you mus
 I build this web game to update my CV (Resume) for application. Learning something new about socket, backend development, React, project management.
 
 ## Try out
-You can play game through the link is bound in the project introduction partition of this page or [here](https://caro-game.vercel.app).
+You can play game through the link is bound in the project introduction partition of this page or [here](https://tuna-caro.pages.dev).
